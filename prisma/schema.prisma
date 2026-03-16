@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Store {
+  id                 String    @id @default(cuid())
+  vendorId           String    @unique // Clerk User ID
+  name               String
+  slug               String    @unique
+  description        String?
+  logoUrl            String?
+  primaryColor       String    @default("#4f46e6")
+  announcement       String?
+  islandDeliveryFee  Decimal   @default(2500)
+  mainlandDeliveryFee Decimal   @default(1500)
+  products           Product[]
+  orders             Order[]
+  visits             Int       @default(0)
+  conversionClicks   Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  store       Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  price       Decimal
+  imageUrl    String?
+  inStock     Boolean  @default(true)
+  variants    Variant[]
+  orderItems  OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  storeId           String
+  store             Store       @relation(fields: [storeId], references: [id])
+  customerName      String
+  customerEmail     String
+  customerPhone     String
+  address           String
+  deliveryArea      String      // MAINLAND or ISLAND
+  deliveryFee       Decimal
+  subtotal          Decimal
+  total             Decimal
+  status            String      @default("PENDING") // PENDING, PAID, DELIVERED
+  paystackReference String?     @unique
+  items             OrderItem[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model OrderItem {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id])
+  variantId       String?
+  variant         Variant? @relation(fields: [variantId], references: [id])
+  quantity        Int
+  priceAtPurchase Decimal
+  createdAt       DateTime @default(now())
+}
+
+model Variant {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name        String
+  sku         String?
+  price       Decimal?
+  stockCount  Int      @default(0)
+  orderItems  OrderItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
