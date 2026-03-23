@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateStore } from "@/lib/actions/store";
-import { ImagePlus, X, Palette, Megaphone, Loader2 } from "lucide-react";
+import { updateStore, updateStorePayoutDetails } from "@/lib/actions/store";
+import { ImagePlus, X, Palette, Megaphone, Loader2, Landmark, CreditCard, User } from "lucide-react";
 import { Store } from "@/types";
 import { motion, Variants } from "framer-motion";
 import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary";
@@ -11,9 +11,10 @@ import Image from "next/image";
 
 interface SettingsFormProps {
     initialData: Store;
+    banks: any[]; // Using any for bank objects to avoid missing type issues
 }
 
-export default function SettingsForm({ initialData }: SettingsFormProps) {
+export default function SettingsForm({ initialData, banks }: SettingsFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -29,13 +30,29 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
         formData.append("primaryColor", primaryColor);
 
         try {
+            // Update general settings
             const result = await updateStore(initialData.id, formData);
 
             if (result.error) {
                 setError(result.error);
-            } else {
-                router.refresh();
+                setLoading(false);
+                return;
             }
+
+            // If payout details are provided and subaccount doesn't exist yet, or to update
+            const bankCode = formData.get("bankCode") as string;
+            const accountNumber = formData.get("accountNumber") as string;
+            
+            if (bankCode && accountNumber && !initialData.subaccountCode) {
+                const payoutResult = await updateStorePayoutDetails(formData);
+                if (payoutResult.error) {
+                    setError(`Settings saved, but payout setup failed: ${payoutResult.error}`);
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            router.refresh();
         } catch (err) {
             console.error(err);
             setError("Something went wrong. Please try again.");
@@ -92,6 +109,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                         <div className="space-y-4">
                             <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Store Logo</label>
                             <div className="flex items-center gap-6">
+                                <input type="hidden" name="logoUrl" value={logoUrl} />
                                 {logoUrl ? (
                                     <div className="group relative h-32 w-32 overflow-hidden rounded-[24px] border-4 border-white bg-gray-50 shadow-immersive transition-all hover:scale-[1.02]">
                                         <Image src={logoUrl} alt="Logo" fill className="object-cover" />
@@ -212,6 +230,7 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                     />
                 </motion.div>
 
+                {/* Delivery Logistics Section */}
                 <motion.div variants={item} className="pt-4">
                     <div className="rounded-[32px] bg-indigo-50/30 border border-indigo-100 p-8 space-y-6">
                         <div>
@@ -241,6 +260,91 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
                                 />
                             </div>
                         </div>
+                    </div>
+                </motion.div>
+
+                {/* Payout Details Section */}
+                <motion.div variants={item} className="pt-4">
+                    <div className="rounded-[32px] bg-emerald-50/30 border border-emerald-100 p-8 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h3 className="text-lg font-black text-gray-900 tracking-tight">Payout Details</h3>
+                                <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider mt-1">Where you want your money settled.</p>
+                            </div>
+                            {initialData.subaccountCode && (
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 border border-emerald-500/20">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    Account Verified
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <div className="space-y-3">
+                                <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
+                                    <Landmark className="h-4 w-4 text-emerald-600" />
+                                    Settlement Bank
+                                </label>
+                                <select
+                                    name="bankCode"
+                                    defaultValue={initialData.bankName || ""}
+                                    disabled={!!initialData.subaccountCode}
+                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm appearance-none disabled:opacity-60"
+                                    onChange={(e) => {
+                                        const selectedBank = banks.find(b => b.code === e.target.value);
+                                        if (selectedBank) {
+                                            // We'll use the hidden input for bankName
+                                            const nameInput = document.getElementById('bankNameInput') as HTMLInputElement;
+                                            if (nameInput) nameInput.value = selectedBank.name;
+                                        }
+                                    }}
+                                >
+                                    <option value="">Select Bank</option>
+                                    {banks.map((bank) => (
+                                        <option key={bank.code} value={bank.code}>{bank.name}</option>
+                                    ))}
+                                </select>
+                                <input type="hidden" name="bankName" id="bankNameInput" defaultValue={initialData.bankName || ""} />
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
+                                    <CreditCard className="h-4 w-4 text-emerald-600" />
+                                    Account Number
+                                </label>
+                                <input
+                                    name="accountNumber"
+                                    type="text"
+                                    defaultValue={initialData.accountNumber || ""}
+                                    disabled={!!initialData.subaccountCode}
+                                    placeholder="0123456789"
+                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm disabled:opacity-60"
+                                />
+                            </div>
+
+                            <div className="space-y-3 md:col-span-2">
+                                <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
+                                    <User className="h-4 w-4 text-emerald-600" />
+                                    Account Name
+                                </label>
+                                <input
+                                    name="accountName"
+                                    type="text"
+                                    defaultValue={initialData.accountName || ""}
+                                    disabled={!!initialData.subaccountCode}
+                                    placeholder="Your Full Name"
+                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm disabled:opacity-60"
+                                />
+                            </div>
+                        </div>
+
+                        {!initialData.subaccountCode && (
+                            <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
+                                <p className="text-[10px] font-bold text-amber-800 leading-relaxed uppercase tracking-wider">
+                                    ⚠️ IMPORTANT: Please ensure your account name matches your bank records. Once linked to Paystack for payouts, these details can only be changed by contacting support.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
             </div>

@@ -86,7 +86,7 @@ export default function CheckoutForm({ store }: CheckoutFormProps) {
     return (
         <div className="grid gap-12 lg:grid-cols-2">
             <div className="space-y-8">
-                <form action={onSubmit} className="space-y-6 rounded-3xl border bg-white p-8 shadow-sm">
+        <form action={onSubmit} className="space-y-6 rounded-3xl border bg-white p-6 md:p-8 shadow-sm">
                     <h2 className="text-xl font-bold text-gray-900">Delivery Details</h2>
 
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -153,7 +153,7 @@ export default function CheckoutForm({ store }: CheckoutFormProps) {
             </div>
 
             <div className="space-y-6">
-                <div className="rounded-3xl border bg-white p-8 shadow-sm space-y-6">
+                <div className="rounded-3xl border bg-white p-6 md:p-8 shadow-sm space-y-6">
                     <h2 className="text-xl font-bold text-gray-900 text-center">Order Summary</h2>
                     <div className="space-y-4">
                         {cart.items.map((item) => (

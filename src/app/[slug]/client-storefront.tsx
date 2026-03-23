@@ -100,13 +100,13 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                         className="relative z-[60] overflow-hidden"
                         style={{ backgroundColor: primaryColor }}
                     >
-                        <div className="mx-auto max-w-7xl px-8 py-3 flex items-center justify-center text-center">
-                            <p className="text-xs font-black uppercase tracking-widest text-white leading-relaxed pr-8">
+                        <div className="mx-auto max-w-7xl px-4 md:px-8 py-3 flex items-center justify-center text-center">
+                            <p className="text-[10px] md:text-xs font-black uppercase tracking-widest text-white leading-relaxed px-6">
                                 {store.announcement}
                             </p>
                             <button
                                 onClick={() => setShowAnnouncement(false)}
-                                className="absolute right-6 p-1 text-white/60 hover:text-white transition-colors"
+                                className="absolute right-3 md:right-6 p-1 text-white/60 hover:text-white transition-colors"
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -116,24 +116,24 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
             </AnimatePresence>
 
             {/* Minimalist Header */}
-            <header className="sticky top-0 z-50 bg-canvas/80 backdrop-blur-md border-b border-border/50 py-6 px-8">
+            <header className="sticky top-0 z-50 bg-canvas/80 backdrop-blur-md border-b border-border/50 py-4 md:py-6 px-4 md:px-8">
                 <div className="mx-auto flex max-w-7xl items-center justify-between">
-                    <Link href={`/${store.slug}`} className="flex items-center gap-4 group">
+                    <Link href={`/${store.slug}`} className="flex items-center gap-3 md:gap-4 group">
                         {store.logoUrl ? (
-                            <div className="h-10 w-10 relative overflow-hidden rounded-xl border-2 border-white shadow-md">
+                            <div className="h-8 w-8 md:h-10 md:w-10 relative overflow-hidden rounded-lg md:rounded-xl border-2 border-white shadow-md">
                                 <Image src={store.logoUrl} alt={store.name} fill className="object-cover" />
                             </div>
                         ) : (
                             <div
-                                className="h-10 w-10 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
+                                className="h-8 w-8 md:h-10 md:w-10 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
                                 style={{ backgroundColor: primaryColor }}
                             >
-                                <div className="relative h-5 w-5">
+                                <div className="relative h-4 w-4 md:h-5 md:w-5">
                                     <Image src="/logo.png" alt="L" fill className="object-cover" />
                                 </div>
                             </div>
                         )}
-                        <span className="text-2xl font-black tracking-tighter text-foreground uppercase italic group-hover:opacity-70 transition-opacity">{store.name}</span>
+                        <span className="text-xl md:text-2xl font-black tracking-tighter text-foreground uppercase italic group-hover:opacity-70 transition-opacity truncate max-w-[150px] md:max-w-none">{store.name}</span>
                     </Link>
 
                     <div className="flex items-center gap-4">
@@ -169,7 +169,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="mx-auto max-w-7xl px-8 py-24 lg:py-32"
+                className="mx-auto max-w-7xl px-4 md:px-8 py-12 md:py-24 lg:py-32"
             >
                 {/* Search Bar Mobile */}
                 <motion.div variants={item} className="md:hidden mb-12">
@@ -196,7 +196,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                         </div>
                         Official Storefront
                     </div>
-                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter text-foreground leading-[0.9] mb-8">
+                    <h1 className="text-5xl md:text-8xl lg:text-9xl font-black tracking-tighter text-foreground leading-[0.9] mb-8">
                         Elevate your <br />
                         <span style={{ color: primaryColor }}>lifestyle.</span>
                     </h1>
@@ -321,22 +321,22 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="relative flex h-full w-full max-w-md flex-col bg-card shadow-2xl border-l border-border"
+                            className="relative flex h-full w-full sm:max-w-md flex-col bg-card shadow-2xl sm:border-l border-border"
                         >
-                            <div className="flex items-center justify-between px-10 py-12">
-                                <h2 className="text-3xl font-black tracking-tighter text-foreground">
+                            <div className="flex items-center justify-between px-6 md:px-10 py-8 md:py-12">
+                                <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground">
                                     Bag
                                     <span className="ml-3 text-sm font-bold tracking-normal text-gray-400">({cart.getTotalItems()} ITEMS)</span>
                                 </h2>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className="group rounded-2xl bg-canvas p-3 text-foreground transition-all hover:bg-foreground hover:text-card"
+                                    className="group rounded-xl md:rounded-2xl bg-canvas p-2.5 md:p-3 text-foreground transition-all hover:bg-foreground hover:text-card"
                                 >
-                                    <X className="h-5 w-5 transition-transform group-hover:rotate-90" />
+                                    <X className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:rotate-90" />
                                 </button>
                             </div>
 
-                            <div className="flex-1 overflow-y-auto px-10 pb-10">
+                            <div className="flex-1 overflow-y-auto px-6 md:px-10 pb-10">
                                 {cart.items.length === 0 ? (
                                     <div className="flex flex-col h-full items-center justify-center text-center space-y-6">
                                         <div className="h-32 w-32 bg-canvas rounded-[40px] flex items-center justify-center shadow-inner border border-border/50">
@@ -410,30 +410,30 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                             </div>
 
                             {cart.items.length > 0 && (
-                                <div className="bg-canvas/50 backdrop-blur-md px-10 py-12 space-y-8 border-t border-border">
+                                <div className="bg-canvas/50 backdrop-blur-md px-6 md:px-10 py-8 md:py-12 space-y-6 md:space-y-8 border-t border-border">
                                     <div className="flex items-end justify-between">
                                         <div className="space-y-1">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Grand Total</span>
-                                            <p className="text-4xl font-black tracking-tighter text-foreground">
+                                            <p className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">
                                                 ₦{cart.getTotalPrice().toLocaleString()}
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-[10px] font-black pb-1 flex items-center justify-end gap-1.5 uppercase tracking-wider" style={{ color: primaryColor }}>
+                                            <div className="text-[10px] font-black pb-1 flex items-center justify-end gap-1.5 uppercase tracking-wider" style={{ color: primaryColor }}>
                                                 <div className="relative h-3 w-3">
                                                     <Image src="/logo.png" alt="L" fill className="object-cover" />
                                                 </div>
-                                                Express Checkout
-                                            </p>
+                                                Checkout
+                                            </div>
                                         </div>
                                     </div>
                                     <Link
                                         href={`/${store.slug}/checkout`}
-                                        className="flex w-full items-center justify-center gap-3 rounded-[24px] p-6 text-xl font-black text-card shadow-2xl transition-all hover:shadow-xl active:scale-[0.98] active:translate-y-1"
+                                        className="flex w-full items-center justify-center gap-3 rounded-[24px] p-5 md:p-6 text-lg md:text-xl font-black text-card shadow-2xl transition-all hover:shadow-xl active:scale-[0.98] active:translate-y-1"
                                         style={{ backgroundColor: primaryColor }}
                                     >
                                         Purchase Now
-                                        <ArrowRight className="h-6 w-6" />
+                                        <ArrowRight className="h-5 w-5 md:h-6 md:w-6" />
                                     </Link>
                                 </div>
                             )}

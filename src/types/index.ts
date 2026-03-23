@@ -11,6 +11,11 @@ export interface Store {
     mainlandDeliveryFee: number | string | { toString(): string };
     visits: number;
     conversionClicks: number;
+    bankName: string | null;
+    accountNumber: string | null;
+    accountName: string | null;
+    subaccountCode: string | null;
+    commissionPercentage: number | string | { toString(): string } | null;
     createdAt: Date;
     updatedAt: Date;
 }

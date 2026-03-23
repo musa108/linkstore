@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { initializePaystackTransaction } from "@/lib/paystack";
 
 export async function createOrder(formData: FormData) {
     const storeId = formData.get("storeId") as string;
@@ -16,7 +17,7 @@ export async function createOrder(formData: FormData) {
     const itemsJson = formData.get("items") as string;
     const origin = formData.get("origin") as string;
     const storeSlug = formData.get("storeSlug") as string;
-    if (!customerName || !customerEmail || !customerPhone || !address || !itemsJson || !origin || !storeSlug) {
+    if (!customerEmail || !customerName || !customerPhone || !address || !itemsJson || !origin || !storeSlug) {
         return { error: "Missing required details for checkout." };
     }
 
@@ -27,6 +28,11 @@ export async function createOrder(formData: FormData) {
     }
 
     try {
+        const store = await prisma.store.findUnique({
+            where: { id: storeId },
+            select: { subaccountCode: true }
+        });
+
         const order = await prisma.order.create({
             data: {
                 storeId,
@@ -50,8 +56,26 @@ export async function createOrder(formData: FormData) {
             },
         });
 
+        // Initialize Paystack Payment
+        const callbackUrl = `${origin}/${storeSlug}/verify`;
+        const paystackResponse = await initializePaystackTransaction(
+            customerEmail,
+            Number(total),
+            order.id,
+            callbackUrl,
+            store?.subaccountCode || undefined
+        );
+
+        if (!paystackResponse.status) {
+            console.error("PAYSTACK_INIT_ERROR", paystackResponse.message);
+            return { error: "Payment system unavailable. Please try again later." };
+        }
+
         revalidatePath("/dashboard/orders");
-        return { order };
+        return { 
+            order, 
+            authorizationUrl: paystackResponse.data.authorization_url 
+        };
     } catch (error) {
         console.error("CREATE_ORDER_ERROR", error);
         return { error: "Could not create order." };

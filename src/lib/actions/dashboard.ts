@@ -21,7 +21,21 @@ export async function getSalesData(storeId: string, timeframe: "7d" | "30d" | "a
     }
 
     try {
-        const orders = await prisma.order.findMany({
+        // Fetch ALL PAID orders for total revenue (ignore timeframe for the summary)
+        const allPaidOrders = await prisma.order.findMany({
+            where: {
+                storeId,
+                status: "PAID",
+            },
+            select: {
+                total: true,
+            },
+        });
+
+        const totalRevenue = allPaidOrders.reduce((sum, order) => sum + Number(order.total), 0);
+
+        // Fetch orders for the CHART (obey timeframe)
+        const chartOrders = await prisma.order.findMany({
             where: {
                 storeId,
                 status: "PAID",
@@ -38,10 +52,10 @@ export async function getSalesData(storeId: string, timeframe: "7d" | "30d" | "a
             },
         });
 
-        // Group by Date (YYYY-MM-DD)
-        const aggregatedData = orders.reduce((acc, order) => {
+        // Group by Date (YYYY-MM-DD) for the chart
+        const aggregatedData = chartOrders.reduce((acc, order) => {
             const dateObj = new Date(order.createdAt);
-            const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); // e.g. "Oct 24"
+            const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
             if (!acc[dateStr]) {
                 acc[dateStr] = { date: dateStr, revenue: 0, orders: 0 };
@@ -51,9 +65,7 @@ export async function getSalesData(storeId: string, timeframe: "7d" | "30d" | "a
             return acc;
         }, {} as Record<string, { date: string; revenue: number; orders: number }>);
 
-        // Convert the record to an array
         const chartData = Object.values(aggregatedData);
-        const totalRevenue = chartData.reduce((sum, item) => sum + item.revenue, 0);
 
         return { data: chartData, totalRevenue };
     } catch (error) {

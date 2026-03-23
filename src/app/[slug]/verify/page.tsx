@@ -9,25 +9,26 @@ export default async function VerifyPaymentPage({
     searchParams,
 }: {
     params: Promise<{ slug: string }>;
-    searchParams: Promise<{ reference: string }>;
+    searchParams: Promise<{ reference?: string; trxref?: string }>;
 }) {
     const { slug } = await params;
-    const { reference } = await searchParams;
+    const { reference, trxref } = await searchParams;
+    const paystackReference = reference || trxref;
 
-    if (!reference) {
+    if (!paystackReference) {
         redirect(`/${slug}/checkout`);
     }
 
-    const verification = await verifyPaystackTransaction(reference);
+    const verification = await verifyPaystackTransaction(paystackReference);
 
     if (verification.success && verification.data.status === "success") {
         // Update order status to paid
         await prisma.order.update({
-            where: { id: reference },
+            where: { id: paystackReference },
             data: { status: "PAID" },
         });
 
-        redirect(`/${slug}/success?orderId=${reference}`);
+        redirect(`/${slug}/success?orderId=${paystackReference}`);
     }
 
     // Handle failure

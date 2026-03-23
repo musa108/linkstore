@@ -2,65 +2,22 @@
 
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { createPaystackSubaccount } from "@/lib/paystack";
 import { revalidatePath } from "next/cache";
-
-export async function createStore(formData: FormData) {
-    const { userId } = await auth();
-
-    if (!userId) {
-        return { error: "Unauthorized" };
-    }
-
-    const name = formData.get("name") as string;
-    const slug = formData.get("slug") as string;
-
-    if (!name || !slug) {
-        return { error: "Name and slug are required" };
-    }
-
-    // Basic slug validation (lowercased, no spaces)
-    const formattedSlug = slug.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-
-    try {
-        // Check if slug is already taken
-        const existingStore = await prisma.store.findUnique({
-            where: { slug: formattedSlug }
-        });
-
-        if (existingStore) {
-            return { error: "This store link is already taken. Try another." };
-        }
-
-        const store = await prisma.store.create({
-            data: {
-                vendorId: userId,
-                name,
-                slug: formattedSlug,
-            }
-        });
-
-        revalidatePath("/dashboard");
-        return { store };
-    } catch (error) {
-        console.error("CREATE_STORE_ERROR", error);
-        return { error: "Could not create store. Please try again." };
-    }
-}
 
 export async function updateStore(storeId: string, formData: FormData) {
     const { userId } = await auth();
-
     if (!userId) {
         return { error: "Unauthorized" };
     }
 
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
-    const islandDeliveryFee = formData.get("islandDeliveryFee") as string;
-    const mainlandDeliveryFee = formData.get("mainlandDeliveryFee") as string;
+    const announcement = formData.get("announcement") as string;
     const logoUrl = formData.get("logoUrl") as string;
     const primaryColor = formData.get("primaryColor") as string;
-    const announcement = formData.get("announcement") as string;
+    const mainlandDeliveryFee = formData.get("mainlandDeliveryFee") as string;
+    const islandDeliveryFee = formData.get("islandDeliveryFee") as string;
 
     try {
         const store = await prisma.store.update({
@@ -68,20 +25,77 @@ export async function updateStore(storeId: string, formData: FormData) {
             data: {
                 name,
                 description,
-                islandDeliveryFee: Number(islandDeliveryFee),
-                mainlandDeliveryFee: Number(mainlandDeliveryFee),
+                announcement,
                 logoUrl,
                 primaryColor,
-                announcement,
+                mainlandDeliveryFee: Number(mainlandDeliveryFee),
+                islandDeliveryFee: Number(islandDeliveryFee),
             },
         });
 
         revalidatePath("/dashboard/settings");
-        revalidatePath("/dashboard");
+        revalidatePath(`/${store.slug}`);
         return { store };
     } catch (error) {
         console.error("UPDATE_STORE_ERROR", error);
-        return { error: "Could not update settings." };
+        return { error: "Could not update store." };
+    }
+}
+
+export async function updateStorePayoutDetails(formData: FormData) {
+    const { userId } = await auth();
+    if (!userId) {
+        return { error: "Unauthorized" };
+    }
+
+    const bankName = formData.get("bankName") as string;
+    const accountNumber = formData.get("accountNumber") as string;
+    const accountName = formData.get("accountName") as string;
+    const bankCode = formData.get("bankCode") as string;
+
+    if (!bankName || !accountNumber || !accountName || !bankCode) {
+        return { error: "All payout details are required." };
+    }
+
+    try {
+        const store = await prisma.store.findUnique({
+            where: { vendorId: userId },
+        });
+
+        if (!store) {
+            return { error: "Store not found." };
+        }
+
+        // Create subaccount on Paystack
+        // Using a default 5% commission for the developer
+        const paystackResponse = await createPaystackSubaccount(
+            store.name,
+            bankCode,
+            accountNumber,
+            5.0 
+        );
+
+        if (!paystackResponse.status) {
+            console.error("PAYSTACK_SUBACCOUNT_ERROR", paystackResponse.message);
+            return { error: paystackResponse.message || "Failed to create Paystack subaccount." };
+        }
+
+        // Save subaccount details to the database
+        await prisma.store.update({
+            where: { id: store.id },
+            data: {
+                bankName,
+                accountNumber,
+                accountName,
+                subaccountCode: paystackResponse.data.subaccount_code,
+            },
+        });
+
+        revalidatePath("/dashboard/settings");
+        return { success: true };
+    } catch (error) {
+        console.error("UPDATE_PAYOUT_DETAILS_ERROR", error);
+        return { error: "Could not update payout details." };
     }
 }
 
@@ -89,11 +103,28 @@ export async function trackConversion(storeId: string) {
     try {
         await prisma.store.update({
             where: { id: storeId },
-            data: { conversionClicks: { increment: 1 } }
+            data: {
+                conversionClicks: {
+                    increment: 1,
+                },
+            },
         });
-        return { success: true };
     } catch (error) {
         console.error("TRACK_CONVERSION_ERROR", error);
-        return { error: "Failed to track conversion" };
+    }
+}
+
+export async function trackVisit(storeId: string) {
+    try {
+        await prisma.store.update({
+            where: { id: storeId },
+            data: {
+                visits: {
+                    increment: 1,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("TRACK_VISIT_ERROR", error);
     }
 }

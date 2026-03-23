@@ -14,6 +14,22 @@
   --ring: rgba(79, 70, 229, 0.1);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #09090b;
+    --foreground: #fdfdfd;
+    --primary: #6366f1;
+    --primary-foreground: #ffffff;
+    --secondary: #18181b;
+    --accent: #818cf8;
+    --canvas: #020617;
+    --card: #0f172a;
+    --card-foreground: #f8fafc;
+    --border: #1e293b;
+    --ring: rgba(99, 102, 241, 0.2);
+  }
+}
+
 /* @ts-ignore - Tailwind v4 uses @theme */
 @theme inline {
   --color-background: var(--background);

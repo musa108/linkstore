@@ -1,6 +1,7 @@
 "use client";
 
-import { TrendingUp, Zap, ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { TrendingUp, Zap, ShoppingCart, Share2, Check } from "lucide-react";
 import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import AnalyticsChart from "./analytics-chart";
@@ -14,6 +15,34 @@ interface DashboardOverviewProps {
 }
 
 export default function DashboardOverview({ store, chartData = [], totalRevenue = 0 }: DashboardOverviewProps) {
+    const [copied, setCopied] = useState(false);
+
+    const onShare = async () => {
+        const url = `${window.location.origin}/${store.slug}`;
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: store.name,
+                    text: `Check out my store on LinkStore: ${store.name}`,
+                    url: url,
+                });
+            } catch (err) {
+                // Ignore abortions
+                if ((err as Error).name !== 'AbortError') {
+                    console.error(err);
+                }
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(url);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            } catch (err) {
+                console.error("FAILED_TO_COPY", err);
+            }
+        }
+    };
+
     const container: Variants = {
         hidden: { opacity: 0 },
         show: {
@@ -46,26 +75,28 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                 {/* Main Stat - Large */}
                 <motion.div
                     variants={item}
-                    className="md:col-span-2 md:row-span-2 bento-card p-10 flex flex-col justify-between group h-[400px] border-indigo-100"
+                    className="md:col-span-2 md:row-span-2 bento-card p-6 md:p-10 group min-h-[400px] border-indigo-100 overflow-hidden"
                 >
-                    <div className="flex justify-between items-start">
-                        <div className="space-y-4">
-                            <div className="h-16 w-16 rounded-[28px] bg-indigo-50 flex items-center justify-center text-indigo-600 transition-all group-hover:scale-110 group-hover:rotate-3 shadow-sm group-hover:shadow-indigo-100">
-                                <TrendingUp className="h-9 w-9" />
+                    <div className="flex flex-col h-full">
+                        <div className="flex justify-between items-start text-left">
+                            <div className="space-y-4">
+                                <div className="h-16 w-16 rounded-[28px] bg-indigo-50 flex items-center justify-center text-indigo-600 transition-all group-hover:scale-110 group-hover:rotate-3 shadow-sm group-hover:shadow-indigo-100">
+                                    <TrendingUp className="h-9 w-9" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Total Visits</h3>
+                                    <p className="text-6xl md:text-8xl font-black tracking-tighter text-gray-900 mt-4 leading-none">{store.visits}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Total Visits</h3>
-                                <p className="text-8xl font-black tracking-tighter text-gray-900 mt-4 leading-none">{store.visits}</p>
+                            <div className="text-right">
+                                <span className="inline-flex items-center rounded-full bg-emerald-50 px-4 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 border border-emerald-100">
+                                    +12% this week
+                                </span>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <span className="inline-flex items-center rounded-full bg-emerald-50 px-4 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 border border-emerald-100">
-                                +12% this week
-                            </span>
+                        <div className="mt-auto pt-8 h-64 w-full">
+                            <AnalyticsChart data={chartData} />
                         </div>
-                    </div>
-                    <div className="mt-8 -mx-6 -mb-6 h-64">
-                        <AnalyticsChart data={chartData} />
                     </div>
                 </motion.div>
 
@@ -116,7 +147,7 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
             {/* Empty State / Activity Section */}
             <motion.div
                 variants={item}
-                className="mt-12 bento-card border-dashed bg-white/40 p-20 text-center relative overflow-hidden group shadow-immersive"
+                className="mt-12 bento-card border-dashed bg-white/40 p-10 md:p-20 text-center relative overflow-hidden group shadow-immersive"
             >
                 <motion.div
                     animate={{
@@ -140,8 +171,20 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                     <p className="mt-4 text-gray-500 max-w-sm mx-auto font-bold uppercase tracking-widest text-[10px] leading-relaxed">
                         LinkStore is tracking every visitor and click. <br />Scale your social media sales with ease.
                     </p>
-                    <button className="mt-10 px-10 py-5 bg-gray-900 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs transition-all active:scale-95 hover:bg-black hover:shadow-2xl shadow-gray-200">
-                        Share My Store
+                    <button
+                        onClick={onShare}
+                        className="mt-10 group relative flex h-14 w-full md:w-64 items-center justify-center overflow-hidden rounded-2xl bg-gray-900 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-black active:scale-[0.98] shadow-xl"
+                    >
+                        <span className={`flex items-center gap-2 transition-all duration-300 ${copied ? "opacity-0 scale-50" : "opacity-100 scale-100"}`}>
+                            <Share2 className="h-4 w-4" />
+                            Share My Store
+                        </span>
+                        {copied && (
+                            <div className="absolute inset-0 flex items-center justify-center gap-2 text-emerald-400 bg-gray-900">
+                                <Check className="h-4 w-4" />
+                                Link Copied
+                            </div>
+                        )}
                     </button>
                 </div>
             </motion.div>
