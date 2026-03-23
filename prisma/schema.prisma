@@ -22,6 +22,8 @@ model Store {
   orders             Order[]
   visits             Int       @default(0)
   conversionClicks   Int       @default(0)
+  phoneNumber        String?   // For WhatsApp Notifications
+  lowStockThreshold  Int       @default(5)
   bankName           String?
   accountNumber      String?
   accountName        String?
@@ -40,6 +42,8 @@ model Product {
   price       Decimal
   imageUrl    String?
   inStock     Boolean  @default(true)
+  views       Int      @default(0) // For Advanced Analytics
+  lowStockThreshold Int?       // Per-product override
   variants    Variant[]
   orderItems  OrderItem[]
   createdAt   DateTime @default(now())
@@ -86,6 +90,7 @@ model Variant {
   sku         String?
   price       Decimal?
   stockCount  Int      @default(0)
+  lowStockThreshold Int?       // Per-variant override
   orderItems  OrderItem[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

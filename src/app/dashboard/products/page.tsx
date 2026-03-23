@@ -46,7 +46,7 @@ export default async function ProductsPage() {
                 </Link>
             </div>
 
-            <ProductList products={store.products} />
+            <ProductList products={store.products} defaultThreshold={store.lowStockThreshold} />
         </div>
     );
 }

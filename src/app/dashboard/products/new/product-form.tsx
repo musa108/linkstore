@@ -20,6 +20,7 @@ interface VariantInput {
     sku?: string;
     price?: string | number;
     stockCount: number;
+    lowStockThreshold?: number;
 }
 
 export default function ProductForm({ storeId, initialData }: ProductFormProps) {
@@ -33,7 +34,8 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
             name: v.name,
             sku: v.sku || "",
             price: v.price?.toString() || "",
-            stockCount: Number(v.stockCount)
+            stockCount: Number(v.stockCount),
+            lowStockThreshold: v.lowStockThreshold || undefined
         }));
     });
     const [error, setError] = useState("");
@@ -185,6 +187,19 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                     </div>
                 </motion.div>
 
+                <motion.div variants={item} className="grid gap-8 md:grid-cols-2">
+                    <div className="space-y-3">
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Low Stock Threshold</label>
+                        <input
+                            name="lowStockThreshold"
+                            type="number"
+                            defaultValue={initialData?.lowStockThreshold || ""}
+                            className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                            placeholder="Default follows store settings"
+                        />
+                    </div>
+                </motion.div>
+
                 <motion.div variants={item} className="space-y-3">
                     <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Description</label>
                     <textarea
@@ -249,6 +264,16 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                                             placeholder="0"
                                             className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                             required
+                                        />
+                                    </div>
+                                    <div className="w-full md:w-24 space-y-2">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Threshold</label>
+                                        <input
+                                            type="number"
+                                            value={variant.lowStockThreshold || ""}
+                                            onChange={(e) => updateVariant(index, "lowStockThreshold", parseInt(e.target.value) || undefined)}
+                                            placeholder="Auto"
+                                            className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                         />
                                     </div>
                                     <div className="flex items-end pb-1">

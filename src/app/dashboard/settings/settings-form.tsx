@@ -230,6 +230,45 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                     />
                 </motion.div>
 
+                {/* Advanced Features Section */}
+                <motion.div variants={item} className="pt-4">
+                    <div className="rounded-[32px] bg-indigo-50/30 border border-indigo-100 p-8 space-y-8">
+                        <div>
+                            <h3 className="text-lg font-black text-gray-900 tracking-tight">Advanced Features</h3>
+                            <p className="text-xs text-indigo-500 font-bold uppercase tracking-wider mt-1">Configure automation and analytics preferences.</p>
+                        </div>
+
+                        <div className="grid gap-8 md:grid-cols-2">
+                            <div className="space-y-3">
+                                <label className="text-sm font-black text-gray-700 ml-1">WhatsApp Number</label>
+                                <div className="relative">
+                                    <input
+                                        name="phoneNumber"
+                                        defaultValue={initialData.phoneNumber || ""}
+                                        placeholder="2348012345678"
+                                        className="w-full rounded-2xl border border-white bg-white/80 p-4 pl-12 text-sm font-black text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                    />
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                                        +
+                                    </div>
+                                </div>
+                                <p className="text-[10px] text-gray-400 font-medium ml-1">Format: 2348012345678 (no &quot;+&quot; sign)</p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <label className="text-sm font-black text-gray-700 ml-1">Low Stock Alert Threshold</label>
+                                <input
+                                    name="lowStockThreshold"
+                                    type="number"
+                                    defaultValue={initialData.lowStockThreshold || 5}
+                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                />
+                                <p className="text-[10px] text-gray-400 font-medium ml-1">Get alerts when stock falls below this number.</p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+
                 {/* Delivery Logistics Section */}
                 <motion.div variants={item} className="pt-4">
                     <div className="rounded-[32px] bg-indigo-50/30 border border-indigo-100 p-8 space-y-6">

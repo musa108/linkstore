@@ -10,9 +10,10 @@ import { motion, Variants } from "framer-motion";
 
 interface ProductListProps {
     products: Product[];
+    defaultThreshold?: number;
 }
 
-export default function ProductList({ products }: ProductListProps) {
+export default function ProductList({ products, defaultThreshold = 5 }: ProductListProps) {
     const [loading, setLoading] = useState<string | null>(null);
 
     async function onDelete(id: string) {
@@ -118,12 +119,40 @@ export default function ProductList({ products }: ProductListProps) {
                                     <span className="font-black text-gray-900">₦{Number(product.price).toLocaleString()}</span>
                                 </td>
                                 <td className="px-6 py-5">
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${product.inStock
-                                        ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                        : "bg-red-50 text-red-700 border-red-100"
-                                        }`}>
-                                        {product.inStock ? "Active" : "Out of Stock"}
-                                    </span>
+                                    {(() => {
+                                        const totalStock = product.variants?.reduce((acc, v) => acc + (v.stockCount || 0), 0) ?? 0;
+                                        const threshold = product.lowStockThreshold ?? defaultThreshold;
+                                        const isLowStock = totalStock > 0 && totalStock <= threshold;
+                                        const isOutOfStock = totalStock === 0 || !product.inStock;
+
+                                        if (isOutOfStock) {
+                                            return (
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-red-50 text-red-700 border-red-100">
+                                                    Out of Stock
+                                                </span>
+                                            );
+                                        }
+
+                                        if (isLowStock) {
+                                            return (
+                                                <div className="space-y-1">
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-amber-50 text-amber-700 border-amber-100">
+                                                        Low Stock
+                                                    </span>
+                                                    <span className="block text-[10px] text-amber-600 font-bold ml-1">{totalStock} remaining</span>
+                                                </div>
+                                            );
+                                        }
+
+                                        return (
+                                            <div className="space-y-1">
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-emerald-50 text-emerald-700 border-emerald-100">
+                                                    Active
+                                                </span>
+                                                <span className="block text-[10px] text-emerald-600 font-bold ml-1">{totalStock} in stock</span>
+                                            </div>
+                                        );
+                                    })()}
                                 </td>
                                 <td className="px-6 py-5 text-gray-500 font-medium">
                                     {new Date(product.createdAt).toLocaleDateString(undefined, {

@@ -18,6 +18,8 @@ export async function updateStore(storeId: string, formData: FormData) {
     const primaryColor = formData.get("primaryColor") as string;
     const mainlandDeliveryFee = formData.get("mainlandDeliveryFee") as string;
     const islandDeliveryFee = formData.get("islandDeliveryFee") as string;
+    const phoneNumber = formData.get("phoneNumber") as string;
+    const lowStockThreshold = formData.get("lowStockThreshold") as string;
 
     try {
         const store = await prisma.store.update({
@@ -30,6 +32,8 @@ export async function updateStore(storeId: string, formData: FormData) {
                 primaryColor,
                 mainlandDeliveryFee: Number(mainlandDeliveryFee),
                 islandDeliveryFee: Number(islandDeliveryFee),
+                phoneNumber,
+                lowStockThreshold: parseInt(lowStockThreshold) || 5,
             },
         });
 

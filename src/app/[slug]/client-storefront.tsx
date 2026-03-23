@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import { trackConversion } from "@/lib/actions/store";
+import { trackProductView } from "@/lib/actions/product";
 import { Store, Product, Variant } from "@/types";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
@@ -21,6 +22,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
     const [searchQuery, setSearchQuery] = useState("");
     const [showAnnouncement, setShowAnnouncement] = useState(true);
     const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({}); // productId -> variantId
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsMounted(true), 0);
@@ -34,26 +36,29 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
         );
     }, [products, searchQuery]);
 
-    const handleBuyNow = async (product: Product) => {
+    const handleBuyNow = async (product: Record<string, any>) => {
         const hasVariants = product.variants && product.variants.length > 0;
         const selectedVariantId = selectedVariants[product.id];
 
         if (hasVariants && !selectedVariantId) {
-            // If they haven't picked a variant yet, we could pulse the selector or show a message
-            // For now, let's just pick the first one as default if not selected
             const defaultVariant = product.variants![0];
-            addItemToCart(product, defaultVariant);
+            addItemToCart(product as Product, defaultVariant);
         } else if (hasVariants && selectedVariantId) {
-            const variant = product.variants!.find(v => v.id === selectedVariantId);
+            const variant = (product.variants as Variant[])!.find(v => v.id === selectedVariantId);
             if (variant) {
-                addItemToCart(product, variant);
+                addItemToCart(product as Product, variant);
             }
         } else {
-            addItemToCart(product);
+            addItemToCart(product as Product);
         }
 
         setIsOpen(true);
         await trackConversion(store.id);
+    };
+
+    const openProductModal = async (product: Product) => {
+        setSelectedProduct(product);
+        await trackProductView(product.id).catch(err => console.error("TRACK_P_VIEW_ERR", err));
     };
 
     const addItemToCart = (product: Product, variant?: Variant) => {
@@ -217,7 +222,8 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                 animate="show"
                                 exit={{ opacity: 0, scale: 0.9 }}
                                 whileHover={{ y: -8 }}
-                                className="bento-card p-6 flex flex-col group h-full"
+                                onClick={() => openProductModal(product)}
+                                className="bento-card p-6 flex flex-col group h-full cursor-pointer"
                             >
                                 <div className="aspect-square relative mb-8 w-full overflow-hidden rounded-2xl bg-canvas border border-border/50">
                                     {product.imageUrl ? (
@@ -281,7 +287,10 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                             </span>
                                         </div>
                                         <button
-                                            onClick={() => handleBuyNow(product)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleBuyNow(product);
+                                            }}
                                             className="h-14 w-14 rounded-2xl bg-foreground text-card flex items-center justify-center shadow-lg shadow-gray-200 hover:shadow-xl hover:-rotate-12 hover:scale-110 active:scale-95 transition-all"
                                             style={{ "--hover-bg": primaryColor } as React.CSSProperties}
                                         >
@@ -302,6 +311,111 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                     </motion.div>
                 )}
             </motion.main>
+
+            {/* Product Detail Modal */}
+            <AnimatePresence>
+                {selectedProduct && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10"
+                    >
+                        <div
+                            className="absolute inset-0 bg-gray-900/40 backdrop-blur-md"
+                            onClick={() => setSelectedProduct(null)}
+                        />
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            className="relative w-full max-w-4xl bg-card rounded-[40px] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
+                        >
+                            <button
+                                onClick={() => setSelectedProduct(null)}
+                                className="absolute right-6 top-6 z-20 p-3 rounded-2xl bg-white/80 backdrop-blur-md text-gray-900 hover:bg-gray-900 hover:text-white transition-all shadow-sm border border-gray-100"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+
+                            {/* Image Section */}
+                            <div className="w-full md:w-1/2 h-80 md:h-auto relative bg-canvas">
+                                {selectedProduct.imageUrl ? (
+                                    <Image
+                                        src={selectedProduct.imageUrl}
+                                        alt={selectedProduct.name}
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-gray-200">
+                                        <Package className="h-24 w-24" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Info Section */}
+                            <div className="flex-1 p-8 md:p-12 overflow-y-auto flex flex-col">
+                                <div className="mb-auto">
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-border bg-gray-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">
+                                        In Stock
+                                    </div>
+                                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-gray-900 mb-4">{selectedProduct.name}</h2>
+                                    <p className="text-gray-500 font-medium leading-relaxed mb-10 text-lg">
+                                        {selectedProduct.description || "No description available for this product."}
+                                    </p>
+
+                                    {/* Modal Variant Selector */}
+                                    {selectedProduct.variants && selectedProduct.variants.length > 0 && (
+                                        <div className="space-y-4 mb-10">
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Choose Option</p>
+                                            <div className="flex flex-wrap gap-3">
+                                                {selectedProduct.variants.map((v) => (
+                                                    <button
+                                                        key={v.id}
+                                                        onClick={() => setSelectedVariants({ ...selectedVariants, [selectedProduct.id]: v.id })}
+                                                        className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${selectedVariants[selectedProduct.id] === v.id
+                                                            ? "bg-foreground text-card border-foreground shadow-lg"
+                                                            : "bg-white text-gray-400 border-gray-100 hover:border-gray-300"
+                                                            }`}
+                                                    >
+                                                        {v.name}
+                                                        {v.price && (
+                                                            <span className="ml-2 opacity-60">
+                                                                ₦{Number(v.price).toLocaleString()}
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="mt-12 pt-10 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Current Price</p>
+                                        <p className="text-4xl font-black tracking-tighter text-gray-900">
+                                            ₦{Number(selectedProduct.price).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            handleBuyNow(selectedProduct);
+                                            setSelectedProduct(null);
+                                        }}
+                                        className="h-16 px-10 rounded-3xl bg-foreground text-card text-sm font-black uppercase tracking-[0.2em] shadow-xl hover:shadow-2xl hover:-translate-y-1 active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+                                        style={{ backgroundColor: primaryColor }}
+                                    >
+                                        Add to Bag
+                                        <ArrowRight className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Cart Drawer Overlay */}
             <AnimatePresence>

@@ -10,6 +10,7 @@ interface VariantInput {
     sku?: string | null;
     price?: string | number | null;
     stockCount?: string | number;
+    lowStockThreshold?: number | null;
 }
 
 export async function createProduct(storeId: string, formData: FormData) {
@@ -21,6 +22,7 @@ export async function createProduct(storeId: string, formData: FormData) {
     const price = formData.get("price") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const inStock = formData.get("inStock") === "on";
+    const lowStockThreshold = formData.get("lowStockThreshold") as string | null;
     const variantsJson = formData.get("variants") as string | null;
 
     let variantsData: VariantInput[] = [];
@@ -41,12 +43,14 @@ export async function createProduct(storeId: string, formData: FormData) {
                 price: Number(price),
                 imageUrl,
                 inStock,
+                lowStockThreshold: lowStockThreshold ? parseInt(lowStockThreshold) : null,
                 variants: {
                     create: variantsData.map((v: VariantInput) => ({
                         name: v.name,
                         sku: v.sku || null,
                         price: v.price ? Number(v.price) : null,
                         stockCount: Number(v.stockCount) || 0,
+                        lowStockThreshold: v.lowStockThreshold || null,
                     })),
                 },
             },
@@ -69,6 +73,7 @@ export async function updateProduct(productId: string, formData: FormData) {
     const price = formData.get("price") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const inStock = formData.get("inStock") === "on";
+    const lowStockThreshold = formData.get("lowStockThreshold") as string | null;
     const variantsJson = formData.get("variants") as string | null;
 
     let variantsData: VariantInput[] = [];
@@ -94,6 +99,7 @@ export async function updateProduct(productId: string, formData: FormData) {
                 price: Number(price),
                 imageUrl,
                 inStock,
+                lowStockThreshold: lowStockThreshold ? parseInt(lowStockThreshold) : null,
                 variants: {
                     deleteMany: { id: { in: variantsToDelete } },
                     upsert: variantsData.map((v: VariantInput) => ({
@@ -103,12 +109,14 @@ export async function updateProduct(productId: string, formData: FormData) {
                             sku: v.sku || null,
                             price: v.price ? Number(v.price) : null,
                             stockCount: Number(v.stockCount) || 0,
+                            lowStockThreshold: v.lowStockThreshold || null,
                         },
                         create: {
                             name: v.name,
                             sku: v.sku || null,
                             price: v.price ? Number(v.price) : null,
                             stockCount: Number(v.stockCount) || 0,
+                            lowStockThreshold: v.lowStockThreshold || null,
                         }
                     }))
                 }
@@ -137,5 +145,20 @@ export async function deleteProduct(productId: string) {
     } catch (error) {
         console.error("DELETE_PRODUCT_ERROR", error);
         return { error: "Could not delete product." };
+    }
+}
+
+export async function trackProductView(productId: string) {
+    try {
+        await (prisma.product.update as unknown as (args: unknown) => Promise<unknown>)({
+            where: { id: productId },
+            data: {
+                views: {
+                    increment: 1,
+                },
+            },
+        });
+    } catch (error) {
+        console.error("TRACK_PRODUCT_VIEW_ERROR", error);
     }
 }

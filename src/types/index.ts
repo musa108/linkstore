@@ -11,6 +11,8 @@ export interface Store {
     mainlandDeliveryFee: number | string | { toString(): string };
     visits: number;
     conversionClicks: number;
+    phoneNumber: string | null;
+    lowStockThreshold: number;
     bankName: string | null;
     accountNumber: string | null;
     accountName: string | null;
@@ -27,6 +29,7 @@ export interface Variant {
     sku: string | null;
     price: number | string | { toString(): string } | null;
     stockCount: number;
+    lowStockThreshold: number | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -39,6 +42,8 @@ export interface Product {
     price: number | string | { toString(): string }; // Decimal
     imageUrl: string | null;
     inStock: boolean;
+    views: number;
+    lowStockThreshold: number | null;
     variants?: Variant[];
     createdAt: Date;
     updatedAt: Date;

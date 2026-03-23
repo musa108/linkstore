@@ -47,6 +47,18 @@ export const createPaystackSubaccount = async (businessName: string, settlementB
     }
 };
 
+const FALLBACK_BANKS = [
+    { name: "Access Bank", code: "044" },
+    { name: "First Bank", code: "011" },
+    { name: "GTBank", code: "058" },
+    { name: "United Bank For Africa", code: "033" },
+    { name: "Zenith Bank", code: "057" },
+    { name: "Opay", code: "999992" },
+    { name: "Kuda Bank", code: "090267" },
+    { name: "Moniepoint", code: "50515" },
+    { name: "PalmPay", code: "999991" }
+];
+
 export const getPaystackBanks = async () => {
     try {
         const response = await fetch("https://api.paystack.co/bank", {
@@ -54,17 +66,19 @@ export const getPaystackBanks = async () => {
             headers: {
                 Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
             },
+            next: { revalidate: 3600 } // Cache for 1 hour
         });
 
         if (!response.ok) {
-            throw new Error(`Paystack API returned ${response.status}`);
+            console.warn(`Paystack API returned ${response.status}. Using fallback banks.`);
+            return { status: true, data: FALLBACK_BANKS };
         }
 
         const data = await response.json();
         return data;
     } catch (error) {
         console.error("PAYSTACK_BANKS_ERROR", error);
-        return { status: false, message: "Failed to fetch banks", data: [] };
+        return { status: true, data: FALLBACK_BANKS };
     }
 };
 

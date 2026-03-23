@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { CheckCircle2, ShoppingBag, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -13,11 +13,35 @@ export default async function SuccessPage({
     const { slug } = await params;
     const { orderId } = await searchParams;
 
-    const store = await prisma.store.findUnique({
-        where: { slug },
-    });
+    const [store, order] = await Promise.all([
+        prisma.store.findUnique({
+            where: { slug },
+        }),
+        prisma.order.findUnique({
+            where: { id: orderId },
+            include: {
+                items: {
+                    include: {
+                        product: true
+                    }
+                }
+            }
+        })
+    ]);
 
-    if (!store) notFound();
+    if (!store || !order) notFound();
+
+    const orderRef = orderId?.slice(-6).toUpperCase();
+    const whatsappMessage = encodeURIComponent(
+        `Hi ${store.name}, I just placed an order!\n\n` +
+        `📝 Order: #${orderRef}\n` +
+        `👤 Name: ${order.customerName}\n` +
+        `💰 Total: ₦${Number(order.total).toLocaleString()}\n\n` +
+        `Please confirm my payment. Thanks!`
+    );
+    const whatsappUrl = store.phoneNumber 
+        ? `https://wa.me/${store.phoneNumber.replace(/[^0-9]/g, '')}?text=${whatsappMessage}`
+        : null;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center">
@@ -42,9 +66,20 @@ export default async function SuccessPage({
                 </div>
 
                 <div className="pt-4 space-y-4">
+                    {whatsappUrl && (
+                        <a
+                            href={whatsappUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] p-5 text-lg font-bold text-white shadow-xl shadow-green-100 transition-all hover:bg-[#22c35e] active:scale-95"
+                        >
+                            <MessageCircle className="h-6 w-6" />
+                            Notify Vendor on WhatsApp
+                        </a>
+                    )}
                     <Link
                         href={`/${store.slug}`}
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 p-5 text-lg font-bold text-white shadow-xl shadow-indigo-100 transition-all hover:bg-indigo-700 active:scale-95"
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gray-900 p-5 text-lg font-bold text-white shadow-xl shadow-gray-100 transition-all hover:bg-black active:scale-[0.98]"
                     >
                         Continue Shopping
                     </Link>
