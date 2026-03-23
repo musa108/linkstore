@@ -4,14 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateStore, updateStorePayoutDetails } from "@/lib/actions/store";
 import { ImagePlus, X, Palette, Megaphone, Loader2, Landmark, CreditCard, User } from "lucide-react";
-import { Store } from "@/types";
+import { Store, Bank } from "@/types";
 import { motion, Variants } from "framer-motion";
 import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary";
 import Image from "next/image";
 
 interface SettingsFormProps {
     initialData: Store;
-    banks: any[]; // Using any for bank objects to avoid missing type issues
+    banks: Bank[]; 
 }
 
 export default function SettingsForm({ initialData, banks }: SettingsFormProps) {
