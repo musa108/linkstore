@@ -73,7 +73,20 @@ export async function getSalesData(storeId: string, timeframe: "7d" | "30d" | "a
         return { error: "Failed to fetch sales data." };
     }
 }
-export async function getAnalyticsData(storeId: string) {
+export async function getAnalyticsData(storeId: string): Promise<{
+    storeStats: { visits: number; conversionClicks: number };
+    productPerformance: {
+        id: string;
+        name: string;
+        imageUrl: string | null;
+        views: number;
+        unitsSold: number;
+        revenue: number;
+        conversionRate: number;
+    }[];
+    totalRevenue: number;
+    recentOrders: { total: any; createdAt: any }[];
+} | { error: string }> {
     const { userId } = await auth();
     if (!userId) {
         throw new Error("Unauthorized");

@@ -5,6 +5,40 @@ import prisma from "@/lib/prisma";
 import { createPaystackSubaccount } from "@/lib/paystack";
 import { revalidatePath } from "next/cache";
 
+export async function createStore(formData: FormData) {
+    const { userId } = await auth();
+
+    if (!userId) {
+        return { error: "Unauthorized" };
+    }
+
+    const name = formData.get("name") as string;
+    const slug = formData.get("slug") as string;
+
+    if (!name || !slug) {
+        return { error: "Name and Link are required" };
+    }
+
+    try {
+        const store = await prisma.store.create({
+            data: {
+                name,
+                slug: slug.toLowerCase().replace(/[^a-z0-9-]/g, "-"),
+                vendorId: userId,
+                primaryColor: "#4f46e6", // Default color
+            },
+        });
+
+        return { store };
+    } catch (error: any) {
+        console.error("CREATE_STORE_ERROR", error);
+        if (error.code === "P2002") {
+            return { error: "This store link is already taken." };
+        }
+        return { error: "Could not create store." };
+    }
+}
+
 export async function updateStore(storeId: string, formData: FormData) {
     const { userId } = await auth();
     if (!userId) {

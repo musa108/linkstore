@@ -29,6 +29,10 @@ interface AnalyticsDashboardProps {
             conversionRate: number;
         }[];
         totalRevenue: number;
+        recentOrders: {
+            total: number | string;
+            createdAt: Date | string;
+        }[];
     };
 }
 

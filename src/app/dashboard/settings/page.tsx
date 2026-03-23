@@ -23,7 +23,7 @@ export default async function SettingsPage() {
         redirect("/setup");
     }
 
-    const banks = Array.from(new Map((banksResponse.status ? banksResponse.data : []).map((bank: any) => [bank.code, bank])).values());
+    const banks = Array.from(new Map((banksResponse.status ? banksResponse.data : []).map((bank: any) => [bank.code, bank])).values()) as any[];
     const store = serializePrisma(storeRaw);
 
     return (
