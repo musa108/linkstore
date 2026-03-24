@@ -44,11 +44,11 @@ export default async function EditProductPage({
     return (
         <div className="space-y-10">
             <div className="flex flex-col gap-2">
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight">Edit Product</h2>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">Modify your listed item details</p>
+                <h2 className="text-4xl font-black text-foreground tracking-tight">Edit Product</h2>
+                <p className="text-sm font-bold text-foreground/40 uppercase tracking-widest">Modify your listed item details</p>
             </div>
 
-            <div className="bento-card max-w-3xl bg-white p-10">
+            <div className="bento-card max-w-3xl bg-card p-10">
                 <ProductForm storeId={store.id} initialData={product} />
             </div>
         </div>

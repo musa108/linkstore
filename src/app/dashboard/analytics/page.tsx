@@ -33,8 +33,8 @@ export default async function AnalyticsPage() {
     return (
         <div className="space-y-8">
             <div>
-                <h2 className="text-3xl font-black text-gray-900 tracking-tight">Advanced Analytics</h2>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">
+                <h2 className="text-3xl font-black text-foreground tracking-tight">Advanced Analytics</h2>
+                <p className="text-sm font-bold text-foreground/40 uppercase tracking-widest mt-1">
                     Deep insights into your store performance and customer behavior.
                 </p>
             </div>

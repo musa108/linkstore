@@ -11,7 +11,7 @@ export default function AnalyticsChart({ data }: AnalyticsChartProps) {
     if (!data || data.length === 0) {
         return (
             <div className="flex h-64 w-full flex-col items-center justify-center rounded-[32px] border border-dashed border-indigo-100 bg-indigo-50/20">
-                <p className="text-sm font-bold text-gray-400">No sales data available for this period.</p>
+                <p className="text-sm font-bold text-foreground/40">No sales data available for this period.</p>
             </div>
         );
     }

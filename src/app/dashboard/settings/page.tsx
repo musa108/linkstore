@@ -33,7 +33,7 @@ export default async function SettingsPage() {
                 <p className="text-muted-foreground">Manage your store appearance, delivery logistics, and payouts.</p>
             </div>
 
-            <div className="max-w-2xl rounded-xl border bg-white p-8 shadow-sm">
+            <div className="max-w-2xl rounded-xl border bg-card p-8 shadow-sm">
                 <SettingsForm initialData={store} banks={banks} />
             </div>
         </div>

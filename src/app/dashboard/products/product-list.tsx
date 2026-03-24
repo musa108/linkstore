@@ -48,13 +48,13 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bento-card border-dashed bg-white/40 p-20 text-center"
+                className="bento-card border-dashed bg-card/40 p-20 text-center"
             >
                 <div className="mx-auto mb-6 h-20 w-20 rounded-[28px] bg-card flex items-center justify-center shadow-bento">
-                    <Package className="h-10 w-10 text-gray-400" />
+                    <Package className="h-10 w-10 text-foreground/40" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">No products yet</h3>
-                <p className="mt-2 text-gray-500 max-w-sm mx-auto">
+                <h3 className="text-xl font-bold text-foreground">No products yet</h3>
+                <p className="mt-2 text-foreground/50 max-w-sm mx-auto">
                     Add your first product to start selling on your LinkStore.
                 </p>
                 <Link
@@ -73,17 +73,17 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
             variants={container}
             initial="hidden"
             animate="show"
-            className="bento-card overflow-hidden bg-white"
+            className="bento-card overflow-hidden bg-card"
         >
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead>
-                        <tr className="border-b bg-gray-50/50">
-                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Product</th>
-                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Price</th>
-                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Inventory</th>
-                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Added Date</th>
-                            <th className="px-6 py-5 text-right text-xs font-bold uppercase tracking-widest text-gray-400">Actions</th>
+                        <tr className="border-b bg-secondary/50">
+                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Product</th>
+                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Price</th>
+                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Inventory</th>
+                            <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Added Date</th>
+                            <th className="px-6 py-5 text-right text-xs font-bold uppercase tracking-widest text-foreground/40">Actions</th>
                         </tr>
                     </thead>
                     <motion.tbody variants={container} className="divide-y divide-gray-100">
@@ -95,7 +95,7 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
                             >
                                 <td className="px-6 py-5">
                                     <div className="flex items-center gap-4">
-                                        <div className="h-14 w-14 relative rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 group-hover:scale-105 transition-transform">
+                                        <div className="h-14 w-14 relative rounded-2xl overflow-hidden bg-secondary border border-border/50 group-hover:scale-105 transition-transform">
                                             {product.imageUrl ? (
                                                 <Image
                                                     src={product.imageUrl}
@@ -110,13 +110,13 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
                                             )}
                                         </div>
                                         <div>
-                                            <span className="block font-bold text-gray-900 leading-none mb-1">{product.name}</span>
-                                            <span className="text-xs text-gray-400 font-medium">ID: {product.id.slice(-6).toUpperCase()}</span>
+                                            <span className="block font-bold text-foreground leading-none mb-1">{product.name}</span>
+                                            <span className="text-xs text-foreground/40 font-medium">ID: {product.id.slice(-6).toUpperCase()}</span>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-5">
-                                    <span className="font-black text-gray-900">₦{Number(product.price).toLocaleString()}</span>
+                                    <span className="font-black text-foreground">₦{Number(product.price).toLocaleString()}</span>
                                 </td>
                                 <td className="px-6 py-5">
                                     {(() => {
@@ -154,7 +154,7 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
                                         );
                                     })()}
                                 </td>
-                                <td className="px-6 py-5 text-gray-500 font-medium">
+                                <td className="px-6 py-5 text-foreground/50 font-medium">
                                     {new Date(product.createdAt).toLocaleDateString(undefined, {
                                         month: 'short',
                                         day: 'numeric',
@@ -165,7 +165,7 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
                                     <div className="flex justify-end gap-3">
                                         <Link
                                             href={`/dashboard/products/${product.id}`}
-                                            className="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90"
+                                            className="h-10 w-10 flex items-center justify-center rounded-xl bg-secondary text-foreground/40 hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90"
                                             title="Edit Product"
                                         >
                                             <Pencil className="h-4 w-4" />
@@ -173,7 +173,7 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
                                         <button
                                             onClick={() => onDelete(product.id)}
                                             disabled={loading === product.id}
-                                            className="h-10 w-10 flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-600 transition-all active:scale-90 disabled:opacity-50"
+                                            className="h-10 w-10 flex items-center justify-center rounded-xl bg-secondary text-foreground/40 hover:bg-red-50 hover:text-red-600 transition-all active:scale-90 disabled:opacity-50"
                                             title="Delete Product"
                                         >
                                             <Trash className="h-4 w-4" />

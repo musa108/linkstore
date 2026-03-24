@@ -101,23 +101,23 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                         <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
                             <Palette className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xl font-black text-gray-900 tracking-tight">Visual Identity</h3>
+                        <h3 className="text-xl font-black text-foreground tracking-tight">Visual Identity</h3>
                     </div>
 
                     <div className="grid gap-10 md:grid-cols-2">
                         {/* Logo Upload */}
                         <div className="space-y-4">
-                            <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Store Logo</label>
+                            <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Store Logo</label>
                             <div className="flex items-center gap-6">
                                 <input type="hidden" name="logoUrl" value={logoUrl} />
                                 {logoUrl ? (
-                                    <div className="group relative h-32 w-32 overflow-hidden rounded-[24px] border-4 border-white bg-gray-50 shadow-immersive transition-all hover:scale-[1.02]">
+                                    <div className="group relative h-32 w-32 overflow-hidden rounded-[24px] border-4 border-white bg-secondary shadow-immersive transition-all hover:scale-[1.02]">
                                         <Image src={logoUrl} alt="Logo" fill className="object-cover" />
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <button
                                                 type="button"
                                                 onClick={() => setLogoUrl("")}
-                                                className="h-10 w-10 rounded-xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-all active:scale-95"
+                                                className="h-10 w-10 rounded-xl bg-card/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-all active:scale-95"
                                             >
                                                 <X className="h-5 w-5" />
                                             </button>
@@ -131,22 +131,22 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                                             }
                                         }}
                                         uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "linkstore"}
-                                        className="flex h-32 w-32 flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-dashed border-gray-200 bg-gray-50/50 text-gray-400 transition-all hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 group"
+                                        className="flex h-32 w-32 flex-col items-center justify-center gap-2 rounded-[24px] border-2 border-dashed border-border bg-secondary/50 text-foreground/40 transition-all hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 group"
                                     >
                                         <ImagePlus className="h-6 w-6" />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Upload Logo</span>
                                     </CldUploadButton>
                                 )}
                                 <div className="flex-1 space-y-2">
-                                    <p className="text-xs font-bold text-gray-900">Brand Representation</p>
-                                    <p className="text-[11px] text-gray-500 leading-relaxed font-medium">Add a square logo (e.g. 500x500px) for the best appearance in the header.</p>
+                                    <p className="text-xs font-bold text-foreground">Brand Representation</p>
+                                    <p className="text-[11px] text-foreground/50 leading-relaxed font-medium">Add a square logo (e.g. 500x500px) for the best appearance in the header.</p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Color Picker */}
                         <div className="space-y-4">
-                            <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Primary Brand Color</label>
+                            <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Primary Brand Color</label>
                             <div className="flex items-center gap-6">
                                 <div
                                     className="h-20 w-20 rounded-[20px] shadow-immersive border-4 border-white shrink-0 transition-transform hover:rotate-12 cursor-pointer relative"
@@ -164,9 +164,9 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                                         type="text"
                                         value={primaryColor}
                                         onChange={(e) => setPrimaryColor(e.target.value)}
-                                        className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-mono font-black text-gray-700 uppercase focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none shadow-sm"
+                                        className="w-full rounded-xl border border-border/50 bg-card p-3 text-xs font-mono font-black text-foreground/80 uppercase focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none shadow-sm"
                                     />
-                                    <p className="text-[11px] text-gray-500 font-medium leading-relaxed">This color will be applied to your buttons, highlights, and icons.</p>
+                                    <p className="text-[11px] text-foreground/50 font-medium leading-relaxed">This color will be applied to your buttons, highlights, and icons.</p>
                                 </div>
                             </div>
                         </div>
@@ -179,41 +179,41 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                         <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                             <Megaphone className="h-4 w-4" />
                         </div>
-                        <h3 className="text-xl font-black text-gray-900 tracking-tight">Announcement Bar</h3>
+                        <h3 className="text-xl font-black text-foreground tracking-tight">Announcement Bar</h3>
                     </div>
 
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Banner Message</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Banner Message</label>
                         <textarea
                             name="announcement"
                             defaultValue={initialData.announcement || ""}
-                            className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none h-24 resize-none shadow-sm"
+                            className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 text-sm font-bold text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none h-24 resize-none shadow-sm"
                             placeholder="e.g. Free delivery on orders over ₦50,000 this weekend! 🚚"
                         />
-                        <p className="text-[11px] text-gray-400 font-medium ml-1 italic">Leave empty to hide the announcement bar on your storefront.</p>
+                        <p className="text-[11px] text-foreground/40 font-medium ml-1 italic">Leave empty to hide the announcement bar on your storefront.</p>
                     </div>
                 </motion.div>
 
                 <motion.div variants={item} className="grid gap-8 md:grid-cols-2">
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Store Name</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Store Name</label>
                         <input
                             name="name"
                             defaultValue={initialData.name}
                             placeholder="My Amazing Shop"
-                            className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                            className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 text-sm font-bold text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                         />
                     </div>
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Store Link (Slug)</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Store Link (Slug)</label>
                         <div className="relative">
                             <input
                                 name="slug"
                                 defaultValue={initialData.slug}
-                                className="w-full rounded-2xl border border-gray-100 bg-gray-100/50 p-4 pl-12 text-sm font-bold text-gray-400 cursor-not-allowed outline-none"
+                                className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 pl-12 text-sm font-bold text-foreground/40 cursor-not-allowed outline-none"
                                 disabled
                             />
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40">
                                 <span className="text-xs font-bold">/@</span>
                             </div>
                         </div>
@@ -221,11 +221,11 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                 </motion.div>
 
                 <motion.div variants={item} className="space-y-3">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Store Description</label>
+                    <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Store Description</label>
                     <textarea
                         name="description"
                         defaultValue={initialData.description || ""}
-                        className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none h-32 resize-none shadow-sm"
+                        className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 text-sm font-bold text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none h-32 resize-none shadow-sm"
                         placeholder="Tell your customers about your shop. This will appear on your storefront..."
                     />
                 </motion.div>
@@ -234,36 +234,36 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                 <motion.div variants={item} className="pt-4">
                     <div className="rounded-[32px] bg-indigo-50/30 border border-indigo-100 p-8 space-y-8">
                         <div>
-                            <h3 className="text-lg font-black text-gray-900 tracking-tight">Advanced Features</h3>
+                            <h3 className="text-lg font-black text-foreground tracking-tight">Advanced Features</h3>
                             <p className="text-xs text-indigo-500 font-bold uppercase tracking-wider mt-1">Configure automation and analytics preferences.</p>
                         </div>
 
                         <div className="grid gap-8 md:grid-cols-2">
                             <div className="space-y-3">
-                                <label className="text-sm font-black text-gray-700 ml-1">WhatsApp Number</label>
+                                <label className="text-sm font-black text-foreground/80 ml-1">WhatsApp Number</label>
                                 <div className="relative">
                                     <input
                                         name="phoneNumber"
                                         defaultValue={initialData.phoneNumber || ""}
                                         placeholder="2348012345678"
-                                        className="w-full rounded-2xl border border-white bg-white/80 p-4 pl-12 text-sm font-black text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                        className="w-full rounded-2xl border border-white bg-card/80 p-4 pl-12 text-sm font-black text-foreground focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                                     />
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 font-bold">
                                         +
                                     </div>
                                 </div>
-                                <p className="text-[10px] text-gray-400 font-medium ml-1">Format: 2348012345678 (no &quot;+&quot; sign)</p>
+                                <p className="text-[10px] text-foreground/40 font-medium ml-1">Format: 2348012345678 (no &quot;+&quot; sign)</p>
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-black text-gray-700 ml-1">Low Stock Alert Threshold</label>
+                                <label className="text-sm font-black text-foreground/80 ml-1">Low Stock Alert Threshold</label>
                                 <input
                                     name="lowStockThreshold"
                                     type="number"
                                     defaultValue={initialData.lowStockThreshold || 5}
-                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                    className="w-full rounded-2xl border border-white bg-card/80 p-4 text-sm font-black text-foreground focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                                 />
-                                <p className="text-[10px] text-gray-400 font-medium ml-1">Get alerts when stock falls below this number.</p>
+                                <p className="text-[10px] text-foreground/40 font-medium ml-1">Get alerts when stock falls below this number.</p>
                             </div>
                         </div>
                     </div>
@@ -273,28 +273,28 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                 <motion.div variants={item} className="pt-4">
                     <div className="rounded-[32px] bg-indigo-50/30 border border-indigo-100 p-8 space-y-6">
                         <div>
-                            <h3 className="text-lg font-black text-gray-900 tracking-tight">Delivery Logistics</h3>
+                            <h3 className="text-lg font-black text-foreground tracking-tight">Delivery Logistics</h3>
                             <p className="text-xs text-indigo-500 font-bold uppercase tracking-wider mt-1">Configure flat-rate delivery fees for your local region.</p>
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-3">
-                                <label className="text-sm font-black text-gray-700 ml-1">Mainland Fee (₦)</label>
+                                <label className="text-sm font-black text-foreground/80 ml-1">Mainland Fee (₦)</label>
                                 <input
                                     name="mainlandDeliveryFee"
                                     type="number"
                                     defaultValue={Number(initialData.mainlandDeliveryFee)}
-                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                    className="w-full rounded-2xl border border-white bg-card/80 p-4 text-sm font-black text-foreground focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                                     placeholder="0"
                                 />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-sm font-black text-gray-700 ml-1">Island Fee (₦)</label>
+                                <label className="text-sm font-black text-foreground/80 ml-1">Island Fee (₦)</label>
                                 <input
                                     name="islandDeliveryFee"
                                     type="number"
                                     defaultValue={Number(initialData.islandDeliveryFee)}
-                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                    className="w-full rounded-2xl border border-white bg-card/80 p-4 text-sm font-black text-foreground focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                                     placeholder="0"
                                 />
                             </div>
@@ -307,7 +307,7 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                     <div className="rounded-[32px] bg-emerald-50/30 border border-emerald-100 p-8 space-y-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h3 className="text-lg font-black text-gray-900 tracking-tight">Payout Details</h3>
+                                <h3 className="text-lg font-black text-foreground tracking-tight">Payout Details</h3>
                                 <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider mt-1">Where you want your money settled.</p>
                             </div>
                             {initialData.subaccountCode && (
@@ -320,7 +320,7 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
 
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="space-y-3">
-                                <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
+                                <label className="text-sm font-black text-foreground/80 ml-1 flex items-center gap-2">
                                     <Landmark className="h-4 w-4 text-emerald-600" />
                                     Settlement Bank
                                 </label>
@@ -328,7 +328,7 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                                     name="bankCode"
                                     defaultValue={initialData.bankName || ""}
                                     disabled={!!initialData.subaccountCode}
-                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm appearance-none disabled:opacity-60"
+                                    className="w-full rounded-2xl border border-white bg-card/80 p-4 text-sm font-black text-foreground focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm appearance-none disabled:opacity-60"
                                     onChange={(e) => {
                                         const selectedBank = banks.find(b => b.code === e.target.value);
                                         if (selectedBank) {
@@ -347,7 +347,7 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
+                                <label className="text-sm font-black text-foreground/80 ml-1 flex items-center gap-2">
                                     <CreditCard className="h-4 w-4 text-emerald-600" />
                                     Account Number
                                 </label>
@@ -357,12 +357,12 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                                     defaultValue={initialData.accountNumber || ""}
                                     disabled={!!initialData.subaccountCode}
                                     placeholder="0123456789"
-                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm disabled:opacity-60"
+                                    className="w-full rounded-2xl border border-white bg-card/80 p-4 text-sm font-black text-foreground focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm disabled:opacity-60"
                                 />
                             </div>
 
                             <div className="space-y-3 md:col-span-2">
-                                <label className="text-sm font-black text-gray-700 ml-1 flex items-center gap-2">
+                                <label className="text-sm font-black text-foreground/80 ml-1 flex items-center gap-2">
                                     <User className="h-4 w-4 text-emerald-600" />
                                     Account Name
                                 </label>
@@ -372,7 +372,7 @@ export default function SettingsForm({ initialData, banks }: SettingsFormProps) 
                                     defaultValue={initialData.accountName || ""}
                                     disabled={!!initialData.subaccountCode}
                                     placeholder="Your Full Name"
-                                    className="w-full rounded-2xl border border-white bg-white/80 p-4 text-sm font-black text-gray-900 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm disabled:opacity-60"
+                                    className="w-full rounded-2xl border border-white bg-card/80 p-4 text-sm font-black text-foreground focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/5 transition-all outline-none shadow-sm disabled:opacity-60"
                                 />
                             </div>
                         </div>

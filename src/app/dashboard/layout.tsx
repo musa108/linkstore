@@ -34,7 +34,7 @@ export default function DashboardLayout({
                         <Link
                             key={item.href}
                             href={item.href}
-                            className="flex items-center gap-4 rounded-xl p-3 text-gray-500 transition-all hover:bg-primary/5 hover:text-primary active:scale-95 group/item"
+                            className="flex items-center gap-4 rounded-xl p-3 text-foreground/50 transition-all hover:bg-primary/5 hover:text-primary active:scale-95 group/item"
                         >
                             <item.icon className="h-6 w-6 shrink-0" />
                             <span className="text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -45,9 +45,9 @@ export default function DashboardLayout({
                 </nav>
 
                 <div className="mt-auto px-4 w-full flex justify-center group-hover:justify-start">
-                    <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer w-full">
+                    <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-secondary transition-colors cursor-pointer w-full">
                         <UserButton />
-                        <span className="text-sm font-semibold text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        <span className="text-sm font-semibold text-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                             My Account
                         </span>
                     </div>
@@ -61,10 +61,10 @@ export default function DashboardLayout({
                         <div className="lg:hidden h-8 w-8 rounded-lg relative overflow-hidden shadow-indigo-500/20">
                             <Image src="/logo.png" alt="L" fill className="object-cover" />
                         </div>
-                        <h2 className="text-xs font-black uppercase tracking-widest text-gray-400">Dashboard</h2>
+                        <h2 className="text-xs font-black uppercase tracking-widest text-foreground/40">Dashboard</h2>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="hidden sm:flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-[10px] md:text-xs font-black uppercase tracking-widest text-gray-600 shadow-sm">
+                        <div className="hidden sm:flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-[10px] md:text-xs font-black uppercase tracking-widest text-foreground/60 shadow-sm">
                             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                             Live Store
                         </div>
@@ -82,7 +82,7 @@ export default function DashboardLayout({
             </div>
 
             {/* Mobile Bottom Navigation */}
-            <nav className="fixed bottom-0 left-0 z-50 w-full lg:hidden bg-white/80 backdrop-blur-xl border-t border-border/50 px-6 py-4 flex items-center justify-between shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+            <nav className="fixed bottom-0 left-0 z-50 w-full lg:hidden bg-card/80 backdrop-blur-xl border-t border-border/50 px-6 py-4 flex items-center justify-between shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
                 {[
                     { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
                     { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
@@ -93,7 +93,7 @@ export default function DashboardLayout({
                     <Link
                         key={item.href}
                         href={item.href}
-                        className="flex flex-col items-center gap-1 text-gray-400 transition-all active:scale-90"
+                        className="flex flex-col items-center gap-1 text-foreground/40 transition-all active:scale-90"
                     >
                         <item.icon className="h-6 w-6" />
                         <span className="text-[10px] font-black uppercase tracking-tighter">

@@ -77,8 +77,8 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                         </span>
                     </div>
                     <div className="mt-6">
-                        <p className="text-4xl font-black tracking-tighter text-gray-900">{storeStats.visits.toLocaleString()}</p>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Total Store Visits</p>
+                        <p className="text-4xl font-black tracking-tighter text-foreground">{storeStats.visits.toLocaleString()}</p>
+                        <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mt-1">Total Store Visits</p>
                     </div>
                 </motion.div>
 
@@ -92,8 +92,8 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                         </span>
                     </div>
                     <div className="mt-6">
-                        <p className="text-4xl font-black tracking-tighter text-gray-900">{overallConversion}%</p>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Visit-to-Click Rate</p>
+                        <p className="text-4xl font-black tracking-tighter text-foreground">{overallConversion}%</p>
+                        <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mt-1">Visit-to-Click Rate</p>
                     </div>
                 </motion.div>
 
@@ -105,8 +105,8 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                             </div>
                         </div>
                         <div className="mt-6">
-                            <p className="text-4xl font-black tracking-tighter text-gray-900">₦{totalRevenue.toLocaleString()}</p>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Total Verified Revenue</p>
+                            <p className="text-4xl font-black tracking-tighter text-foreground">₦{totalRevenue.toLocaleString()}</p>
+                            <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mt-1">Total Verified Revenue</p>
                         </div>
                     </div>
                     <div className="absolute -right-4 -bottom-4 h-32 w-32 bg-emerald-50/50 rounded-full blur-2xl" />
@@ -115,19 +115,19 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
 
             {/* Product Performance Table */}
             <motion.div variants={item} className="bento-card overflow-hidden">
-                <div className="p-8 border-b border-gray-100 flex items-center justify-between">
+                <div className="p-8 border-b border-border/50 flex items-center justify-between">
                     <div>
-                        <h3 className="text-xl font-black text-gray-900 tracking-tight">Product Performance</h3>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">Detailed breakdown of product-level metrics.</p>
+                        <h3 className="text-xl font-black text-foreground tracking-tight">Product Performance</h3>
+                        <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mt-1">Detailed breakdown of product-level metrics.</p>
                     </div>
-                    <div className="h-10 px-4 rounded-xl bg-gray-50 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 border border-gray-100">
+                    <div className="h-10 px-4 rounded-xl bg-secondary flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/40 border border-border/50">
                         Sorted by Revenue
                     </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-gray-50/50 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-b border-gray-100">
+                            <tr className="bg-secondary/50 text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 border-b border-border/50">
                                 <th className="px-8 py-5">Product</th>
                                 <th className="px-8 py-5">Views</th>
                                 <th className="px-8 py-5">Sales</th>
@@ -137,10 +137,10 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {productPerformance.map((product) => (
-                                <tr key={product.id} className="group hover:bg-gray-50/50 transition-colors">
+                                <tr key={product.id} className="group hover:bg-secondary/50 transition-colors">
                                     <td className="px-8 py-5">
                                         <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 relative rounded-xl overflow-hidden bg-gray-100 border border-gray-100 group-hover:scale-105 transition-transform">
+                                            <div className="h-12 w-12 relative rounded-xl overflow-hidden bg-secondary border border-border/50 group-hover:scale-105 transition-transform">
                                                 {product.imageUrl ? (
                                                     <Image src={product.imageUrl} alt={product.name} fill className="object-cover" />
                                                 ) : (
@@ -150,24 +150,24 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                                                 )}
                                             </div>
                                             <div>
-                                                <span className="block font-black text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-1">{product.name}</span>
-                                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ID: {product.id.slice(-6).toUpperCase()}</span>
+                                                <span className="block font-black text-foreground group-hover:text-indigo-600 transition-colors line-clamp-1">{product.name}</span>
+                                                <span className="text-[10px] text-foreground/40 font-bold uppercase tracking-widest">ID: {product.id.slice(-6).toUpperCase()}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5 text-gray-600 font-bold">
+                                    <td className="px-8 py-5 text-foreground/60 font-bold">
                                         <div className="flex items-center gap-2">
                                             <Eye className="h-3 w-3 text-indigo-400" />
                                             {product.views.toLocaleString()}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5 text-gray-600 font-bold">
+                                    <td className="px-8 py-5 text-foreground/60 font-bold">
                                         <div className="flex items-center gap-2">
                                             <ShoppingBag className="h-3 w-3 text-emerald-400" />
                                             {product.unitsSold.toLocaleString()}
                                         </div>
                                     </td>
-                                    <td className="px-8 py-5 text-gray-900 font-black">
+                                    <td className="px-8 py-5 text-foreground font-black">
                                         ₦{product.revenue.toLocaleString()}
                                     </td>
                                     <td className="px-8 py-5 text-right">
@@ -186,23 +186,23 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
             {/* Conversion Insights */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <motion.div variants={item} className="bento-card p-8">
-                    <h3 className="text-xl font-black text-gray-900 tracking-tight mb-8">Sales Funnel</h3>
+                    <h3 className="text-xl font-black text-foreground tracking-tight mb-8">Sales Funnel</h3>
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-foreground/40">
                                 <span>Store Visits</span>
                                 <span>100%</span>
                             </div>
-                            <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
                                 <div className="h-full bg-indigo-600 transition-all" style={{ width: '100%' }} />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-foreground/40">
                                 <span>Click-to-Buy Intent</span>
                                 <span>{overallConversion}% of visits</span>
                             </div>
-                            <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
                                 <div className="h-full bg-amber-500 transition-all" style={{ width: `${overallConversion}%` }} />
                             </div>
                         </div>
@@ -214,11 +214,11 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                                     : "0";
                                 return (
                                     <>
-                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-foreground/40">
                                             <span>Payment Confirmed</span>
                                             <span>{checkoutToPaid}% of clicks</span>
                                         </div>
-                                        <div className="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                                        <div className="h-3 w-full bg-secondary rounded-full overflow-hidden">
                                             <div className="h-full bg-emerald-500 transition-all" style={{ width: `${checkoutToPaid}%` }} />
                                         </div>
                                     </>
@@ -233,11 +233,11 @@ export default function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
                     <p className="text-indigo-100 text-sm font-medium leading-relaxed">
                          Your products with higher view counts but low conversion might need better descriptions or more media. Consider adding a video or positive customer reviews to these items!
                     </p>
-                    <div className="mt-8 p-4 rounded-2xl bg-white/10 border border-white/10">
+                    <div className="mt-8 p-4 rounded-2xl bg-card/10 border border-white/10">
                         <p className="text-[10px] font-black uppercase tracking-widest mb-2">Most viewed product</p>
                         {productPerformance.length > 0 ? (
                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 relative rounded-lg bg-white/20">
+                                <div className="h-10 w-10 relative rounded-lg bg-card/20">
                                     {productPerformance.find(p => p.views === Math.max(...productPerformance.map(i => i.views)))?.imageUrl && (
                                         <Image src={productPerformance.find(p => p.views === Math.max(...productPerformance.map(i => i.views)))!.imageUrl!} alt="Top" fill className="object-cover rounded-lg" />
                                     )}

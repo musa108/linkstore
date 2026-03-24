@@ -19,11 +19,11 @@ export default async function SetupPage() {
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-            <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl">
+        <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
+            <div className="w-full max-w-md space-y-8 rounded-2xl bg-card p-10 shadow-xl">
                 <div className="text-center">
-                    <h1 className="text-3xl font-extrabold text-gray-900">Welcome to LinkStore</h1>
-                    <p className="mt-2 text-gray-600">Let's set up your business storefront.</p>
+                    <h1 className="text-3xl font-extrabold text-foreground">Welcome to LinkStore</h1>
+                    <p className="mt-2 text-foreground/60">Let's set up your business storefront.</p>
                 </div>
 
                 <SetupStoreForm />

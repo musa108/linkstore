@@ -18,11 +18,11 @@ export default async function CheckoutPage({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-12 px-6">
+        <div className="min-h-screen bg-secondary py-12 px-6">
             <div className="mx-auto max-w-4xl space-y-8">
                 <div>
-                    <h1 className="text-3xl font-black tracking-tight text-gray-900">Complete Your Order</h1>
-                    <p className="text-gray-500">Secure checkout for {store.name}</p>
+                    <h1 className="text-3xl font-black tracking-tight text-foreground">Complete Your Order</h1>
+                    <p className="text-foreground/50">Secure checkout for {store.name}</p>
                 </div>
 
                 <CheckoutForm store={serializePrisma(store)} />

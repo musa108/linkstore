@@ -86,8 +86,8 @@ export default function CheckoutForm({ store }: CheckoutFormProps) {
     return (
         <div className="grid gap-12 lg:grid-cols-2">
             <div className="space-y-8">
-        <form action={onSubmit} className="space-y-6 rounded-3xl border bg-white p-6 md:p-8 shadow-sm">
-                    <h2 className="text-xl font-bold text-gray-900">Delivery Details</h2>
+        <form action={onSubmit} className="space-y-6 rounded-3xl border bg-card p-6 md:p-8 shadow-sm">
+                    <h2 className="text-xl font-bold text-foreground">Delivery Details</h2>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
@@ -119,20 +119,20 @@ export default function CheckoutForm({ store }: CheckoutFormProps) {
                             <button
                                 type="button"
                                 onClick={() => setDeliveryArea("MAINLAND")}
-                                className={`flex flex-col items-center justify-center rounded-2xl border-2 p-4 transition-all ${deliveryArea === "MAINLAND" ? "border-indigo-600 bg-indigo-50" : "border-gray-100 hover:border-gray-200"
+                                className={`flex flex-col items-center justify-center rounded-2xl border-2 p-4 transition-all ${deliveryArea === "MAINLAND" ? "border-indigo-600 bg-indigo-50" : "border-border/50 hover:border-border"
                                     }`}
                             >
                                 <span className="font-bold">Mainland</span>
-                                <span className="text-xs text-gray-500 font-medium">₦{Number(store.mainlandDeliveryFee).toLocaleString()}</span>
+                                <span className="text-xs text-foreground/50 font-medium">₦{Number(store.mainlandDeliveryFee).toLocaleString()}</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setDeliveryArea("ISLAND")}
-                                className={`flex flex-col items-center justify-center rounded-2xl border-2 p-4 transition-all ${deliveryArea === "ISLAND" ? "border-indigo-600 bg-indigo-50" : "border-gray-100 hover:border-gray-200"
+                                className={`flex flex-col items-center justify-center rounded-2xl border-2 p-4 transition-all ${deliveryArea === "ISLAND" ? "border-indigo-600 bg-indigo-50" : "border-border/50 hover:border-border"
                                     }`}
                             >
                                 <span className="font-bold">Island</span>
-                                <span className="text-xs text-gray-500 font-medium">₦{Number(store.islandDeliveryFee).toLocaleString()}</span>
+                                <span className="text-xs text-foreground/50 font-medium">₦{Number(store.islandDeliveryFee).toLocaleString()}</span>
                             </button>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ export default function CheckoutForm({ store }: CheckoutFormProps) {
                         {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "Pay Now"}
                     </button>
 
-                    <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-1">
+                    <p className="text-center text-xs text-foreground/40 flex items-center justify-center gap-1">
                         <ShieldCheck className="h-3 w-3" />
                         Secure payment powered by Paystack
                     </p>
@@ -153,39 +153,39 @@ export default function CheckoutForm({ store }: CheckoutFormProps) {
             </div>
 
             <div className="space-y-6">
-                <div className="rounded-3xl border bg-white p-6 md:p-8 shadow-sm space-y-6">
-                    <h2 className="text-xl font-bold text-gray-900 text-center">Order Summary</h2>
+                <div className="rounded-3xl border bg-card p-6 md:p-8 shadow-sm space-y-6">
+                    <h2 className="text-xl font-bold text-foreground text-center">Order Summary</h2>
                     <div className="space-y-4">
                         {cart.items.map((item) => (
                             <div key={`${item.id}-${item.variantId || 'default'}`} className="flex items-center gap-4">
-                                <div className="relative h-16 w-16 overflow-hidden rounded-xl border bg-gray-50">
+                                <div className="relative h-16 w-16 overflow-hidden rounded-xl border bg-secondary">
                                     {item.imageUrl && <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />}
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-bold text-gray-900">{item.name}</p>
+                                    <p className="font-bold text-foreground">{item.name}</p>
                                     {item.variantName && (
                                         <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Option: {item.variantName}</p>
                                     )}
-                                    <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                                    <p className="text-sm text-foreground/50">Qty: {item.quantity}</p>
                                 </div>
-                                <p className="font-bold text-gray-900 sans">₦{(Number(item.price) * item.quantity).toLocaleString()}</p>
+                                <p className="font-bold text-foreground sans">₦{(Number(item.price) * item.quantity).toLocaleString()}</p>
                             </div>
                         ))}
                     </div>
 
-                    <hr className="border-gray-100" />
+                    <hr className="border-border/50" />
 
                     <div className="space-y-2">
-                        <div className="flex justify-between text-gray-500">
+                        <div className="flex justify-between text-foreground/50">
                             <span className="font-medium">Subtotal</span>
                             <span className="font-bold">₦{subtotal.toLocaleString()}</span>
                         </div>
-                        <div className="flex justify-between text-gray-500">
+                        <div className="flex justify-between text-foreground/50">
                             <span className="font-medium">Delivery Fee ({deliveryArea})</span>
                             <span className="font-bold">₦{deliveryFee.toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between pt-4">
-                            <span className="text-xl font-black text-gray-900">Total</span>
+                            <span className="text-xl font-black text-foreground">Total</span>
                             <span className="text-2xl font-black text-indigo-600 sans">₦{total.toLocaleString()}</span>
                         </div>
                     </div>

@@ -44,13 +44,13 @@ export default function OrderList({ orders }: OrderListProps) {
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bento-card border-dashed bg-white/40 p-20 text-center"
+                className="bento-card border-dashed bg-card/40 p-20 text-center"
             >
                 <div className="mx-auto mb-6 h-20 w-20 rounded-[28px] bg-card flex items-center justify-center shadow-bento">
-                    <ShoppingCart className="h-10 w-10 text-gray-400" />
+                    <ShoppingCart className="h-10 w-10 text-foreground/40" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">No orders yet</h3>
-                <p className="mt-2 text-gray-500 max-w-sm mx-auto">
+                <h3 className="text-xl font-bold text-foreground">No orders yet</h3>
+                <p className="mt-2 text-foreground/50 max-w-sm mx-auto">
                     Your sales will appear here once customers start placing orders from your store link.
                 </p>
             </motion.div>
@@ -63,18 +63,18 @@ export default function OrderList({ orders }: OrderListProps) {
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="bento-card overflow-hidden bg-white"
+                className="bento-card overflow-hidden bg-card"
             >
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
                         <thead>
-                            <tr className="border-b bg-gray-50/50">
-                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Order ID</th>
-                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Customer</th>
-                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Details</th>
-                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Amount</th>
-                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-gray-400">Status</th>
-                                <th className="px-6 py-5 text-right text-xs font-bold uppercase tracking-widest text-gray-400">Actions</th>
+                            <tr className="border-b bg-secondary/50">
+                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Order ID</th>
+                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Customer</th>
+                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Details</th>
+                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Amount</th>
+                                <th className="px-6 py-5 text-xs font-bold uppercase tracking-widest text-foreground/40">Status</th>
+                                <th className="px-6 py-5 text-right text-xs font-bold uppercase tracking-widest text-foreground/40">Actions</th>
                             </tr>
                         </thead>
                         <motion.tbody variants={container} className="divide-y divide-gray-100">
@@ -86,26 +86,26 @@ export default function OrderList({ orders }: OrderListProps) {
                                 >
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
-                                            <span className="font-mono font-black text-gray-900">#{order.id.slice(-6).toUpperCase()}</span>
-                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight">
+                                            <span className="font-mono font-black text-foreground">#{order.id.slice(-6).toUpperCase()}</span>
+                                            <span className="text-[10px] text-foreground/40 font-bold uppercase tracking-tight">
                                                 {new Date(order.createdAt).toLocaleDateString()}
                                             </span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="flex flex-col">
-                                            <span className="font-bold text-gray-900">{order.customerName}</span>
-                                            <span className="text-xs text-gray-400 font-medium">{order.customerEmail}</span>
+                                            <span className="font-bold text-foreground">{order.customerName}</span>
+                                            <span className="text-xs text-foreground/40 font-medium">{order.customerEmail}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <div className="flex items-center gap-2 text-gray-500 font-medium">
+                                        <div className="flex items-center gap-2 text-foreground/50 font-medium">
                                             <Package className="h-4 w-4 text-indigo-400" />
                                             <span>{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <span className="font-black text-gray-900">₦{Number(order.total).toLocaleString()}</span>
+                                        <span className="font-black text-foreground">₦{Number(order.total).toLocaleString()}</span>
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="relative inline-block">
@@ -129,7 +129,7 @@ export default function OrderList({ orders }: OrderListProps) {
                                     <td className="px-6 py-5 text-right">
                                         <button
                                             onClick={() => setSelectedOrder(order)}
-                                            className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-gray-50 text-gray-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90"
+                                            className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-secondary text-foreground/40 hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90"
                                         >
                                             <Eye className="h-4 w-4" />
                                         </button>
@@ -149,21 +149,21 @@ export default function OrderList({ orders }: OrderListProps) {
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="w-full max-w-3xl rounded-[32px] bg-white p-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+                            className="w-full max-w-3xl rounded-[32px] bg-card p-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
                         >
-                            <div className="p-8 border-b flex items-center justify-between bg-gray-50/50">
+                            <div className="p-8 border-b flex items-center justify-between bg-secondary/50">
                                 <div className="flex items-center gap-4">
                                     <div className="h-14 w-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200">
                                         <ShoppingCart className="h-7 w-7" />
                                     </div>
                                     <div>
-                                        <h3 className="text-2xl font-black text-gray-900 tracking-tight">Order Details</h3>
-                                        <p className="text-sm font-mono text-gray-400 font-bold uppercase tracking-widest">ID: #{selectedOrder.id.toUpperCase()}</p>
+                                        <h3 className="text-2xl font-black text-foreground tracking-tight">Order Details</h3>
+                                        <p className="text-sm font-mono text-foreground/40 font-bold uppercase tracking-widest">ID: #{selectedOrder.id.toUpperCase()}</p>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setSelectedOrder(null)}
-                                    className="h-12 w-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-50 transition-all shadow-sm"
+                                    className="h-12 w-12 rounded-2xl bg-card border border-border/50 flex items-center justify-center text-foreground/40 hover:text-foreground hover:bg-secondary transition-all shadow-sm"
                                 >
                                     <X className="h-6 w-6" />
                                 </button>
@@ -174,25 +174,25 @@ export default function OrderList({ orders }: OrderListProps) {
                                     <div className="md:col-span-3 space-y-10">
                                         {/* Items List */}
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Line Items ({selectedOrder.items.length})</h4>
+                                            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 mb-6">Line Items ({selectedOrder.items.length})</h4>
                                             <div className="space-y-4">
                                                 {selectedOrder.items.map((item) => (
-                                                    <div key={item.id} className="flex gap-5 items-center p-4 rounded-3xl border border-gray-50 hover:border-gray-100 transition-colors bg-white shadow-sm">
-                                                        <div className="h-16 w-16 bg-gray-50 rounded-2xl shrink-0 overflow-hidden relative border border-gray-100">
+                                                    <div key={item.id} className="flex gap-5 items-center p-4 rounded-3xl border border-gray-50 hover:border-border/50 transition-colors bg-card shadow-sm">
+                                                        <div className="h-16 w-16 bg-secondary rounded-2xl shrink-0 overflow-hidden relative border border-border/50">
                                                             {item.product.imageUrl && (
                                                                 <Image src={item.product.imageUrl} alt={item.product.name} fill className="object-cover" />
                                                             )}
                                                         </div>
                                                         <div className="flex-1">
-                                                            <p className="text-base font-bold text-gray-900 leading-tight mb-1">{item.product.name}</p>
+                                                            <p className="text-base font-bold text-foreground leading-tight mb-1">{item.product.name}</p>
                                                             {item.variant && (
                                                                 <p className="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-1">
                                                                     Option: {item.variant.name}
                                                                 </p>
                                                             )}
-                                                            <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Qty: {item.quantity} · ₦{Number(item.priceAtPurchase).toLocaleString()}</p>
+                                                            <p className="text-xs text-foreground/40 font-bold uppercase tracking-wider">Qty: {item.quantity} · ₦{Number(item.priceAtPurchase).toLocaleString()}</p>
                                                         </div>
-                                                        <p className="text-lg font-black text-gray-900 sans">
+                                                        <p className="text-lg font-black text-foreground sans">
                                                             ₦{(item.quantity * Number(item.priceAtPurchase)).toLocaleString()}
                                                         </p>
                                                     </div>
@@ -201,18 +201,18 @@ export default function OrderList({ orders }: OrderListProps) {
                                         </div>
 
                                         {/* Order Summary Table */}
-                                        <div className="rounded-[32px] bg-gray-50/50 p-8 border border-gray-100 space-y-4">
-                                            <div className="flex justify-between text-sm font-bold text-gray-500">
+                                        <div className="rounded-[32px] bg-secondary/50 p-8 border border-border/50 space-y-4">
+                                            <div className="flex justify-between text-sm font-bold text-foreground/50">
                                                 <span>Subtotal</span>
-                                                <span className="text-gray-900">₦{Number(selectedOrder.subtotal).toLocaleString()}</span>
+                                                <span className="text-foreground">₦{Number(selectedOrder.subtotal).toLocaleString()}</span>
                                             </div>
-                                            <div className="flex justify-between text-sm font-bold text-gray-500">
+                                            <div className="flex justify-between text-sm font-bold text-foreground/50">
                                                 <span>Delivery Fee ({selectedOrder.deliveryArea})</span>
-                                                <span className="text-gray-900">₦{Number(selectedOrder.deliveryFee).toLocaleString()}</span>
+                                                <span className="text-foreground">₦{Number(selectedOrder.deliveryFee).toLocaleString()}</span>
                                             </div>
-                                            <div className="pt-4 border-t border-gray-200 flex justify-between items-center">
-                                                <span className="text-base font-black text-gray-900 uppercase tracking-widest">Total Paid</span>
-                                                <span className="text-3xl font-black text-indigo-600 bg-white px-5 py-2 rounded-2xl shadow-sm border border-indigo-50">
+                                            <div className="pt-4 border-t border-border flex justify-between items-center">
+                                                <span className="text-base font-black text-foreground uppercase tracking-widest">Total Paid</span>
+                                                <span className="text-3xl font-black text-indigo-600 bg-card px-5 py-2 rounded-2xl shadow-sm border border-indigo-50">
                                                     ₦{Number(selectedOrder.total).toLocaleString()}
                                                 </span>
                                             </div>
@@ -223,21 +223,21 @@ export default function OrderList({ orders }: OrderListProps) {
                                         {/* Customer & Shipping */}
                                         <div className="space-y-10">
                                             <div>
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Customer Profile</h4>
-                                                <div className="space-y-4 p-6 rounded-3xl bg-white border border-gray-100 shadow-sm">
+                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 mb-6">Customer Profile</h4>
+                                                <div className="space-y-4 p-6 rounded-3xl bg-card border border-border/50 shadow-sm">
                                                     <div className="flex flex-col">
-                                                        <span className="text-lg font-black text-gray-900 leading-none mb-1">{selectedOrder.customerName}</span>
+                                                        <span className="text-lg font-black text-foreground leading-none mb-1">{selectedOrder.customerName}</span>
                                                         <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">{selectedOrder.status}</span>
                                                     </div>
                                                     <div className="space-y-3 pt-2">
-                                                        <a href={`mailto:${selectedOrder.customerEmail}`} className="flex items-center gap-3 text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors">
-                                                            <div className="h-8 w-8 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                                                        <a href={`mailto:${selectedOrder.customerEmail}`} className="flex items-center gap-3 text-sm font-bold text-foreground/60 hover:text-indigo-600 transition-colors">
+                                                            <div className="h-8 w-8 rounded-xl bg-secondary flex items-center justify-center shrink-0">
                                                                 <Mail className="h-4 w-4" />
                                                             </div>
                                                             {selectedOrder.customerEmail}
                                                         </a>
-                                                        <a href={`tel:${selectedOrder.customerPhone}`} className="flex items-center gap-3 text-sm font-bold text-gray-600 hover:text-indigo-600 transition-colors">
-                                                            <div className="h-8 w-8 rounded-xl bg-gray-50 flex items-center justify-center shrink-0">
+                                                        <a href={`tel:${selectedOrder.customerPhone}`} className="flex items-center gap-3 text-sm font-bold text-foreground/60 hover:text-indigo-600 transition-colors">
+                                                            <div className="h-8 w-8 rounded-xl bg-secondary flex items-center justify-center shrink-0">
                                                                 <Phone className="h-4 w-4" />
                                                             </div>
                                                             {selectedOrder.customerPhone}
@@ -247,12 +247,12 @@ export default function OrderList({ orders }: OrderListProps) {
                                             </div>
 
                                             <div>
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Shipping Address</h4>
+                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 mb-6">Shipping Address</h4>
                                                 <div className="p-6 rounded-3xl bg-indigo-50/30 border border-indigo-100 shadow-sm flex gap-4">
-                                                    <div className="h-10 w-10 rounded-2xl bg-white border border-indigo-100 flex items-center justify-center shrink-0 text-indigo-500 shadow-sm">
+                                                    <div className="h-10 w-10 rounded-2xl bg-card border border-indigo-100 flex items-center justify-center shrink-0 text-indigo-500 shadow-sm">
                                                         <MapPin className="h-5 w-5" />
                                                     </div>
-                                                    <p className="text-sm font-bold text-gray-700 leading-relaxed pt-1">
+                                                    <p className="text-sm font-bold text-foreground/80 leading-relaxed pt-1">
                                                         {selectedOrder.address}
                                                     </p>
                                                 </div>
@@ -262,7 +262,7 @@ export default function OrderList({ orders }: OrderListProps) {
                                 </div>
                             </div>
 
-                            <div className="p-8 bg-gray-50/50 border-t flex gap-4">
+                            <div className="p-8 bg-secondary/50 border-t flex gap-4">
                                 <button
                                     onClick={() => setSelectedOrder(null)}
                                     className="flex-1 h-14 rounded-2xl bg-gray-900 p-4 text-xs font-black uppercase tracking-[0.2em] text-white hover:bg-black transition-all shadow-lg active:scale-95"

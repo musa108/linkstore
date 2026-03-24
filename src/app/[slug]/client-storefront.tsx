@@ -143,13 +143,13 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
 
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-foreground transition-colors" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40 group-focus-within:text-foreground transition-colors" />
                             <input
                                 type="text"
                                 placeholder="Search catalog..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="h-12 w-64 rounded-2xl bg-gray-50/50 border border-gray-100 pl-11 pr-4 text-sm font-bold placeholder:text-gray-400 focus:bg-white focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none"
+                                className="h-12 w-64 rounded-2xl bg-secondary/50 border border-border/50 pl-11 pr-4 text-sm font-bold placeholder:text-foreground/40 focus:bg-card focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none"
                             />
                         </div>
                         <button
@@ -179,13 +179,13 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                 {/* Search Bar Mobile */}
                 <motion.div variants={item} className="md:hidden mb-12">
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/40" />
                         <input
                             type="text"
                             placeholder="Find products..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="h-14 w-full rounded-2xl bg-white border border-gray-100 pl-11 pr-4 text-base font-bold shadow-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none"
+                            className="h-14 w-full rounded-2xl bg-card border border-border/50 pl-11 pr-4 text-base font-bold shadow-sm focus:border-indigo-600 focus:ring-4 focus:ring-indigo-600/5 outline-none"
                         />
                     </div>
                 </motion.div>
@@ -193,7 +193,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                 {/* Immersive Hero */}
                 <motion.div variants={item} className="mb-32">
                     <div
-                        className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-1.5 text-xs font-black uppercase tracking-widest shadow-sm mb-12"
+                        className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-black uppercase tracking-widest shadow-sm mb-12"
                         style={{ color: primaryColor }}
                     >
                         <div className="relative h-3 w-3">
@@ -205,7 +205,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                         Elevate your <br />
                         <span style={{ color: primaryColor }}>lifestyle.</span>
                     </h1>
-                    <p className="max-w-xl text-xl font-medium text-gray-500/80 leading-relaxed">
+                    <p className="max-w-xl text-xl font-medium text-foreground/50/80 leading-relaxed">
                         {store.description || `Welcome to ${store.name}. We provide high-quality products curated for those who value excellence.`}
                     </p>
                 </motion.div>
@@ -238,7 +238,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                             <Package className="h-16 w-16" />
                                         </div>
                                     )}
-                                    <div className="absolute right-4 top-4 rounded-full bg-white/95 px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-sm border border-border/50 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
+                                    <div className="absolute right-4 top-4 rounded-full bg-card/95 px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase shadow-sm border border-border/50 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
                                         In Stock
                                     </div>
                                 </div>
@@ -251,7 +251,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                         >
                                             {product.name}
                                         </h3>
-                                        <p className="mt-1 text-sm font-medium text-gray-400 line-clamp-2 leading-relaxed">
+                                        <p className="mt-1 text-sm font-medium text-foreground/40 line-clamp-2 leading-relaxed">
                                             {product.description}
                                         </p>
                                     </div>
@@ -269,7 +269,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                                         }}
                                                         className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${selectedVariants[product.id] === v.id
                                                             ? "bg-foreground text-card border-foreground"
-                                                            : "bg-white text-gray-400 border-gray-100 hover:border-gray-300"
+                                                            : "bg-card text-foreground/40 border-border/50 hover:border-border/80"
                                                             }`}
                                                     >
                                                         {v.name}
@@ -281,7 +281,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
 
                                     <div className="mt-auto pt-6 flex items-center justify-between">
                                         <div className="flex flex-col">
-                                            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Price</span>
+                                            <span className="text-xs font-bold uppercase tracking-widest text-foreground/40">Price</span>
                                             <span className="text-3xl font-black tracking-tighter text-foreground">
                                                 ₦{Number(product.price).toLocaleString()}
                                             </span>
@@ -304,10 +304,10 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                 </div>
 
                 {filteredProducts.length === 0 && (
-                    <motion.div variants={item} className="py-40 text-center bento-card border-dashed bg-white/30">
+                    <motion.div variants={item} className="py-40 text-center bento-card border-dashed bg-card/30">
                         <ShoppingBag className="h-20 w-20 mx-auto text-gray-200 mb-6" />
                         <h3 className="text-2xl font-black text-foreground">No items found</h3>
-                        <p className="mt-3 text-gray-400 max-w-xs mx-auto font-medium">We couldn&apos;t find anything matching &quot;{searchQuery}&quot;. Try a different term.</p>
+                        <p className="mt-3 text-foreground/40 max-w-xs mx-auto font-medium">We couldn&apos;t find anything matching &quot;{searchQuery}&quot;. Try a different term.</p>
                     </motion.div>
                 )}
             </motion.main>
@@ -333,7 +333,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                         >
                             <button
                                 onClick={() => setSelectedProduct(null)}
-                                className="absolute right-6 top-6 z-20 p-3 rounded-2xl bg-white/80 backdrop-blur-md text-gray-900 hover:bg-gray-900 hover:text-white transition-all shadow-sm border border-gray-100"
+                                className="absolute right-6 top-6 z-20 p-3 rounded-2xl bg-card/80 backdrop-blur-md text-foreground hover:bg-gray-900 hover:text-white transition-all shadow-sm border border-border/50"
                             >
                                 <X className="h-5 w-5" />
                             </button>
@@ -357,18 +357,18 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                             {/* Info Section */}
                             <div className="flex-1 p-8 md:p-12 overflow-y-auto flex flex-col">
                                 <div className="mb-auto">
-                                    <div className="inline-flex items-center gap-2 rounded-full border border-border bg-gray-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-6">
+                                    <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-[10px] font-black uppercase tracking-widest text-foreground/40 mb-6">
                                         In Stock
                                     </div>
-                                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-gray-900 mb-4">{selectedProduct.name}</h2>
-                                    <p className="text-gray-500 font-medium leading-relaxed mb-10 text-lg">
+                                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-foreground mb-4">{selectedProduct.name}</h2>
+                                    <p className="text-foreground/50 font-medium leading-relaxed mb-10 text-lg">
                                         {selectedProduct.description || "No description available for this product."}
                                     </p>
 
                                     {/* Modal Variant Selector */}
                                     {selectedProduct.variants && selectedProduct.variants.length > 0 && (
                                         <div className="space-y-4 mb-10">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Choose Option</p>
+                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Choose Option</p>
                                             <div className="flex flex-wrap gap-3">
                                                 {selectedProduct.variants.map((v) => (
                                                     <button
@@ -376,7 +376,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                                         onClick={() => setSelectedVariants({ ...selectedVariants, [selectedProduct.id]: v.id })}
                                                         className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border-2 ${selectedVariants[selectedProduct.id] === v.id
                                                             ? "bg-foreground text-card border-foreground shadow-lg"
-                                                            : "bg-white text-gray-400 border-gray-100 hover:border-gray-300"
+                                                            : "bg-card text-foreground/40 border-border/50 hover:border-border/80"
                                                             }`}
                                                     >
                                                         {v.name}
@@ -392,10 +392,10 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                     )}
                                 </div>
 
-                                <div className="mt-12 pt-10 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-8">
+                                <div className="mt-12 pt-10 border-t border-border/50 flex flex-col md:flex-row md:items-center justify-between gap-8">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Current Price</p>
-                                        <p className="text-4xl font-black tracking-tighter text-gray-900">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Current Price</p>
+                                        <p className="text-4xl font-black tracking-tighter text-foreground">
                                             ₦{Number(selectedProduct.price).toLocaleString()}
                                         </p>
                                     </div>
@@ -440,7 +440,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                             <div className="flex items-center justify-between px-6 md:px-10 py-8 md:py-12">
                                 <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-foreground">
                                     Bag
-                                    <span className="ml-3 text-sm font-bold tracking-normal text-gray-400">({cart.getTotalItems()} ITEMS)</span>
+                                    <span className="ml-3 text-sm font-bold tracking-normal text-foreground/40">({cart.getTotalItems()} ITEMS)</span>
                                 </h2>
                                 <button
                                     onClick={() => setIsOpen(false)}
@@ -458,7 +458,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                         </div>
                                         <div className="space-y-2">
                                             <p className="text-xl font-black text-foreground">Waiting for items</p>
-                                            <p className="text-gray-400 font-medium tracking-tight">Your shopping bag is currently empty.</p>
+                                            <p className="text-foreground/40 font-medium tracking-tight">Your shopping bag is currently empty.</p>
                                         </div>
                                     </div>
                                 ) : (
@@ -483,7 +483,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                                             <div className="space-y-0.5">
                                                                 <h3 className="text-lg font-black text-foreground leading-tight pr-4">{item.name}</h3>
                                                                 {item.variantName && (
-                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">
                                                                         Option: {item.variantName}
                                                                     </p>
                                                                 )}
@@ -496,21 +496,21 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                                             <div className="flex items-center gap-1 bg-canvas rounded-xl p-1 border border-border">
                                                                 <button
                                                                     onClick={() => cart.updateQuantity(item.id, item.quantity - 1, item.variantId)}
-                                                                    className="rounded-lg bg-card p-2 text-gray-400 shadow-sm transition-all hover:scale-110 focus:text-indigo-600"
+                                                                    className="rounded-lg bg-card p-2 text-foreground/40 shadow-sm transition-all hover:scale-110 focus:text-indigo-600"
                                                                 >
                                                                     <Minus className="h-3 w-3" />
                                                                 </button>
                                                                 <span className="min-w-[34px] text-center text-sm font-black text-foreground">{item.quantity}</span>
                                                                 <button
                                                                     onClick={() => cart.updateQuantity(item.id, item.quantity + 1, item.variantId)}
-                                                                    className="rounded-lg bg-card p-2 text-gray-400 shadow-sm transition-all hover:scale-110 focus:text-indigo-600"
+                                                                    className="rounded-lg bg-card p-2 text-foreground/40 shadow-sm transition-all hover:scale-110 focus:text-indigo-600"
                                                                 >
                                                                     <Plus className="h-3 w-3" />
                                                                 </button>
                                                             </div>
                                                             <button
                                                                 onClick={() => cart.removeItem(item.id, item.variantId)}
-                                                                className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-red-500 transition-colors"
+                                                                className="text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:text-red-500 transition-colors"
                                                             >
                                                                 Remove
                                                             </button>
@@ -527,7 +527,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                 <div className="bg-canvas/50 backdrop-blur-md px-6 md:px-10 py-8 md:py-12 space-y-6 md:space-y-8 border-t border-border">
                                     <div className="flex items-end justify-between">
                                         <div className="space-y-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Grand Total</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Grand Total</span>
                                             <p className="text-3xl md:text-4xl font-black tracking-tighter text-foreground">
                                                 ₦{cart.getTotalPrice().toLocaleString()}
                                             </p>
@@ -567,7 +567,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                     </div>
                     <div>
                         <p className="text-sm font-black uppercase tracking-[0.4em] text-foreground">© {store.name}</p>
-                        <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                        <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-foreground/40">
                             Powered by <span style={{ color: primaryColor }}>LinkStore</span>
                         </p>
                     </div>

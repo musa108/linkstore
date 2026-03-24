@@ -67,8 +67,8 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
             className="space-y-10"
         >
             <motion.div variants={item}>
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight">Welcome back, {store.name}</h2>
-                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Here is what is happening with your store today.</p>
+                <h2 className="text-4xl font-black text-foreground tracking-tight">Welcome back, {store.name}</h2>
+                <p className="text-sm font-bold text-foreground/40 uppercase tracking-widest mt-1">Here is what is happening with your store today.</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-8 auto-rows-fr">
@@ -84,8 +84,8 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                                     <TrendingUp className="h-9 w-9" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Total Visits</h3>
-                                    <p className="text-6xl md:text-8xl font-black tracking-tighter text-gray-900 mt-4 leading-none">{store.visits}</p>
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40">Total Visits</h3>
+                                    <p className="text-6xl md:text-8xl font-black tracking-tighter text-foreground mt-4 leading-none">{store.visits}</p>
                                 </div>
                             </div>
                             <div className="text-right">
@@ -106,8 +106,8 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                     className="md:col-span-2 bento-card p-10 flex items-center justify-between group border-amber-100/50"
                 >
                     <div className="space-y-4">
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Conversion Rate</h3>
-                        <p className="text-6xl font-black tracking-tighter text-gray-900 leading-none">
+                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40">Conversion Rate</h3>
+                        <p className="text-6xl font-black tracking-tighter text-foreground leading-none">
                             {store.visits > 0 ? ((store.conversionClicks / store.visits) * 100).toFixed(1) : 0}%
                         </p>
                     </div>
@@ -125,8 +125,8 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                         <ShoppingCart className="h-6 w-6" />
                     </div>
                     <div className="mt-6">
-                        <p className="text-3xl font-black tracking-tighter text-gray-900 leading-none mb-2">{store._count?.orders || 0}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Orders</p>
+                        <p className="text-3xl font-black tracking-tighter text-foreground leading-none mb-2">{store._count?.orders || 0}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Total Orders</p>
                     </div>
                 </motion.div>
 
@@ -138,8 +138,8 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                         <TrendingUp className="h-6 w-6" />
                     </div>
                     <div className="mt-6">
-                        <p className="text-3xl font-black tracking-tighter text-gray-900 leading-none mb-2">₦{totalRevenue.toLocaleString()}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Sales</p>
+                        <p className="text-3xl font-black tracking-tighter text-foreground leading-none mb-2">₦{totalRevenue.toLocaleString()}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Total Sales</p>
                     </div>
                 </motion.div>
             </div>
@@ -147,7 +147,7 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
             {/* Empty State / Activity Section */}
             <motion.div
                 variants={item}
-                className="mt-12 bento-card border-dashed bg-white/40 p-10 md:p-20 text-center relative overflow-hidden group shadow-immersive"
+                className="mt-12 bento-card border-dashed bg-card/40 p-10 md:p-20 text-center relative overflow-hidden group shadow-immersive"
             >
                 <motion.div
                     animate={{
@@ -164,11 +164,11 @@ export default function DashboardOverview({ store, chartData = [], totalRevenue 
                 />
 
                 <div className="relative z-10">
-                    <div className="mx-auto mb-8 h-24 w-24 rounded-[32px] bg-white relative overflow-hidden shadow-bento group-hover:scale-110 group-hover:rotate-6 transition-all border border-gray-100 p-4">
+                    <div className="mx-auto mb-8 h-24 w-24 rounded-[32px] bg-card relative overflow-hidden shadow-bento group-hover:scale-110 group-hover:rotate-6 transition-all border border-border/50 p-4">
                         <Image src="/logo.png" alt="LinkStore" fill className="object-contain p-4" />
                     </div>
-                    <h3 className="text-3xl font-black text-gray-900 tracking-tight">Your Business Journey</h3>
-                    <p className="mt-4 text-gray-500 max-w-sm mx-auto font-bold uppercase tracking-widest text-[10px] leading-relaxed">
+                    <h3 className="text-3xl font-black text-foreground tracking-tight">Your Business Journey</h3>
+                    <p className="mt-4 text-foreground/50 max-w-sm mx-auto font-bold uppercase tracking-widest text-[10px] leading-relaxed">
                         LinkStore is tracking every visitor and click. <br />Scale your social media sales with ease.
                     </p>
                     <button

@@ -120,20 +120,20 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
             <div className="space-y-8">
                 {/* Image Upload Section */}
                 <motion.div variants={item} className="space-y-4">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Product Media</label>
+                    <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Product Media</label>
 
                     {/* Hidden input to ensure imageUrl is sent with the form */}
                     <input type="hidden" name="imageUrl" value={imageUrl} />
 
                     <div className="flex flex-wrap gap-6">
                         {imageUrl ? (
-                            <div className="group relative h-48 w-48 overflow-hidden rounded-[32px] border-4 border-white bg-gray-50 shadow-immersive transition-all hover:scale-[1.02]">
+                            <div className="group relative h-48 w-48 overflow-hidden rounded-[32px] border-4 border-white bg-secondary shadow-immersive transition-all hover:scale-[1.02]">
                                 <Image src={imageUrl} alt="Upload" fill className="object-cover" />
                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <button
                                         type="button"
                                         onClick={() => setImageUrl("")}
-                                        className="h-12 w-12 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-all active:scale-95"
+                                        className="h-12 w-12 rounded-2xl bg-card/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-all active:scale-95"
                                     >
                                         <X className="h-6 w-6" />
                                     </button>
@@ -147,9 +147,9 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                                     }
                                 }}
                                 uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "linkstore"}
-                                className="flex h-48 w-48 flex-col items-center justify-center gap-3 rounded-[32px] border-2 border-dashed border-gray-200 bg-gray-50/50 text-gray-400 transition-all hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 group"
+                                className="flex h-48 w-48 flex-col items-center justify-center gap-3 rounded-[32px] border-2 border-dashed border-border bg-secondary/50 text-foreground/40 transition-all hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 group"
                             >
-                                <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center shadow-sm group-hover:shadow-indigo-100 transition-all">
+                                <div className="h-12 w-12 rounded-2xl bg-card flex items-center justify-center shadow-sm group-hover:shadow-indigo-100 transition-all">
                                     <ImagePlus className="h-6 w-6" />
                                 </div>
                                 <span className="text-xs font-bold uppercase tracking-widest">Add Photo</span>
@@ -160,27 +160,27 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
 
                 <motion.div variants={item} className="grid gap-8 md:grid-cols-2">
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Product Name</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Product Name</label>
                         <input
                             name="name"
                             defaultValue={initialData?.name}
                             required
-                            className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                            className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 text-sm font-bold text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                             placeholder="e.g. Signature Leather Tote"
                         />
                     </div>
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Price (₦)</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Price (₦)</label>
                         <div className="relative">
                             <input
                                 name="price"
                                 type="number"
                                 defaultValue={initialData?.price ? Number(initialData.price) : ""}
                                 required
-                                className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 pl-10 text-sm font-black text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                                className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 pl-10 text-sm font-black text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                                 placeholder="0.00"
                             />
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/40 font-bold">
                                 ₦
                             </div>
                         </div>
@@ -189,30 +189,30 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
 
                 <motion.div variants={item} className="grid gap-8 md:grid-cols-2">
                     <div className="space-y-3">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Low Stock Threshold</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Low Stock Threshold</label>
                         <input
                             name="lowStockThreshold"
                             type="number"
                             defaultValue={initialData?.lowStockThreshold || ""}
-                            className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
+                            className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 text-sm font-bold text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none shadow-sm"
                             placeholder="Default follows store settings"
                         />
                     </div>
                 </motion.div>
 
                 <motion.div variants={item} className="space-y-3">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Description</label>
+                    <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Description</label>
                     <textarea
                         name="description"
                         defaultValue={initialData?.description || ""}
-                        className="w-full rounded-2xl border border-gray-100 bg-gray-50/50 p-4 text-sm font-bold text-gray-900 focus:border-indigo-600 focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none h-40 resize-none shadow-sm"
+                        className="w-full rounded-2xl border border-border/50 bg-secondary/50 p-4 text-sm font-bold text-foreground focus:border-indigo-600 focus:bg-card focus:ring-4 focus:ring-indigo-600/5 transition-all outline-none h-40 resize-none shadow-sm"
                         placeholder="Describe the unique features and details of this product..."
                     />
                 </motion.div>
 
                 <motion.div variants={item} className="space-y-4">
                     <div className="flex items-center justify-between">
-                        <label className="text-xs font-black uppercase tracking-[0.2em] text-gray-400 ml-1">Product Variants (Optional)</label>
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Product Variants (Optional)</label>
                         <button
                             type="button"
                             onClick={addVariant}
@@ -225,62 +225,62 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                     {variants.length > 0 && (
                         <div className="space-y-4">
                             {variants.map((variant, index) => (
-                                <div key={index} className="flex flex-col md:flex-row gap-4 p-4 rounded-2xl border border-gray-100 bg-gray-50/50">
+                                <div key={index} className="flex flex-col md:flex-row gap-4 p-4 rounded-2xl border border-border/50 bg-secondary/50">
                                     <div className="flex-1 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Variant Name</label>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Variant Name</label>
                                         <input
                                             value={variant.name}
                                             onChange={(e) => updateVariant(index, "name", e.target.value)}
                                             placeholder="e.g. Size L, Red"
-                                            className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
+                                            className="w-full rounded-xl border border-border/50 bg-card p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                             required
                                         />
                                     </div>
                                     <div className="w-full md:w-32 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">SKU</label>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">SKU</label>
                                         <input
                                             value={variant.sku}
                                             onChange={(e) => updateVariant(index, "sku", e.target.value)}
                                             placeholder="SKU-123"
-                                            className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
+                                            className="w-full rounded-xl border border-border/50 bg-card p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                         />
                                     </div>
                                     <div className="w-full md:w-32 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Price Override</label>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Price Override</label>
                                         <input
                                             type="number"
                                             value={variant.price || ""}
                                             onChange={(e) => updateVariant(index, "price", e.target.value)}
                                             placeholder="Base Price"
-                                            className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
+                                            className="w-full rounded-xl border border-border/50 bg-card p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                         />
                                     </div>
                                     <div className="w-full md:w-24 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Stock</label>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Stock</label>
                                         <input
                                             type="number"
                                             value={variant.stockCount}
                                             onChange={(e) => updateVariant(index, "stockCount", parseInt(e.target.value) || 0)}
                                             placeholder="0"
-                                            className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
+                                            className="w-full rounded-xl border border-border/50 bg-card p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                             required
                                         />
                                     </div>
                                     <div className="w-full md:w-24 space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Threshold</label>
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Threshold</label>
                                         <input
                                             type="number"
                                             value={variant.lowStockThreshold || ""}
                                             onChange={(e) => updateVariant(index, "lowStockThreshold", parseInt(e.target.value) || undefined)}
                                             placeholder="Auto"
-                                            className="w-full rounded-xl border border-gray-100 bg-white p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
+                                            className="w-full rounded-xl border border-border/50 bg-card p-3 text-xs font-bold shadow-sm outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-600/10"
                                         />
                                     </div>
                                     <div className="flex items-end pb-1">
                                         <button
                                             type="button"
                                             onClick={() => removeVariant(index)}
-                                            className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                            className="p-3 text-foreground/40 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </button>
@@ -300,9 +300,9 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                             defaultChecked={initialData ? initialData.inStock : true}
                             className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border/80 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </div>
-                    <label htmlFor="inStock" className="text-sm font-bold text-gray-700 cursor-pointer">
+                    <label htmlFor="inStock" className="text-sm font-bold text-foreground/80 cursor-pointer">
                         Mark as Active & Available in Store
                     </label>
                 </motion.div>
@@ -326,7 +326,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                 <button
                     type="button"
                     onClick={() => router.back()}
-                    className="h-14 px-8 rounded-2xl border border-gray-200 bg-white text-xs font-black uppercase tracking-[0.2em] text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all active:scale-[0.98]"
+                    className="h-14 px-8 rounded-2xl border border-border bg-card text-xs font-black uppercase tracking-[0.2em] text-foreground/50 hover:bg-secondary hover:text-foreground transition-all active:scale-[0.98]"
                 >
                     Cancel
                 </button>

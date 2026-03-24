@@ -38,7 +38,7 @@ export default function SetupStoreForm() {
             )}
 
             <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="name" className="block text-sm font-medium text-foreground/80">
                     Store Name
                 </label>
                 <input
@@ -47,16 +47,16 @@ export default function SetupStoreForm() {
                     name="name"
                     required
                     placeholder="e.g. Trendy Wears Lagos"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="mt-1 block w-full rounded-md border border-border/80 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
             </div>
 
             <div>
-                <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="slug" className="block text-sm font-medium text-foreground/80">
                     Store Link (Slug)
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
-                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500">
+                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-border/80 bg-secondary px-3 text-sm text-foreground/50">
                         linkstore.app/
                     </span>
                     <input
@@ -65,10 +65,10 @@ export default function SetupStoreForm() {
                         name="slug"
                         required
                         placeholder="my-shop"
-                        className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border border-border/80 px-3 py-2 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-foreground/50">
                     This will be your unique store URL to share on Instagram/WhatsApp.
                 </p>
             </div>
