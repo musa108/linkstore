@@ -1,8 +1,6 @@
 import { openai } from '@ai-sdk/openai';
-import { streamText, tool } from 'ai';
-import { z } from 'zod';
+import { streamText } from 'ai';
 import prisma from '@/lib/prisma';
-import { NextResponse } from 'next/server';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -60,7 +58,7 @@ Rules:
             messages,
         });
 
-        return result.toDataStreamResponse();
+        return result.toTextStreamResponse();
     } catch (error) {
         console.error("AI_CHAT_ERROR:", error);
         return new Response('An error occurred during chat.', { status: 500 });
