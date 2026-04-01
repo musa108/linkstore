@@ -9,6 +9,7 @@ import { trackConversion } from "@/lib/actions/store";
 import { trackProductView } from "@/lib/actions/product";
 import { Store, Product, Variant } from "@/types";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import ChatWidget from "@/components/chat/chat-widget";
 
 interface ClientStorefrontProps {
     store: Store;
@@ -573,6 +574,8 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                     </div>
                 </div>
             </footer>
+
+            <ChatWidget storeId={store.id} storeName={store.name} primaryColor={primaryColor} />
         </div>
     );
 }
