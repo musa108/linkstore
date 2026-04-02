@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from '@ai-sdk/react';
+import { useChat } from 'ai/react';
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,15 +13,23 @@ interface ChatWidgetProps {
 
 export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [localInput, setLocalInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    const { messages, append, isLoading } = useChat({
         api: '/api/chat',
         body: { storeId },
         initialMessages: [
             { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
         ]
     });
+
+    const onSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!localInput.trim()) return;
+        append({ role: 'user', content: localInput });
+        setLocalInput("");
+    };
 
     // Auto-scroll to bottom of chat
     const scrollToBottom = () => {
@@ -112,20 +120,20 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                         {/* Chat Input */}
                         <div className="p-3 bg-card border-t border-border/50 shrink-0">
                             <form 
-                                onSubmit={handleSubmit}
+                                onSubmit={onSubmit}
                                 className="flex items-center gap-2 bg-secondary rounded-full p-1 pl-4 shadow-inner border border-border/30 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all font-medium"
                             >
                                 <input
-                                    value={input}
-                                    onChange={handleInputChange}
+                                    value={localInput}
+                                    onChange={(e) => setLocalInput(e.target.value)}
                                     placeholder="Type your question..."
                                     className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-foreground/40"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={isLoading || !input.trim()}
+                                    disabled={isLoading || !localInput.trim()}
                                     className="h-10 w-10 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-white disabled:opacity-40 disabled:scale-100 hover:bg-indigo-700 active:scale-95 transition-all shadow-md"
-                                    style={{ backgroundColor: !isLoading && input.trim() ? primaryColor : undefined }}
+                                    style={{ backgroundColor: !isLoading && localInput.trim() ? primaryColor : undefined }}
                                 >
                                     <Send className="h-4 w-4 ml-0.5" />
                                 </button>

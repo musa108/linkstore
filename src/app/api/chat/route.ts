@@ -52,13 +52,13 @@ Rules:
 4. When they are ready to buy, simply instruct them to click the "Add to Cart" button on the product card or search for the item on the page. Do not promise to add it to their cart for them, as you just guide them.
 `;
 
-        const result = streamText({
+        const result = await streamText({
             model: openai('gpt-4o-mini'),
             system: systemPrompt,
             messages,
         });
 
-        return result.toTextStreamResponse();
+        return result.toAIStreamResponse();
     } catch (error) {
         console.error("AI_CHAT_ERROR:", error);
         return new Response('An error occurred during chat.', { status: 500 });
