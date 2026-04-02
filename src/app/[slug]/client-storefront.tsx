@@ -38,7 +38,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
         );
     }, [products, searchQuery]);
 
-    const handleBuyNow = async (product: Record<string, any>) => {
+    const handleBuyNow = async (product: Product) => {
         const hasVariants = product.variants && product.variants.length > 0;
         const selectedVariantId = selectedVariants[product.id];
 

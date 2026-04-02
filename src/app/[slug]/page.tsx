@@ -9,6 +9,7 @@ export default async function PublicStorePage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const store: any = await (prisma.store.findUnique as any)({
         where: { slug },
         include: {

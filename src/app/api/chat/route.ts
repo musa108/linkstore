@@ -13,7 +13,7 @@ export async function POST(req: Request) {
             return new Response('Store ID is required', { status: 400 });
         }
 
-        // Fetch the store and its products
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const store: any = await (prisma.store.findUnique as any)({
             where: { id: storeId },
             include: {
@@ -29,10 +29,19 @@ export async function POST(req: Request) {
         }
 
         // Format the inventory into a readable string for the AI's system prompt
-        const inventoryContext = store.products.map(p => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const inventoryContext = (store.products as any[]).map((p: any) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const hasVideo = p.media?.some((m: any) => m.type === "VIDEO");
+            const mediaCount = p.media?.length || 0;
+            
             let desc = `- ${p.name}: ₦${Number(p.price).toLocaleString()} (${p.description || "No description"})`;
+            if (hasVideo) desc += " [HAS VIDEO PREVIEW]";
+            if (mediaCount > 1) desc += ` [GALLERY: ${mediaCount} photos]`;
+
             if (p.variants && p.variants.length > 0) {
-                desc += `\n  Variants: ${p.variants.map(v => `${v.name} (₦${Number(v.price || p.price).toLocaleString()})`).join(', ')}`;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                desc += `\n  Variants: ${p.variants.map((v: any) => `${v.name} (₦${Number(v.price || p.price).toLocaleString()})`).join(', ')}`;
             }
             return desc;
         }).join('\n');
@@ -49,7 +58,9 @@ Rules:
 1. ONLY answer questions about the products listed above or general shopping queries (e.g., shipping, policies usually handled by simply telling them to proceed to checkout).
 2. If the user asks for something that is NOT in the inventory above, apologize and say you don't carry it right now.
 3. If they ask about prices, always format the Nigerian Naira nicely like ₦5,000.
-4. When they are ready to buy, simply instruct them to click the "Add to Cart" button on the product card or search for the item on the page. Do not promise to add it to their cart for them, as you just guide them.
+4. **NEW FEATURE**: If a product has "[HAS VIDEO PREVIEW]" in the inventory, mention that they can "watch the product video" by clicking on the product image to see it in action.
+5. **GALLERY**: If it has "[GALLERY: X photos]", mention they can swipe through the photos to see more angles.
+6. When they are ready to buy, simply instruct them to click the "Add to Cart" button on the product card or search for the item on the page. Do not promise to add it to their cart for them, as you just guide them.
 `;
 
         const result = await streamText({
