@@ -45,8 +45,18 @@ export interface Product {
     views: number;
     lowStockThreshold: number | null;
     variants?: Variant[];
+    media?: ProductMedia[];
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface ProductMedia {
+    id: string;
+    productId: string;
+    url: string;
+    type: string; // "IMAGE" or "VIDEO"
+    order: number;
+    createdAt: Date;
 }
 
 export interface Order {

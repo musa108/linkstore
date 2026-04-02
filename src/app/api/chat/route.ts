@@ -14,12 +14,12 @@ export async function POST(req: Request) {
         }
 
         // Fetch the store and its products
-        const store = await prisma.store.findUnique({
+        const store: any = await (prisma.store.findUnique as any)({
             where: { id: storeId },
             include: {
                 products: {
                     where: { inStock: true },
-                    include: { variants: true }
+                    include: { variants: true, media: true }
                 }
             }
         });

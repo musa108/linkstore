@@ -9,11 +9,12 @@ export default async function PublicStorePage({
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = await params;
-    const store = await prisma.store.findUnique({
+    const store: any = await (prisma.store.findUnique as any)({
         where: { slug },
         include: {
             products: {
                 where: { inStock: true },
+                include: { variants: true, media: true },
                 orderBy: { createdAt: "desc" },
             },
         },

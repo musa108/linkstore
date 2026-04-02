@@ -24,6 +24,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
     const [showAnnouncement, setShowAnnouncement] = useState(true);
     const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({}); // productId -> variantId
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [activeMediaIndex, setActiveMediaIndex] = useState(0);
 
     useEffect(() => {
         const timer = setTimeout(() => setIsMounted(true), 0);
@@ -59,6 +60,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
 
     const openProductModal = async (product: Product) => {
         setSelectedProduct(product);
+        setActiveMediaIndex(0);
         await trackProductView(product.id).catch(err => console.error("TRACK_P_VIEW_ERR", err));
     };
 
@@ -339,19 +341,84 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                 <X className="h-5 w-5" />
                             </button>
 
-                            {/* Image Section */}
-                            <div className="w-full md:w-1/2 h-80 md:h-auto relative bg-canvas">
-                                {selectedProduct.imageUrl ? (
-                                    <Image
-                                        src={selectedProduct.imageUrl}
-                                        alt={selectedProduct.name}
-                                        fill
-                                        className="object-cover"
-                                    />
+                            {/* Media Section (Carousel) */}
+                            <div className="w-full md:w-1/2 h-96 md:h-auto relative bg-canvas overflow-hidden group/modal">
+                                {selectedProduct.media && selectedProduct.media.length > 0 ? (
+                                    <>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <AnimatePresence mode="wait">
+                                                <motion.div
+                                                    key={activeMediaIndex}
+                                                    initial={{ opacity: 0, x: 20 }}
+                                                    animate={{ opacity: 1, x: 0 }}
+                                                    exit={{ opacity: 0, x: -20 }}
+                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                    className="relative h-full w-full"
+                                                >
+                                                    {selectedProduct.media[activeMediaIndex].type === "VIDEO" ? (
+                                                        <video
+                                                            src={selectedProduct.media[activeMediaIndex].url}
+                                                            controls
+                                                            autoPlay
+                                                            muted
+                                                            loop
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <Image
+                                                            src={selectedProduct.media[activeMediaIndex].url}
+                                                            alt={selectedProduct.name}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
+                                                    )}
+                                                </motion.div>
+                                            </AnimatePresence>
+                                        </div>
+
+                                        {/* Navigation Arrows */}
+                                        {selectedProduct.media.length > 1 && (
+                                            <>
+                                                <button
+                                                    onClick={() => setActiveMediaIndex((prev) => (prev > 0 ? prev - 1 : selectedProduct.media!.length - 1))}
+                                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/10 backdrop-blur-md text-white opacity-0 group-hover/modal:opacity-100 transition-opacity hover:bg-white/20"
+                                                >
+                                                    <Plus className="h-5 w-5 rotate-45" />
+                                                </button>
+                                                <button
+                                                    onClick={() => setActiveMediaIndex((prev) => (prev < selectedProduct.media!.length - 1 ? prev + 1 : 0))}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/10 backdrop-blur-md text-white opacity-0 group-hover/modal:opacity-100 transition-opacity hover:bg-white/20"
+                                                >
+                                                    <Plus className="h-5 w-5" />
+                                                </button>
+                                            </>
+                                        )}
+
+                                        {/* Dots */}
+                                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-2 rounded-full bg-black/20 backdrop-blur-md">
+                                            {selectedProduct.media.map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className={`h-1.5 w-1.5 rounded-full transition-all ${i === activeMediaIndex ? "bg-white w-4" : "bg-white/40"}`}
+                                                />
+                                            ))}
+                                        </div>
+                                    </>
                                 ) : (
-                                    <div className="flex h-full items-center justify-center text-gray-200">
-                                        <Package className="h-24 w-24" />
-                                    </div>
+                                    <>
+                                        {selectedProduct.imageUrl ? (
+                                            <Image
+                                                src={selectedProduct.imageUrl}
+                                                alt={selectedProduct.name}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center text-gray-200">
+                                                <Package className="h-24 w-24" />
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
 

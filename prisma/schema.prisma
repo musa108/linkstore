@@ -41,13 +41,24 @@ model Product {
   description String?
   price       Decimal
   imageUrl    String?
-  inStock     Boolean  @default(true)
-  views       Int      @default(0) // For Advanced Analytics
+  inStock     Boolean      @default(true)
+  views       Int          @default(0) // For Advanced Analytics
   lowStockThreshold Int?       // Per-product override
   variants    Variant[]
+  media       ProductMedia[]
   orderItems  OrderItem[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ProductMedia {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  type      String   @default("IMAGE") // IMAGE or VIDEO
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
 }
 
 model Order {

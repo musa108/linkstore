@@ -4,6 +4,13 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+interface MediaInput {
+    id?: string;
+    url: string;
+    type: string; // IMAGE or VIDEO
+    order: number;
+}
+
 interface VariantInput {
     id?: string;
     name: string;
@@ -24,6 +31,7 @@ export async function createProduct(storeId: string, formData: FormData) {
     const inStock = formData.get("inStock") === "on";
     const lowStockThreshold = formData.get("lowStockThreshold") as string | null;
     const variantsJson = formData.get("variants") as string | null;
+    const mediaJson = formData.get("media") as string | null;
 
     let variantsData: VariantInput[] = [];
     if (variantsJson) {
@@ -31,6 +39,15 @@ export async function createProduct(storeId: string, formData: FormData) {
             variantsData = JSON.parse(variantsJson);
         } catch (e) {
             console.error("Failed to parse variants JSON", e);
+        }
+    }
+
+    let mediaData: MediaInput[] = [];
+    if (mediaJson) {
+        try {
+            mediaData = JSON.parse(mediaJson);
+        } catch (e) {
+            console.error("Failed to parse media JSON", e);
         }
     }
 
@@ -51,6 +68,13 @@ export async function createProduct(storeId: string, formData: FormData) {
                         price: v.price ? Number(v.price) : null,
                         stockCount: Number(v.stockCount) || 0,
                         lowStockThreshold: v.lowStockThreshold || null,
+                    })),
+                },
+                media: {
+                    create: mediaData.map((m: MediaInput) => ({
+                        url: m.url,
+                        type: m.type,
+                        order: m.order,
                     })),
                 },
             },
@@ -75,6 +99,7 @@ export async function updateProduct(productId: string, formData: FormData) {
     const inStock = formData.get("inStock") === "on";
     const lowStockThreshold = formData.get("lowStockThreshold") as string | null;
     const variantsJson = formData.get("variants") as string | null;
+    const mediaJson = formData.get("media") as string | null;
 
     let variantsData: VariantInput[] = [];
     if (variantsJson) {
@@ -82,6 +107,15 @@ export async function updateProduct(productId: string, formData: FormData) {
             variantsData = JSON.parse(variantsJson);
         } catch (e) {
             console.error("Failed to parse variants JSON", e);
+        }
+    }
+
+    let mediaData: MediaInput[] = [];
+    if (mediaJson) {
+        try {
+            mediaData = JSON.parse(mediaJson);
+        } catch (e) {
+            console.error("Failed to parse media JSON", e);
         }
     }
 
@@ -119,6 +153,14 @@ export async function updateProduct(productId: string, formData: FormData) {
                             lowStockThreshold: v.lowStockThreshold || null,
                         }
                     }))
+                },
+                media: {
+                    deleteMany: {}, // Simplest way to sync is to redraw the media collection for now
+                    create: mediaData.map((m: MediaInput) => ({
+                        url: m.url,
+                        type: m.type,
+                        order: m.order,
+                    })),
                 }
             },
         });

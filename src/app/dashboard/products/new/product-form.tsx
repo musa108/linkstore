@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct, updateProduct } from "@/lib/actions/product";
 import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary";
-import { ImagePlus, Loader2, Plus, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Product } from "@/types";
-import { motion, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 interface ProductFormProps {
     storeId: string;
@@ -23,10 +23,16 @@ interface VariantInput {
     lowStockThreshold?: number;
 }
 
+interface MediaInput {
+    id?: string;
+    url: string;
+    type: "IMAGE" | "VIDEO";
+    order: number;
+}
+
 export default function ProductForm({ storeId, initialData }: ProductFormProps) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || "");
     const [variants, setVariants] = useState<VariantInput[]>(() => {
         if (!initialData?.variants) return [];
         return initialData.variants.map((v) => ({
@@ -37,6 +43,15 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
             stockCount: Number(v.stockCount),
             lowStockThreshold: v.lowStockThreshold || undefined
         }));
+    });
+    const [media, setMedia] = useState<MediaInput[]>(() => {
+        if (!initialData?.media) return [];
+        return initialData.media.map(m => ({
+            id: m.id,
+            url: m.url,
+            type: m.type as "IMAGE" | "VIDEO",
+            order: m.order
+        })).sort((a, b) => a.order - b.order);
     });
     const [error, setError] = useState("");
 
@@ -59,8 +74,11 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
         setError("");
 
         // Append custom fields
-        formData.append("imageUrl", imageUrl);
+        // Set first image as primary thumbnail for backward compat
+        const firstImage = media.find(m => m.type === "IMAGE")?.url || media[0]?.url || "";
+        formData.append("imageUrl", firstImage);
         formData.append("variants", JSON.stringify(variants));
+        formData.append("media", JSON.stringify(media));
 
         try {
             let result;
@@ -118,41 +136,74 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
             )}
 
             <div className="space-y-8">
-                {/* Image Upload Section */}
-                <motion.div variants={item} className="space-y-4">
-                    <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">Product Media</label>
+                {/* Image & Video Gallery Section */}
+                <motion.div variants={item} className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <label className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40 ml-1">
+                            Product Gallery ({media.length}/10)
+                        </label>
+                        <p className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest">Supports Images & Videos</p>
+                    </div>
 
-                    {/* Hidden input to ensure imageUrl is sent with the form */}
-                    <input type="hidden" name="imageUrl" value={imageUrl} />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <AnimatePresence mode="popLayout">
+                            {media.map((item, index) => (
+                                <motion.div
+                                    key={item.url}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    className="group relative aspect-square overflow-hidden rounded-3xl border-2 border-white bg-secondary shadow-sm transition-all hover:shadow-md"
+                                >
+                                    {item.type === "IMAGE" ? (
+                                        <Image src={item.url} alt="Product" fill className="object-cover" />
+                                    ) : (
+                                        <div className="relative h-full w-full bg-gray-900 flex items-center justify-center">
+                                            <video src={item.url} className="h-full w-full object-cover opacity-50" />
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                                                    <Loader2 className="h-5 w-5 text-white animate-spin-slow" />
+                                                </div>
+                                            </div>
+                                            <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-lg bg-indigo-600 text-[8px] font-black text-white uppercase tracking-widest">Video</span>
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMedia(media.filter((_, i) => i !== index))}
+                                            className="h-10 w-10 rounded-2xl bg-white/10 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-all active:scale-95"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                    {index === 0 && (
+                                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-lg bg-white/90 backdrop-blur-md text-[8px] font-black text-indigo-600 uppercase tracking-widest shadow-sm">Main</div>
+                                    )}
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
 
-                    <div className="flex flex-wrap gap-6">
-                        {imageUrl ? (
-                            <div className="group relative h-48 w-48 overflow-hidden rounded-[32px] border-4 border-white bg-secondary shadow-immersive transition-all hover:scale-[1.02]">
-                                <Image src={imageUrl} alt="Upload" fill className="object-cover" />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <button
-                                        type="button"
-                                        onClick={() => setImageUrl("")}
-                                        className="h-12 w-12 rounded-2xl bg-card/20 backdrop-blur-md text-white flex items-center justify-center hover:bg-red-500 transition-all active:scale-95"
-                                    >
-                                        <X className="h-6 w-6" />
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
+                        {media.length < 10 && (
                             <CldUploadButton
                                 onSuccess={(result: CloudinaryUploadWidgetResults) => {
                                     if (result.info && typeof result.info !== "string") {
-                                        setImageUrl(result.info.secure_url);
+                                        const type = result.info.resource_type === "video" ? "VIDEO" : "IMAGE";
+                                        setMedia([...media, { 
+                                            url: result.info.secure_url, 
+                                            type, 
+                                            order: media.length 
+                                        }]);
                                     }
                                 }}
                                 uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "linkstore"}
-                                className="flex h-48 w-48 flex-col items-center justify-center gap-3 rounded-[32px] border-2 border-dashed border-border bg-secondary/50 text-foreground/40 transition-all hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 group"
+                                className="flex aspect-square flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-border bg-secondary/50 text-foreground/40 transition-all hover:border-indigo-400 hover:bg-indigo-50/30 hover:text-indigo-600 group"
                             >
-                                <div className="h-12 w-12 rounded-2xl bg-card flex items-center justify-center shadow-sm group-hover:shadow-indigo-100 transition-all">
-                                    <ImagePlus className="h-6 w-6" />
+                                <div className="h-10 w-10 rounded-2xl bg-card flex items-center justify-center shadow-sm group-hover:shadow-indigo-100 transition-all">
+                                    <Plus className="h-5 w-5" />
                                 </div>
-                                <span className="text-xs font-bold uppercase tracking-widest">Add Photo</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest">Upload Media</span>
                             </CldUploadButton>
                         )}
                     </div>
