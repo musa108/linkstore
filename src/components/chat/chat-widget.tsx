@@ -81,28 +81,31 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
 
                         {/* Chat Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-canvas/30">
-                            {messages.map((m: { id: string, role: string, content: string }) => (
-                                <div key={m.id} className={`flex w-full ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`flex items-end gap-2 max-w-[85%] ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                            {messages.map((m: unknown) => {
+                                const msg = m as { id: string, role: string, content: string };
+                                return (
+                                <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                    <div className={`flex items-end gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                                         
                                         {/* Avatar */}
                                         <div className={`shrink-0 h-6 w-6 rounded-full flex items-center justify-center text-[10px] shadow-sm ${
-                                            m.role === 'user' ? 'bg-indigo-100 text-indigo-600' : 'bg-secondary text-foreground border border-border/50'
+                                            msg.role === 'user' ? 'bg-indigo-100 text-indigo-600' : 'bg-secondary text-foreground border border-border/50'
                                         }`}>
-                                            {m.role === 'user' ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+                                            {msg.role === 'user' ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
                                         </div>
                                         
                                         {/* Bubble */}
                                         <div className={`px-4 py-2.5 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-sm text-sm ${
-                                            m.role === 'user' 
+                                            msg.role === 'user' 
                                                 ? 'bg-indigo-600 text-white rounded-br-sm' 
                                                 : 'bg-card border border-border/50 text-foreground rounded-bl-sm'
                                         }`}>
-                                            {m.content}
+                                            {msg.content}
                                         </div>
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                             {isLoading && (
                                 <div className="flex w-full justify-start">
                                     <div className="flex items-end gap-2 max-w-[85%]">
