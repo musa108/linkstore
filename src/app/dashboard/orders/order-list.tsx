@@ -1,7 +1,7 @@
 "use client";
 
 import { updateOrderStatus } from "@/lib/actions/order";
-import { Eye, Mail, Phone, MapPin, Package, ShoppingCart, X } from "lucide-react";
+import { Eye, Mail, Phone, MapPin, Package, ShoppingCart, X, ShieldAlert } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { OrderWithItems } from "@/types";
@@ -109,21 +109,28 @@ export default function OrderList({ orders }: OrderListProps) {
                                     </td>
                                     <td className="px-6 py-5">
                                         <div className="relative inline-block">
-                                            <select
-                                                disabled={loading === order.id}
-                                                defaultValue={order.status}
-                                                onChange={(e) => onStatusChange(order.id, e.target.value)}
-                                                className={`appearance-none text-[10px] font-black uppercase tracking-widest rounded-full px-4 py-1.5 border-0 focus:ring-0 cursor-pointer ${order.status === "PAID"
-                                                    ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                                    : order.status === "DELIVERED"
-                                                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                                        : "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                                                    }`}
-                                            >
-                                                <option value="PENDING">PENDING</option>
-                                                <option value="PAID">PAID</option>
-                                                <option value="DELIVERED">DELIVERED</option>
-                                            </select>
+                                            {order.isDisputed ? (
+                                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 border border-red-100">
+                                                    <ShieldAlert className="h-3 w-3" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">DISPUTED</span>
+                                                </div>
+                                            ) : (
+                                                <select
+                                                    disabled={loading === order.id}
+                                                    defaultValue={order.status}
+                                                    onChange={(e) => onStatusChange(order.id, e.target.value)}
+                                                    className={`appearance-none text-[10px] font-black uppercase tracking-widest rounded-full px-4 py-1.5 border-0 focus:ring-0 cursor-pointer ${order.status === "PAID"
+                                                        ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                                        : order.status === "DELIVERED"
+                                                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                                            : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                                                        }`}
+                                                >
+                                                    <option value="PENDING">PENDING</option>
+                                                    <option value="PAID">PAID</option>
+                                                    <option value="DELIVERED">DELIVERED</option>
+                                                </select>
+                                            )}
                                         </div>
                                     </td>
                                     <td className="px-6 py-5 text-right">
@@ -227,8 +234,19 @@ export default function OrderList({ orders }: OrderListProps) {
                                                 <div className="space-y-4 p-6 rounded-3xl bg-card border border-border/50 shadow-sm">
                                                     <div className="flex flex-col">
                                                         <span className="text-lg font-black text-foreground leading-none mb-1">{selectedOrder.customerName}</span>
-                                                        <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">{selectedOrder.status}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs font-bold text-indigo-500 uppercase tracking-widest">{selectedOrder.status}</span>
+                                                            {selectedOrder.isDisputed && (
+                                                                <span className="text-[10px] font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-md border border-red-100">DISPUTED</span>
+                                                            )}
+                                                        </div>
                                                     </div>
+                                                    {selectedOrder.isDisputed && (
+                                                        <div className="p-4 rounded-2xl bg-red-50 border border-red-100 mt-2">
+                                                            <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1.5">Dispute Reason</p>
+                                                            <p className="text-sm font-bold text-red-700 leading-snug">{selectedOrder.disputeReason}</p>
+                                                        </div>
+                                                    )}
                                                     <div className="space-y-3 pt-2">
                                                         <a href={`mailto:${selectedOrder.customerEmail}`} className="flex items-center gap-3 text-sm font-bold text-foreground/60 hover:text-indigo-600 transition-colors">
                                                             <div className="h-8 w-8 rounded-xl bg-secondary flex items-center justify-center shrink-0">

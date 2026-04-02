@@ -96,3 +96,20 @@ export async function updateOrderStatus(orderId: string, status: string) {
         return { error: "Could not update order status." };
     }
 }
+export async function reportDispute(orderId: string, reason: string) {
+    try {
+        const order = await prisma.order.update({
+            where: { id: orderId },
+            data: { 
+                isDisputed: true,
+                disputeReason: reason,
+            },
+        });
+
+        revalidatePath(`/dashboard/orders`);
+        return { success: true, order };
+    } catch (error) {
+        console.error("REPORT_DISPUTE_ERROR", error);
+        return { error: "An error occurred while reporting the dispute. Please contact support." };
+    }
+}

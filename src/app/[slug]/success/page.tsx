@@ -1,9 +1,11 @@
 import prisma from "@/lib/prisma";
-import { CheckCircle2, MessageCircle, ArrowLeft, Store as StoreIcon, ShoppingBag } from "lucide-react";
+import { CheckCircle2, MessageCircle, ArrowLeft, Store as StoreIcon, ShoppingBag, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import PrintButton from "./print-button";
+import DisputeButton from "./dispute-button";
+import { OrderWithItems } from "@/types";
 
 export default async function SuccessPage({
     params,
@@ -182,6 +184,16 @@ export default async function SuccessPage({
                     {/* Action Area */}
                     <div className="pt-8 space-y-4 print:hidden">
                         <PrintButton />
+                        
+                        {!(order as unknown as OrderWithItems).isDisputed ? (
+                            <DisputeButton orderId={(order as unknown as OrderWithItems).id} />
+                        ) : (
+                            <div className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-sm">
+                                <ShieldAlert className="h-4 w-4" />
+                                Order Flagged / Under Investigation
+                            </div>
+                        )}
+
                         <p className="text-[10px] text-center font-bold text-foreground/30 uppercase tracking-widest mt-6">
                             Powered by LinkStore Core
                         </p>

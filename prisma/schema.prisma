@@ -63,6 +63,8 @@ model Order {
   subtotal          Decimal
   total             Decimal
   status            String      @default("PENDING") // PENDING, PAID, DELIVERED
+  isDisputed        Boolean     @default(false)
+  disputeReason     String?
   paystackReference String?     @unique
   items             OrderItem[]
   createdAt         DateTime    @default(now())

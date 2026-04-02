@@ -61,6 +61,8 @@ export interface Order {
     subtotal: number | string | { toString(): string }; // Decimal
     total: number | string | { toString(): string }; // Decimal
     status: string;
+    isDisputed: boolean;
+    disputeReason: string | null;
     paystackReference: string | null;
     createdAt: Date;
     updatedAt: Date;
