@@ -59,7 +59,7 @@ Rules:
             messages,
         });
 
-        return result.toAIStreamResponse();
+        return result.toDataStreamResponse();
     } catch (error) {
         console.error("AI_CHAT_ERROR:", error);
         return new Response('An error occurred during chat.', { status: 500 });
