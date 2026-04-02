@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,6 +16,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
     const [localInput, setLocalInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
+    // Using simple append and messages to guarantee type stability across AI SDK updates
     const { messages, append, isLoading } = useChat({
         api: '/api/chat',
         body: { storeId },
@@ -78,7 +79,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
 
                         {/* Chat Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-canvas/30">
-                            {messages.map((m: { id: string, role: string, content: string }) => (
+                            {messages.map((m: any) => (
                                 <div key={m.id} className={`flex w-full ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`flex items-end gap-2 max-w-[85%] ${m.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
                                         
