@@ -347,32 +347,35 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                     <>
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <AnimatePresence mode="wait">
-                                                <motion.div
-                                                    key={activeMediaIndex}
-                                                    initial={{ opacity: 0, x: 20 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    exit={{ opacity: 0, x: -20 }}
-                                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                                    className="relative h-full w-full"
-                                                >
-                                                    {selectedProduct.media[activeMediaIndex].type === "VIDEO" ? (
-                                                        <video
-                                                            src={selectedProduct.media[activeMediaIndex].url}
-                                                            controls
-                                                            autoPlay
-                                                            muted
-                                                            loop
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <Image
-                                                            src={selectedProduct.media[activeMediaIndex].url}
-                                                            alt={selectedProduct.name}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    )}
-                                                </motion.div>
+                                                {selectedProduct.media && selectedProduct.media[activeMediaIndex] && (
+                                                    <motion.div
+                                                        key={activeMediaIndex}
+                                                        initial={{ opacity: 0, x: 20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        exit={{ opacity: 0, x: -20 }}
+                                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                                        className="relative h-full w-full"
+                                                    >
+                                                        {selectedProduct.media[activeMediaIndex].type === "VIDEO" ? (
+                                                            <video
+                                                                src={selectedProduct.media[activeMediaIndex].url}
+                                                                controls
+                                                                autoPlay
+                                                                muted
+                                                                loop
+                                                                className="h-full w-full object-cover"
+                                                                playsInline
+                                                            />
+                                                        ) : (
+                                                            <Image
+                                                                src={selectedProduct.media[activeMediaIndex].url}
+                                                                alt={selectedProduct.name}
+                                                                fill
+                                                                className="object-cover"
+                                                            />
+                                                        )}
+                                                    </motion.div>
+                                                )}
                                             </AnimatePresence>
                                         </div>
 

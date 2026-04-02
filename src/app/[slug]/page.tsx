@@ -10,16 +10,36 @@ export default async function PublicStorePage({
 }) {
     const { slug } = await params;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const store: any = await (prisma.store.findUnique as any)({
-        where: { slug },
-        include: {
-            products: {
-                where: { inStock: true },
-                include: { variants: true, media: true },
-                orderBy: { createdAt: "desc" },
+    let store: any;
+    
+    try {
+        // Try fetching with all new gallery and variant data
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        store = await (prisma.store.findUnique as any)({
+            where: { slug },
+            include: {
+                products: {
+                    where: { inStock: true },
+                    include: { variants: true, media: true },
+                    orderBy: { createdAt: "desc" },
+                },
             },
-        },
-    });
+        });
+    } catch (err) {
+        console.error("PRISMA_GALLERY_FETCH_ERROR, falling back...", err);
+        // Fallback: Fetch store and products WITHOUT the new media relation if schema is stale on Vercel
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        store = await (prisma.store.findUnique as any)({
+            where: { slug },
+            include: {
+                products: {
+                    where: { inStock: true },
+                    include: { variants: true },
+                    orderBy: { createdAt: "desc" },
+                },
+            },
+        });
+    }
 
     if (!store) {
         notFound();
