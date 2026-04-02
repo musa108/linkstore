@@ -53,6 +53,7 @@ Rules:
 `;
 
         const result = await streamText({
+            // @ts-expect-error - suppress LanguageModel interface mismatch between core and provider packages
             model: openai('gpt-4o-mini'),
             system: systemPrompt,
             messages,
