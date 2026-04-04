@@ -26,16 +26,14 @@ export default async function PublicStorePage({
             },
         });
     } catch (err) {
-        console.error("PRISMA_GALLERY_FETCH_ERROR, falling back...", err);
-        // Fallback: Fetch store and products WITHOUT the new media relation if schema is stale on Vercel
+        console.error("PRISMA_GALLERY_FETCH_ERROR, falling back to minimal...", err);
+        // Fallback: Fetch only the absolute essentials to keep the page alive
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         store = await (prisma.store.findUnique as any)({
             where: { slug },
             include: {
                 products: {
-                    where: { inStock: true },
-                    include: { variants: true },
-                    orderBy: { createdAt: "desc" },
+                    where: { inStock: true }
                 },
             },
         });

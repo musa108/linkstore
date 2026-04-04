@@ -19,27 +19,26 @@ export function formatPrice(price: number | string | { toString(): string }) {
 export function serializePrisma<T>(data: T): T {
     if (!data) return data;
     try {
-        return JSON.parse(JSON.stringify(data, (key, value) => {
-            // Handle Prisma Decimal objects safely
+        const serialized = JSON.stringify(data, (key, value) => {
             if (value && typeof value === 'object') {
-                // Safely check constructor name without risking access on null/proto-less objects
                 const constructorName = value?.constructor?.name;
                 if (constructorName === 'Decimal' || constructorName === 'd') {
                     return Number(value);
                 }
-                // Handle Dates (though stringify usually does this, better to be explicit if needed)
                 if (value instanceof Date) {
                     return value.toISOString();
                 }
             }
-            // Handle BigInt which JSON.stringify doesn't support by default
             if (typeof value === 'bigint') {
                 return value.toString();
             }
             return value;
-        }));
+        });
+        return JSON.parse(serialized);
     } catch (error) {
-        console.error("SERIALIZE_PRISMA_ERROR:", error);
-        return data; // Fallback to raw data if serialization fails
+        console.error("SERIALIZE_PRISMA_FATAL_ERROR (Returning fallback to prevent crash):", error);
+        // CRITICAL: Never return the raw 'data' here, as it will crash Next.js with a Digest error.
+        // Return an empty array if the input was an array, otherwise an empty object.
+        return (Array.isArray(data) ? [] : {}) as T;
     }
 }
