@@ -18,27 +18,49 @@ export function formatPrice(price: number | string | { toString(): string }) {
  */
 export function serializePrisma<T>(data: T): T {
     if (!data) return data;
+    
+    // Seen set to handle circular references
+    const seen = new WeakSet();
+
+    function recursiveClone(obj: any): any {
+        // Handle primitives and null
+        if (obj === null || typeof obj !== 'object') {
+            if (typeof obj === 'bigint') return obj.toString();
+            return obj;
+        }
+
+        // Handle Dates
+        if (obj instanceof Date) return obj.toISOString();
+
+        // Handle Prisma Decimals
+        const constructorName = obj?.constructor?.name;
+        if (constructorName === 'Decimal' || constructorName === 'd') {
+            return Number(obj);
+        }
+
+        // Handle circular references
+        if (seen.has(obj)) return undefined; // Skip circular links to prevent crash
+        seen.add(obj);
+
+        // Handle Arrays
+        if (Array.isArray(obj)) {
+            return obj.map(item => recursiveClone(item));
+        }
+
+        // Handle Objects
+        const clone: any = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                clone[key] = recursiveClone(obj[key]);
+            }
+        }
+        return clone;
+    }
+
     try {
-        const serialized = JSON.stringify(data, (key, value) => {
-            if (value && typeof value === 'object') {
-                const constructorName = value?.constructor?.name;
-                if (constructorName === 'Decimal' || constructorName === 'd') {
-                    return Number(value);
-                }
-                if (value instanceof Date) {
-                    return value.toISOString();
-                }
-            }
-            if (typeof value === 'bigint') {
-                return value.toString();
-            }
-            return value;
-        });
-        return JSON.parse(serialized);
+        return recursiveClone(data);
     } catch (error) {
         console.error("SERIALIZE_PRISMA_FATAL_ERROR (Returning fallback to prevent crash):", error);
-        // CRITICAL: Never return the raw 'data' here, as it will crash Next.js with a Digest error.
-        // Return an empty array if the input was an array, otherwise an empty object.
         return (Array.isArray(data) ? [] : {}) as T;
     }
 }

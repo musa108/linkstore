@@ -39,7 +39,7 @@ export default function OrderList({ orders }: OrderListProps) {
         show: { opacity: 1, y: 0 }
     };
 
-    if (orders.length === 0) {
+    if (!orders || orders.length === 0) {
         return (
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}

@@ -40,6 +40,19 @@ export default async function SuccessPage({
     const safeStore = serializePrisma(store);
     const safeOrder = serializePrisma(order);
 
+    if (!safeStore || !safeStore.name || !safeOrder || !safeOrder.id) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-secondary">
+                <div className="text-center p-8 bg-card rounded-3xl border border-border shadow-soft animate-in fade-in zoom-in">
+                    <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <h2 className="text-xl font-black mb-2">Order Confirmed!</h2>
+                    <p className="text-foreground/50 text-sm mb-6">Your payment was successful. We&apos;re generating your receipt...</p>
+                    <Link href="/" className="px-6 py-3 bg-primary text-white rounded-2xl font-bold text-sm">Return Home</Link>
+                </div>
+            </div>
+        );
+    }
+
     const orderRef = orderId?.slice(-6).toUpperCase();
     const whatsappMessage = encodeURIComponent(
         `Hi ${safeStore.name}, I just paid for an order!\n\n` +
