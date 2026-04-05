@@ -19,10 +19,12 @@ export function formatPrice(price: number | string | { toString(): string }) {
 export function serializePrisma<T>(data: T): T {
     if (!data) return data;
     
-    // Seen set to handle circular references
     const seen = new WeakSet();
 
-    function recursiveClone(obj: any): any {
+    function recursiveClone(obj: any, depth = 0): any {
+        // Safety: Prevent stack overflow on extremely deep structures (rare in Prisma but possible)
+        if (depth > 10) return undefined;
+
         // Handle primitives and null
         if (obj === null || typeof obj !== 'object') {
             if (typeof obj === 'bigint') return obj.toString();
@@ -39,19 +41,19 @@ export function serializePrisma<T>(data: T): T {
         }
 
         // Handle circular references
-        if (seen.has(obj)) return undefined; // Skip circular links to prevent crash
+        if (seen.has(obj)) return undefined;
         seen.add(obj);
 
         // Handle Arrays
         if (Array.isArray(obj)) {
-            return obj.map(item => recursiveClone(item));
+            return obj.map(item => recursiveClone(item, depth + 1));
         }
 
         // Handle Objects
         const clone: any = {};
         for (const key in obj) {
             if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                clone[key] = recursiveClone(obj[key]);
+                clone[key] = recursiveClone(obj[key], depth + 1);
             }
         }
         return clone;
@@ -60,7 +62,7 @@ export function serializePrisma<T>(data: T): T {
     try {
         return recursiveClone(data);
     } catch (error) {
-        console.error("SERIALIZE_PRISMA_FATAL_ERROR (Returning fallback to prevent crash):", error);
+        console.error("SERIALIZE_PRISMA_FATAL_ERROR:", error);
         return (Array.isArray(data) ? [] : {}) as T;
     }
 }
