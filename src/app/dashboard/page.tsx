@@ -54,18 +54,23 @@ export default async function DashboardPage() {
                 </div>
                 
                 <h2 className="text-2xl font-black text-foreground mb-4">Dashboard temporarily unreachable</h2>
-                <p className="text-foreground/50 font-medium mb-12 leading-relaxed">
+                <p className="text-foreground/50 font-medium mb-4 leading-relaxed">
                     We&apos;re currently performing a safety check on your database connection. Your store and products remain safe and active.
                 </p>
+                <div className="mb-12 p-4 bg-red-50 rounded-2xl border border-red-100 text-left overflow-auto max-h-40 w-full">
+                    <p className="text-[10px] font-mono text-red-600 break-words">
+                        ERROR: {error instanceof Error ? error.message : String(error)}
+                    </p>
+                </div>
                 
                 <div className="flex flex-col sm:flex-row gap-4 w-full">
-                    <button 
-                        onClick={() => window.location.reload()}
-                        className="flex-1 h-14 bg-foreground text-background rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95"
+                    <Link 
+                        href="/dashboard"
+                        className="flex-1 h-14 bg-foreground text-card rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95"
                     >
                         <RefreshCcw className="h-4 w-4" />
                         Reload Dashboard
-                    </button>
+                    </Link>
                     <Link 
                         href="/dashboard/settings"
                         className="flex-1 h-14 bg-secondary text-foreground/60 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-border/50"

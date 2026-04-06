@@ -58,17 +58,24 @@ export default async function PublicStorePage({
                     </div>
                     
                     <h1 className="text-2xl font-black text-foreground mb-4">Store Temporarily Offline</h1>
-                    <p className="text-foreground/50 font-medium mb-10 leading-relaxed">
+                    <p className="text-foreground/50 font-medium mb-4 leading-relaxed">
                         We&apos;re currently updating the store configuration. Please check back in a few moments.
                     </p>
+                    {process.env.NODE_ENV !== "production" && (
+                        <div className="mb-10 p-4 bg-red-50 rounded-2xl border border-red-100 text-left overflow-auto max-h-40">
+                            <p className="text-[10px] font-mono text-red-600 break-words">
+                                ERROR: {error instanceof Error ? error.message : String(error)}
+                            </p>
+                        </div>
+                    )}
                     
-                    <button 
-                        onClick={() => window.location.reload()}
-                        className="w-full h-15 bg-foreground text-background rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95"
+                    <Link 
+                        href={`/${slug}`}
+                        className="w-full h-15 bg-foreground text-card rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95"
                     >
                         <RefreshCcw className="h-4 w-4" />
                         Retry Connection
-                    </button>
+                    </Link>
                 </div>
             </div>
         );
