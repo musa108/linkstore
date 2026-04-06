@@ -49,7 +49,7 @@ export default async function OrdersPage() {
                 <p className="text-muted-foreground">Monitor and manage your incoming customer orders.</p>
             </div>
 
-            <OrderList orders={(store as StoreWithOrders).orders} />
+            <OrderList orders={(store as StoreWithOrders).orders} storeSlug={(store as Store).slug} />
         </div>
     );
 }

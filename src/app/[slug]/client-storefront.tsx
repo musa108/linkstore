@@ -359,7 +359,7 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                     <>
                                         <div className="absolute inset-0 flex items-center justify-center">
                                             <AnimatePresence mode="wait">
-                                                {selectedProduct.media && selectedProduct.media[activeMediaIndex] && (
+                                                {selectedProduct.media[activeMediaIndex] && (
                                                     <motion.div
                                                         key={activeMediaIndex}
                                                         initial={{ opacity: 0, x: 20 }}
@@ -473,46 +473,45 @@ export default function ClientStorefront({ store, products }: ClientStorefrontPr
                                             </div>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Modal Reviews Section */}
+                                <div className="mt-12 space-y-6">
+                                    <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Verified Reviews</p>
+                                        <div className="flex items-center gap-2">
+                                            <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                                            <span className="text-sm font-black">
+                                                {selectedProduct.reviews && selectedProduct.reviews.length > 0
+                                                    ? (selectedProduct.reviews.reduce((acc, r: any) => acc + r.rating, 0) / selectedProduct.reviews.length).toFixed(1)
+                                                    : "5.0"
+                                                }
+                                            </span>
+                                        </div>
                                     </div>
 
-                                    {/* Modal Reviews Section */}
-                                    <div className="mt-12 space-y-6">
-                                        <div className="flex items-center justify-between border-b border-border/50 pb-4">
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">Verified Reviews</p>
-                                            <div className="flex items-center gap-2">
-                                                <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                                                <span className="text-sm font-black">
-                                                    {selectedProduct.reviews && selectedProduct.reviews.length > 0 
-                                                        ? (selectedProduct.reviews.reduce((acc, r: any) => acc + r.rating, 0) / selectedProduct.reviews.length).toFixed(1)
-                                                        : "5.0"
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-                                        
-                                        <div className="space-y-6 max-h-64 overflow-y-auto pr-4 custom-scrollbar">
-                                            {selectedProduct.reviews && (selectedProduct.reviews as any[]).length > 0 ? (
-                                                (selectedProduct.reviews as any[]).map((rev) => (
-                                                    <div key={rev.id} className="space-y-2">
-                                                        <div className="flex items-center justify-between">
-                                                            <p className="text-xs font-black text-foreground">{rev.customerName}</p>
-                                                            <div className="flex text-amber-400">
-                                                                {[1, 2, 3, 4, 5].map((s) => (
-                                                                    <Star key={s} className={`h-2.5 w-2.5 ${s <= rev.rating ? 'fill-current' : 'text-gray-200'}`} />
-                                                                ))}
-                                                            </div>
+                                    <div className="space-y-6 max-h-64 overflow-y-auto pr-4 custom-scrollbar">
+                                        {selectedProduct.reviews && (selectedProduct.reviews as any[]).length > 0 ? (
+                                            (selectedProduct.reviews as any[]).map((rev) => (
+                                                <div key={rev.id} className="space-y-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <p className="text-xs font-black text-foreground">{rev.customerName}</p>
+                                                        <div className="flex text-amber-400">
+                                                            {[1, 2, 3, 4, 5].map((s) => (
+                                                                <Star key={s} className={`h-2.5 w-2.5 ${s <= rev.rating ? 'fill-current' : 'text-gray-200'}`} />
+                                                            ))}
                                                         </div>
-                                                        <p className="text-sm font-medium text-foreground/60 leading-relaxed italic">
-                                                            &ldquo;{rev.comment}&rdquo;
-                                                        </p>
                                                     </div>
-                                                ))
-                                            ) : (
-                                                <div className="py-8 text-center bg-secondary/50 rounded-3xl border border-dashed border-border/50">
-                                                    <p className="text-xs font-bold text-foreground/30 uppercase tracking-widest">No reviews yet</p>
+                                                    <p className="text-sm font-medium text-foreground/60 leading-relaxed italic">
+                                                        &ldquo;{rev.comment}&rdquo;
+                                                    </p>
                                                 </div>
-                                            )}
-                                        </div>
+                                            ))
+                                        ) : (
+                                            <div className="py-8 text-center bg-secondary/50 rounded-3xl border border-dashed border-border/50">
+                                                <p className="text-xs font-bold text-foreground/30 uppercase tracking-widest">No reviews yet</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

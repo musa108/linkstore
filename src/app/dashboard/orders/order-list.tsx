@@ -1,15 +1,19 @@
+"use client";
+
 import { updateOrderStatus, confirmOrderDelivery } from "@/lib/actions/order";
-import { Eye, Mail, Phone, MapPin, Package, ShoppingCart, X, ShieldAlert, CheckCircle2, Truck } from "lucide-react";
+import { Eye, Mail, Phone, MapPin, Package, ShoppingCart, X, ShieldAlert, CheckCircle2, Truck, Loader2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { OrderWithItems } from "@/types";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 
 interface OrderListProps {
     orders: OrderWithItems[];
+    storeSlug: string;
 }
 
-export default function OrderList({ orders }: OrderListProps) {
+export default function OrderList({ orders, storeSlug }: OrderListProps) {
     const [loading, setLoading] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
 
@@ -171,7 +175,7 @@ export default function OrderList({ orders }: OrderListProps) {
                                     <td className="px-6 py-5 text-right flex items-center justify-end gap-2">
                                         {order.status === "SHIPPED" && (
                                             <Link 
-                                                href={`/${order.store.slug}/track/${order.id}`} 
+                                                href={`/${storeSlug}/track/${order.id}`} 
                                                 target="_blank"
                                                 className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-400 hover:bg-indigo-100 hover:text-indigo-600 transition-all active:scale-90"
                                                 title="View Tracking Page"
