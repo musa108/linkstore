@@ -14,12 +14,18 @@ export default async function PublicStorePage({
 
     try {
         // ESSENTIAL DATA FETCH
-        const store = await prisma.store.findUnique({
+        const store = await (prisma as any).store.findUnique({
             where: { slug },
             include: {
                 products: {
                     where: { inStock: true },
-                    include: { variants: true, media: true },
+                    include: { 
+                        variants: true, 
+                        media: true,
+                        reviews: {
+                            orderBy: { createdAt: "desc" }
+                        }
+                    },
                     orderBy: { createdAt: "desc" },
                 },
             },

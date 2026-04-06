@@ -1,5 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
-import { LayoutDashboard, Package, Settings, ShoppingCart, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Package, Settings, ShoppingCart, BarChart3, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -29,6 +29,7 @@ export default function DashboardLayout({
                         { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
                         { href: "/dashboard/products", icon: Package, label: "Products" },
                         { href: "/dashboard/orders", icon: ShoppingCart, label: "Orders" },
+                        { href: "/dashboard/reviews", icon: Star, label: "Reviews" },
                         { href: "/dashboard/settings", icon: Settings, label: "Settings" },
                     ].map((item) => (
                         <Link
@@ -88,6 +89,7 @@ export default function DashboardLayout({
                     { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
                     { href: "/dashboard/products", icon: Package, label: "Products" },
                     { href: "/dashboard/orders", icon: ShoppingCart, label: "Orders" },
+                    { href: "/dashboard/reviews", icon: Star, label: "Reviews" },
                     { href: "/dashboard/settings", icon: Settings, label: "Settings" },
                 ].map((item) => (
                     <Link

@@ -84,18 +84,61 @@ export async function createOrder(formData: FormData) {
 
 export async function updateOrderStatus(orderId: string, status: string) {
     try {
+        const updateData: any = { status };
+        
+        if (status === "SHIPPED") {
+            updateData.shippedAt = new Date();
+        }
+
         const order = await prisma.order.update({
             where: { id: orderId },
-            data: { status },
+            data: updateData,
         });
 
         revalidatePath("/dashboard/orders");
+        revalidatePath(`/[slug]/track/${orderId}`, 'page');
         return { order };
     } catch (error) {
         console.error("UPDATE_ORDER_STATUS_ERROR", error);
         return { error: "Could not update order status." };
     }
 }
+
+export async function confirmOrderDelivery(orderId: string, role: "VENDOR" | "CUSTOMER") {
+    try {
+        const order = await prisma.order.findUnique({
+            where: { id: orderId }
+        });
+
+        if (!order) return { error: "Order not found" };
+
+        const updateData: any = {};
+        if (role === "VENDOR") updateData.vendorConfirmedDelivery = true;
+        if (role === "CUSTOMER") updateData.customerConfirmedDelivery = true;
+
+        // Check if this confirmation completes the process
+        const isVendorDone = role === "VENDOR" ? true : order.vendorConfirmedDelivery;
+        const isCustomerDone = role === "CUSTOMER" ? true : order.customerConfirmedDelivery;
+
+        if (isVendorDone && isCustomerDone) {
+            updateData.status = "DELIVERED";
+            updateData.deliveredAt = new Date();
+        }
+
+        const updatedOrder = await prisma.order.update({
+            where: { id: orderId },
+            data: updateData,
+        });
+
+        revalidatePath("/dashboard/orders");
+        revalidatePath(`/[slug]/track/${orderId}`, 'page');
+        return { order: updatedOrder };
+    } catch (error) {
+        console.error("CONFIRM_DELIVERY_ERROR", error);
+        return { error: "Failed to confirm delivery" };
+    }
+}
+
 export async function reportDispute(orderId: string, reason: string) {
     try {
         const order = await prisma.order.update({

@@ -1,7 +1,5 @@
-"use client";
-
-import { updateOrderStatus } from "@/lib/actions/order";
-import { Eye, Mail, Phone, MapPin, Package, ShoppingCart, X, ShieldAlert } from "lucide-react";
+import { updateOrderStatus, confirmOrderDelivery } from "@/lib/actions/order";
+import { Eye, Mail, Phone, MapPin, Package, ShoppingCart, X, ShieldAlert, CheckCircle2, Truck } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { OrderWithItems } from "@/types";
@@ -19,6 +17,15 @@ export default function OrderList({ orders }: OrderListProps) {
         setLoading(id);
         try {
             await updateOrderStatus(id, status);
+        } finally {
+            setLoading(null);
+        }
+    }
+
+    async function onConfirmDelivery(id: string) {
+        setLoading(id);
+        try {
+            await confirmOrderDelivery(id, "VENDOR");
         } finally {
             setLoading(null);
         }
@@ -108,32 +115,70 @@ export default function OrderList({ orders }: OrderListProps) {
                                         <span className="font-black text-foreground">₦{Number(order.total).toLocaleString()}</span>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <div className="relative inline-block">
-                                            {order.isDisputed ? (
-                                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 border border-red-100">
-                                                    <ShieldAlert className="h-3 w-3" />
-                                                    <span className="text-[10px] font-black uppercase tracking-widest">DISPUTED</span>
-                                                </div>
-                                            ) : (
-                                                <select
+                                        <div className="flex flex-col gap-2">
+                                            <div className="relative inline-block">
+                                                {order.isDisputed ? (
+                                                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 border border-red-100">
+                                                        <ShieldAlert className="h-3 w-3" />
+                                                        <span className="text-[10px] font-black uppercase tracking-widest">DISPUTED</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center gap-2">
+                                                        <select
+                                                            disabled={loading === order.id}
+                                                            defaultValue={order.status}
+                                                            onChange={(e) => onStatusChange(order.id, e.target.value)}
+                                                            className={`appearance-none text-[10px] font-black uppercase tracking-widest rounded-full px-4 py-1.5 border-0 focus:ring-0 cursor-pointer ${order.status === "PAID"
+                                                                ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                                                : order.status === "SHIPPED"
+                                                                    ? "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                                                                    : order.status === "DELIVERED"
+                                                                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                                                        : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                                                                }`}
+                                                        >
+                                                            <option value="PENDING">PENDING</option>
+                                                            <option value="PAID">PAID</option>
+                                                            <option value="SHIPPED">SHIPPED</option>
+                                                            <option value="DELIVERED">DELIVERED</option>
+                                                        </select>
+                                                        {(order.status === "SHIPPED" || order.status === "DELIVERED") && (
+                                                            <div className="flex gap-1">
+                                                                <div title="Vendor Confirmed" className={`h-5 w-5 rounded-full flex items-center justify-center border ${order.vendorConfirmedDelivery ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-gray-200 text-gray-300'}`}>
+                                                                    <CheckCircle2 className="h-3 w-3" />
+                                                                </div>
+                                                                <div title="Customer Confirmed" className={`h-5 w-5 rounded-full flex items-center justify-center border ${order.customerConfirmedDelivery ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-transparent border-gray-200 text-gray-300'}`}>
+                                                                    <CheckCircle2 className="h-3 w-3" />
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {order.status === "SHIPPED" && !order.vendorConfirmedDelivery && (
+                                                <button
+                                                    onClick={() => onConfirmDelivery(order.id)}
                                                     disabled={loading === order.id}
-                                                    defaultValue={order.status}
-                                                    onChange={(e) => onStatusChange(order.id, e.target.value)}
-                                                    className={`appearance-none text-[10px] font-black uppercase tracking-widest rounded-full px-4 py-1.5 border-0 focus:ring-0 cursor-pointer ${order.status === "PAID"
-                                                        ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
-                                                        : order.status === "DELIVERED"
-                                                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                                            : "bg-amber-50 text-amber-700 hover:bg-amber-100"
-                                                        }`}
+                                                    className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all active:scale-95 disabled:opacity-50"
                                                 >
-                                                    <option value="PENDING">PENDING</option>
-                                                    <option value="PAID">PAID</option>
-                                                    <option value="DELIVERED">DELIVERED</option>
-                                                </select>
+                                                    {loading === order.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                                                    Confirm Delivery
+                                                </button>
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-5 text-right">
+                                    <td className="px-6 py-5 text-right flex items-center justify-end gap-2">
+                                        {order.status === "SHIPPED" && (
+                                            <Link 
+                                                href={`/${order.store.slug}/track/${order.id}`} 
+                                                target="_blank"
+                                                className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-400 hover:bg-indigo-100 hover:text-indigo-600 transition-all active:scale-90"
+                                                title="View Tracking Page"
+                                            >
+                                                <Truck className="h-4 w-4" />
+                                            </Link>
+                                        )}
                                         <button
                                             onClick={() => setSelectedOrder(order)}
                                             className="h-10 w-10 inline-flex items-center justify-center rounded-xl bg-secondary text-foreground/40 hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90"

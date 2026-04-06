@@ -46,8 +46,19 @@ export interface Product {
     lowStockThreshold: number | null;
     variants?: Variant[];
     media?: ProductMedia[];
+    reviews?: Review[];
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface Review {
+    id: string;
+    productId: string;
+    orderId: string;
+    customerName: string;
+    rating: number;
+    comment: string | null;
+    createdAt: Date;
 }
 
 export interface ProductMedia {
@@ -74,6 +85,13 @@ export interface Order {
     isDisputed: boolean;
     disputeReason: string | null;
     paystackReference: string | null;
+
+    // Dual-Confirmation Fields
+    vendorConfirmedDelivery: boolean;
+    customerConfirmedDelivery: boolean;
+    shippedAt: Date | null;
+    deliveredAt: Date | null;
+
     createdAt: Date;
     updatedAt: Date;
 }

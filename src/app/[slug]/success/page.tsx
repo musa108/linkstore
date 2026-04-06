@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { CheckCircle2, MessageCircle, ArrowLeft, Store as StoreIcon, ShoppingBag, ShieldAlert } from "lucide-react";
+import { CheckCircle2, MessageCircle, ArrowLeft, Store as StoreIcon, ShoppingBag, ShieldAlert, Truck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -205,16 +205,25 @@ export default async function SuccessPage({
 
                     {/* Action Area */}
                     <div className="pt-8 space-y-4 print:hidden">
-                        <PrintButton />
-                        
-                        {!safeOrder.isDisputed ? (
-                            <DisputeButton orderId={safeOrder.id} />
-                        ) : (
-                            <div className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-sm">
-                                <ShieldAlert className="h-4 w-4" />
-                                Order Flagged / Under Investigation
-                            </div>
-                        )}
+                        <Link 
+                            href={`/${safeStore.slug}/track/${safeOrder.id}`}
+                            className="w-full flex items-center justify-center gap-3 py-5 px-8 rounded-[24px] bg-indigo-600 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
+                        >
+                            <Truck className="h-5 w-5" />
+                            Track Your Package
+                        </Link>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <PrintButton />
+                            {!safeOrder.isDisputed ? (
+                                <DisputeButton orderId={safeOrder.id} />
+                            ) : (
+                                <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-orange-500/10 text-orange-600 border border-orange-500/20 font-bold text-sm">
+                                    <ShieldAlert className="h-4 w-4" />
+                                    Disputed
+                                </div>
+                            )}
+                        </div>
 
                         <p className="text-[10px] text-center font-bold text-foreground/30 uppercase tracking-widest mt-6">
                             Powered by LinkStore Core

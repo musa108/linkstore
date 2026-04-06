@@ -47,6 +47,7 @@ model Product {
   variants    Variant[]
   media       ProductMedia[]
   orderItems  OrderItem[]
+  reviews     Review[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 }
@@ -73,13 +74,33 @@ model Order {
   deliveryFee       Decimal
   subtotal          Decimal
   total             Decimal
-  status            String      @default("PENDING") // PENDING, PAID, DELIVERED
+  status            String      @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED
   isDisputed        Boolean     @default(false)
   disputeReason     String?
   paystackReference String?     @unique
+  
+  // Dual-Confirmation Fields
+  vendorConfirmedDelivery   Boolean   @default(false)
+  customerConfirmedDelivery Boolean   @default(false)
+  shippedAt                 DateTime?
+  deliveredAt               DateTime?
+
   items             OrderItem[]
+  reviews           Review[]
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customerName  String
+  rating        Int      @default(5)
+  comment       String?
+  createdAt     DateTime @default(now())
 }
 
 model OrderItem {
