@@ -36,8 +36,13 @@ export function serializePrisma<T>(data: T): T {
 
         // Handle Prisma Decimals
         const constructorName = obj?.constructor?.name;
-        if (constructorName === 'Decimal' || constructorName === 'd') {
-            return Number(obj);
+        if (
+            constructorName === 'Decimal' || 
+            constructorName === 'd' || 
+            constructorName === 'Decimal2' ||
+            (typeof obj.toNumber === 'function' && 'd' in obj && 'e' in obj && 's' in obj)
+        ) {
+            return Number(obj.toString());
         }
 
         // Handle circular references
