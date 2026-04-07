@@ -25,9 +25,9 @@ export default async function ReviewsPage() {
 
     if (!store) redirect("/setup");
 
-    const allReviews = store.products.flatMap(p => 
-        p.reviews.map(r => ({ ...r, product: p }))
-    ).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const allReviews = (store.products as any[]).flatMap((p: any) => 
+        (p.reviews as any[]).map((r: any) => ({ ...r, product: p }))
+    ).sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const averageRating = allReviews.length > 0 
         ? allReviews.reduce((acc, curr) => acc + curr.rating, 0) / allReviews.length 
