@@ -2,7 +2,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prismaClientSingleton = () => {
     console.log("Initializing Prisma Client with URL:", process.env.DATABASE_URL?.replace(/:[^:]*@/, ":****@"));
-    return new PrismaClient();
+    return new PrismaClient({
+        datasource: {
+            url: process.env.DATABASE_URL
+        }
+    } as any);
 };
 
 declare global {
