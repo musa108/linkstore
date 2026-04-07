@@ -13,6 +13,9 @@ import {
     Loader2
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+
+export const dynamic = "force-dynamic";
 import { serializePrisma } from "@/lib/utils";
 import TrackingTimeline from "./tracking-timeline";
 import ReviewForm from "./review-form";
@@ -96,11 +99,17 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                                 Order Items
                             </h3>
                             <div className="space-y-4">
-                                {order.items.map((item) => (
+                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                {order.items.map((item: any) => (
                                     <div key={item.id} className="flex gap-4 items-center p-4 rounded-3xl bg-secondary/30 border border-border/10">
                                         <div className="h-14 w-14 rounded-2xl bg-card border overflow-hidden relative shrink-0">
                                             {item.product.imageUrl && (
-                                                <img src={item.product.imageUrl} alt={item.product.name} className="object-cover w-full h-full" />
+                                                <Image 
+                                                    src={item.product.imageUrl} 
+                                                    alt={item.product.name} 
+                                                    fill 
+                                                    className="object-cover" 
+                                                />
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">

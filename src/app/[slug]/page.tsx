@@ -5,6 +5,8 @@ import { serializePrisma } from "@/lib/utils";
 import { ShieldAlert, Store as StoreIcon, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function PublicStorePage({
     params,
 }: {

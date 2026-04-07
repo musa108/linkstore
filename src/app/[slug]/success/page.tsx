@@ -8,6 +8,8 @@ import PrintButton from "./print-button";
 import DisputeButton from "./dispute-button";
 import { OrderWithItems } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function SuccessPage({
     params,
     searchParams,

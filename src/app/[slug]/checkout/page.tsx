@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import CheckoutForm from "./checkout-form";
 import { serializePrisma } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function CheckoutPage({
     params,
 }: {

@@ -4,6 +4,7 @@ import prisma from '@/lib/prisma';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
     try {

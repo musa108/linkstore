@@ -23,7 +23,7 @@ export default async function SetupPage() {
             <div className="w-full max-w-md space-y-8 rounded-2xl bg-card p-10 shadow-xl">
                 <div className="text-center">
                     <h1 className="text-3xl font-extrabold text-foreground">Welcome to LinkStore</h1>
-                    <p className="mt-2 text-foreground/60">Let's set up your business storefront.</p>
+                    <p className="mt-2 text-foreground/60">Let&apos;s set up your business storefront.</p>
                 </div>
 
                 <SetupStoreForm />
