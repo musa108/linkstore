@@ -16,9 +16,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
     const [localInput, setLocalInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
-    // Using simple append and messages to guarantee type stability across AI SDK updates
-    // @ts-expect-error - Bypassing aggressive generic checking for AI SDK breaking changes
-    const { messages, append, isLoading } = useChat({
+    const chatHelpers: any = useChat({
         // @ts-expect-error - Suppressing Vercel api options mismatch
         api: '/api/chat',
         body: { storeId },
@@ -26,11 +24,13 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
             { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
         ]
     });
+    
+    const { messages, append, isLoading } = chatHelpers;
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!localInput.trim()) return;
-        append({ role: 'user', content: localInput });
+        append({ id: Date.now().toString(), role: 'user', content: localInput });
         setLocalInput("");
     };
 
