@@ -9,7 +9,15 @@ const prismaClientSingleton = () => {
         return new PrismaClient();
     }
 
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    let connectionString = process.env.DATABASE_URL;
+    
+    // Automatically upgrade sslmode=require to sslmode=verify-full to silence security warnings 
+    // and maintain current security guarantees in future 'pg' driver versions.
+    if (connectionString?.includes('sslmode=require')) {
+        connectionString = connectionString.replace('sslmode=require', 'sslmode=verify-full');
+    }
+
+    const pool = new Pool({ connectionString });
     const adapter = new PrismaPg(pool);
     return new PrismaClient({ adapter } as any);
 };
