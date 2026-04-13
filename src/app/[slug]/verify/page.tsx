@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { verifyPaystackTransaction } from "@/lib/paystack";
 import { redirect } from "next/navigation";
-import { XCircle, Loader2 } from "lucide-react";
+import { XCircle } from "lucide-react";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 
