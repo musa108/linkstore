@@ -1,6 +1,7 @@
 import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import prisma from '@/lib/prisma';
+import { z } from 'zod';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -50,18 +51,28 @@ export async function POST(req: Request) {
         const systemPrompt = `
 You are a helpful, professional, and friendly virtual store assistant for "${store.name}".
 Your goal is to answer customer questions about the store's products, help them find what they need, and encourage them to make a purchase.
-You should act as if you *work* at ${store.name}. Use a polite, slightly enthusiastic tone, but keep your answers incredibly short, concise, and easy to read on mobile. Avoid long paragraphs.
+You should act as if you *work* at ${store.name}. Use a polite, slightly enthusiastic tone.
 
-Here is the current active inventory available in the store:
+LOCAL CONTEXT:
+- You are serving customers primarily in Nigeria.
+- If a user uses local slang like "How far?", "Abeg", or "Oga", respond professionally but acknowledge the friendly tone.
+- When talking about prices, use the "₦" symbol (e.g., ₦5,000).
+
+ORDER TRACKING VIBE:
+- If a user asks about their order, ALWAYS ask for their **Order ID** AND either their **Email** or **Phone Number** linked to the order.
+- You have a tool called "get_order_status" to fetch this data. Do NOT use it until you have both pieces of information.
+- Be empathetic if an order is PENDING or delayed.
+
+INVENTORY:
 ${inventoryContext || "The store appears to have no products in stock right now."}
 
-Rules:
+RULES:
 1. ONLY answer questions about the products listed above or general shopping queries (e.g., shipping, policies usually handled by simply telling them to proceed to checkout).
-2. If the user asks for something that is NOT in the inventory above, apologize and say you don't carry it right now.
-3. If they ask about prices, always format the Nigerian Naira nicely like ₦5,000.
-4. **NEW FEATURE**: If a product has "[HAS VIDEO PREVIEW]" in the inventory, mention that they can "watch the product video" by clicking on the product image to see it in action.
-5. **GALLERY**: If it has "[GALLERY: X photos]", mention they can swipe through the photos to see more angles.
-6. When they are ready to buy, simply instruct them to click the "Add to Cart" button on the product card or search for the item on the page. Do not promise to add it to their cart for them, as you just guide them.
+2. If the user asks for something that is NOT in the inventory above, say: "I don't have that in stock right now, but feel free to check out our other great items!"
+3. KEEP ANSWERS SHORT: People are on mobile. Avoid long paragraphs. Use bullet points if listing more than 2 items.
+4. **VIDEO/MEDIA**: If a product has "[HAS VIDEO PREVIEW]", encourage them to "click the product to watch the video". If it has "[GALLERY]", tell them they can "swipe to see more angles".
+5. **CHECKOUT**: When they want to buy, tell them to "Click the 'Add to Cart' button" on the product card. Mention they can then go to the "Checkout" page to finish.
+6. **LAST PRICE**: If they ask for a discount or "last price", politely explain that the prices are fixed to ensure the best quality, but they are getting a great deal.
 `;
 
         const result = await streamText({
@@ -69,6 +80,50 @@ Rules:
             model: openai('gpt-4o-mini'),
             system: systemPrompt,
             messages,
+            maxSteps: 5,
+            tools: {
+                get_order_status: {
+                    description: 'Get the current status and items of an order. Requires Order ID and verification (email or phone).',
+                    parameters: z.object({
+                        orderId: z.string().describe('The full order ID from the customer.'),
+                        verification: z.string().describe('The email or phone number provided by the customer for verification.'),
+                    }),
+                    execute: async ({ orderId, verification }) => {
+                        try {
+                            const order = await prisma.order.findUnique({
+                                where: { id: orderId },
+                                include: {
+                                    items: {
+                                        include: { product: true }
+                                    }
+                                }
+                            });
+
+                            if (!order) return { error: "Order not found." };
+                            if (order.storeId !== storeId) return { error: "Order not found." };
+
+                            // Verify email or phone
+                            const isEmailMatch = order.customerEmail.toLowerCase() === verification.toLowerCase();
+                            const isPhoneMatch = order.customerPhone.replace(/\D/g, '').includes(verification.replace(/\D/g, '')) || verification.replace(/\D/g, '').includes(order.customerPhone.replace(/\D/g, ''));
+                            
+                            if (!isEmailMatch && !isPhoneMatch) {
+                                return { error: "Verification failed. The email or phone does not match this order." };
+                            }
+
+                            return {
+                                status: order.status,
+                                items: order.items.map(i => `${i.quantity}x ${i.product.name}`),
+                                total: Number(order.total),
+                                createdAt: order.createdAt,
+                                updatedAt: order.updatedAt,
+                            };
+                        } catch (err) {
+                            console.error("TOOL_ERROR:", err);
+                            return { error: "Could not retrieve order details." };
+                        }
+                    }
+                }
+            }
         });
 
         return result.toDataStreamResponse();

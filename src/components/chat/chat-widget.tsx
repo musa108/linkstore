@@ -2,7 +2,7 @@
 
 import { useChat } from '@ai-sdk/react';
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatWidgetProps {
@@ -11,27 +11,31 @@ interface ChatWidgetProps {
     primaryColor: string;
 }
 
+interface Message {
+    id: string;
+    role: 'user' | 'assistant' | 'system' | 'data';
+    content: string;
+}
+
 export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [localInput, setLocalInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
-    const chatHelpers: any = useChat({
-        // @ts-expect-error - Suppressing Vercel api options mismatch
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
+        // @ts-expect-error - Suppressing Vercel api options mismatch in certain environments
         api: '/api/chat',
         body: { storeId },
+        maxSteps: 5,
         initialMessages: [
             { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
         ]
-    });
-    
-    const { messages, append, isLoading } = chatHelpers;
+    }) as any;
 
-    const onSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!localInput.trim()) return;
-        append({ id: Date.now().toString(), role: 'user', content: localInput });
-        setLocalInput("");
+    const onClearChat = () => {
+        setMessages([
+            { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
+        ]);
     };
 
     // Auto-scroll to bottom of chat
@@ -71,18 +75,26 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                                     <span className="text-[10px] text-white/80 uppercase tracking-widest font-bold">Online</span>
                                 </div>
                             </div>
-                            <button 
-                                onClick={() => setIsOpen(false)}
-                                className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all active:scale-95 text-white"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
+                            <div className="flex items-center gap-1">
+                                <button 
+                                    onClick={onClearChat}
+                                    title="Clear Chat"
+                                    className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all active:scale-95 text-white"
+                                >
+                                    <RotateCcw className="h-4 w-4" />
+                                </button>
+                                <button 
+                                    onClick={() => setIsOpen(false)}
+                                    className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all active:scale-95 text-white"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Chat Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-canvas/30">
-                            {messages.map((m: unknown) => {
-                                const msg = m as { id: string, role: string, content: string };
+                            {messages.map((msg: Message) => {
                                 return (
                                 <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                                     <div className={`flex items-end gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -126,20 +138,20 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                         {/* Chat Input */}
                         <div className="p-3 bg-card border-t border-border/50 shrink-0">
                             <form 
-                                onSubmit={onSubmit}
+                                onSubmit={handleSubmit}
                                 className="flex items-center gap-2 bg-secondary rounded-full p-1 pl-4 shadow-inner border border-border/30 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all font-medium"
                             >
                                 <input
-                                    value={localInput}
-                                    onChange={(e) => setLocalInput(e.target.value)}
+                                    value={input}
+                                    onChange={handleInputChange}
                                     placeholder="Type your question..."
                                     className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-foreground/40"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={isLoading || !localInput.trim()}
+                                    disabled={isLoading || !input.trim()}
                                     className="h-10 w-10 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-white disabled:opacity-40 disabled:scale-100 hover:bg-indigo-700 active:scale-95 transition-all shadow-md"
-                                    style={{ backgroundColor: !isLoading && localInput.trim() ? primaryColor : undefined }}
+                                    style={{ backgroundColor: !isLoading && input.trim() ? primaryColor : undefined }}
                                 >
                                     <Send className="h-4 w-4 ml-0.5" />
                                 </button>
