@@ -114,6 +114,7 @@ RULES:
                                 status: order.status,
                                 items: order.items.map(i => `${i.quantity}x ${i.product.name}`),
                                 total: Number(order.total),
+                                trackingUrl: `/${store.slug}/track/${order.id}`,
                                 createdAt: order.createdAt,
                                 updatedAt: order.updatedAt,
                             };

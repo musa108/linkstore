@@ -1,8 +1,9 @@
 import prisma from "@/lib/prisma";
 import { verifyPaystackTransaction } from "@/lib/paystack";
 import { redirect } from "next/navigation";
-import { XCircle } from "lucide-react";
+import { XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { revalidatePath } from "next/cache";
 
 export default async function VerifyPaymentPage({
     params,
@@ -22,11 +23,17 @@ export default async function VerifyPaymentPage({
     const verification = await verifyPaystackTransaction(paystackReference);
 
     if (verification.success && verification.data.status === "success") {
-        // Update order status to paid
+        // Update order status to paid and store the reference
         await prisma.order.update({
             where: { id: paystackReference },
-            data: { status: "PAID" },
+            data: { 
+                status: "PAID",
+                paystackReference: paystackReference
+            },
         });
+
+        revalidatePath("/dashboard/orders");
+        revalidatePath(`/${slug}/track/${paystackReference}`);
 
         redirect(`/${slug}/success?orderId=${paystackReference}`);
     }

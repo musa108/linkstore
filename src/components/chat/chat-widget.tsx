@@ -21,7 +21,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
     const [isOpen, setIsOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // Using standard useChat bindings
     const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
         // @ts-expect-error - Suppressing Vercel api options mismatch in certain environments
         api: '/api/chat',
@@ -30,6 +30,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
         initialMessages: [
             { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
         ]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
 
     const onClearChat = () => {
@@ -149,9 +150,9 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                                 />
                                 <button
                                     type="submit"
-                                    disabled={isLoading || !input.trim()}
+                                    disabled={isLoading || !input?.trim()}
                                     className="h-10 w-10 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-white disabled:opacity-40 disabled:scale-100 hover:bg-indigo-700 active:scale-95 transition-all shadow-md"
-                                    style={{ backgroundColor: !isLoading && input.trim() ? primaryColor : undefined }}
+                                    style={{ backgroundColor: !isLoading && input?.trim() ? primaryColor : undefined }}
                                 >
                                     <Send className="h-4 w-4 ml-0.5" />
                                 </button>
