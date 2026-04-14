@@ -19,19 +19,31 @@ interface Message {
 
 export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [chatInput, setChatInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     
-    // Using standard useChat bindings
-    const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { messages, append, isLoading, setMessages } = useChat({
         // @ts-expect-error - Suppressing Vercel api options mismatch in certain environments
         api: '/api/chat',
         body: { storeId },
         maxSteps: 5,
+        onError: (err) => {
+            console.error("AI CHAT ERROR:", err);
+        },
         initialMessages: [
             { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
         ]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any;
+
+    const handleSendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!chatInput.trim() || isLoading) return;
+        
+        append({ role: 'user', content: chatInput });
+        setChatInput("");
+    };
 
     const onClearChat = () => {
         setMessages([
@@ -139,20 +151,20 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                         {/* Chat Input */}
                         <div className="p-3 bg-card border-t border-border/50 shrink-0">
                             <form 
-                                onSubmit={handleSubmit}
+                                onSubmit={handleSendMessage}
                                 className="flex items-center gap-2 bg-secondary rounded-full p-1 pl-4 shadow-inner border border-border/30 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all font-medium"
                             >
                                 <input
-                                    value={input}
-                                    onChange={handleInputChange}
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
                                     placeholder="Type your question..."
                                     className="flex-1 bg-transparent border-none outline-none text-sm text-foreground placeholder:text-foreground/40"
                                 />
                                 <button
                                     type="submit"
-                                    disabled={isLoading || !input?.trim()}
+                                    disabled={isLoading || !chatInput.trim()}
                                     className="h-10 w-10 shrink-0 rounded-full bg-indigo-600 flex items-center justify-center text-white disabled:opacity-40 disabled:scale-100 hover:bg-indigo-700 active:scale-95 transition-all shadow-md"
-                                    style={{ backgroundColor: !isLoading && input?.trim() ? primaryColor : undefined }}
+                                    style={{ backgroundColor: !isLoading && chatInput.trim() ? primaryColor : undefined }}
                                 >
                                     <Send className="h-4 w-4 ml-0.5" />
                                 </button>
