@@ -11,38 +11,49 @@ interface ChatWidgetProps {
     primaryColor: string;
 }
 
-interface Message {
-    id: string;
-    role: 'user' | 'assistant' | 'system' | 'data';
-    content: string;
-}
 
 export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWidgetProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [chatInput, setChatInput] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { messages, append, isLoading, setMessages } = useChat({
-        // @ts-expect-error - Suppressing Vercel api options mismatch in certain environments
+    const { messages, append, isLoading, setMessages } = (useChat as any)({
         api: '/api/chat',
         body: { storeId },
         maxSteps: 5,
-        onError: (err) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onError: (err: any) => {
             console.error("AI CHAT ERROR:", err);
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onResponse: (res: any) => {
+            if (!res.ok) console.error("AI CHAT RESPONSE ERROR:", res.statusText);
         },
         initialMessages: [
             { id: '1', role: 'assistant', content: `Hi there! I'm the digital assistant for ${storeName}. What are you looking for today?` }
         ]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }) as any;
+    });
 
-    const handleSendMessage = (e: React.FormEvent) => {
+    const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!chatInput.trim() || isLoading) return;
-        
-        append({ role: 'user', content: chatInput });
+        const content = chatInput.trim();
+        if (!content || isLoading) return;
+
         setChatInput("");
+
+        try {
+            await append({
+                id: Date.now().toString(),
+                role: 'user',
+                content: content,
+            }, {
+                body: { storeId }
+            });
+        } catch (err) {
+            console.error("APPEND ERROR:", err);
+            setChatInput(content); // Restore if it failed
+        }
     };
 
     const onClearChat = () => {
@@ -75,7 +86,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                         style={{ maxHeight: 'calc(100vh - 120px)', height: '500px' }}
                     >
                         {/* Chat Header */}
-                        <div 
+                        <div
                             className="p-4 flex items-center justify-between text-white shrink-0 shadow-sm z-10"
                             style={{ backgroundColor: primaryColor }}
                         >
@@ -89,14 +100,14 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
-                                <button 
+                                <button
                                     onClick={onClearChat}
                                     title="Clear Chat"
                                     className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all active:scale-95 text-white"
                                 >
                                     <RotateCcw className="h-4 w-4" />
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setIsOpen(false)}
                                     className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all active:scale-95 text-white"
                                 >
@@ -107,28 +118,27 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
 
                         {/* Chat Messages */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-canvas/30">
-                            {messages.map((msg: Message) => {
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                            {messages.map((msg: any) => {
                                 return (
-                                <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`flex items-end gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                        
-                                        {/* Avatar */}
-                                        <div className={`shrink-0 h-6 w-6 rounded-full flex items-center justify-center text-[10px] shadow-sm ${
-                                            msg.role === 'user' ? 'bg-indigo-100 text-indigo-600' : 'bg-secondary text-foreground border border-border/50'
-                                        }`}>
-                                            {msg.role === 'user' ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-                                        </div>
-                                        
-                                        {/* Bubble */}
-                                        <div className={`px-4 py-2.5 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-sm text-sm ${
-                                            msg.role === 'user' 
-                                                ? 'bg-indigo-600 text-white rounded-br-sm' 
-                                                : 'bg-card border border-border/50 text-foreground rounded-bl-sm'
-                                        }`}>
-                                            {msg.content}
+                                    <div key={msg.id} className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`flex items-end gap-2 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+
+                                            {/* Avatar */}
+                                            <div className={`shrink-0 h-6 w-6 rounded-full flex items-center justify-center text-[10px] shadow-sm ${msg.role === 'user' ? 'bg-indigo-100 text-indigo-600' : 'bg-secondary text-foreground border border-border/50'
+                                                }`}>
+                                                {msg.role === 'user' ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+                                            </div>
+
+                                            {/* Bubble */}
+                                            <div className={`px-4 py-2.5 rounded-2xl whitespace-pre-wrap leading-relaxed shadow-sm text-sm ${msg.role === 'user'
+                                                    ? 'bg-indigo-600 text-white rounded-br-sm'
+                                                    : 'bg-card border border-border/50 text-foreground rounded-bl-sm'
+                                                }`}>
+                                                {msg.content}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 );
                             })}
                             {isLoading && (
@@ -150,7 +160,7 @@ export default function ChatWidget({ storeId, storeName, primaryColor }: ChatWid
 
                         {/* Chat Input */}
                         <div className="p-3 bg-card border-t border-border/50 shrink-0">
-                            <form 
+                            <form
                                 onSubmit={handleSendMessage}
                                 className="flex items-center gap-2 bg-secondary rounded-full p-1 pl-4 shadow-inner border border-border/30 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all font-medium"
                             >
