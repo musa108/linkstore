@@ -4,6 +4,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/webhooks(.*)",
+  "/api/chat(.*)",
   "/:slug", // Public storefront
   "/:slug/track/(.*)", // Order tracking
   "/" // Landing page
