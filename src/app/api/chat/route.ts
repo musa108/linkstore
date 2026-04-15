@@ -128,8 +128,8 @@ RULES:
         });
 
         return result.toDataStreamResponse();
-    } catch (error) {
+    } catch (error: any) {
         console.error("AI_CHAT_ERROR:", error);
-        return new Response('An error occurred during chat.', { status: 500 });
+        return new Response(`An error occurred during chat. ${error?.message || String(error)}`, { status: 500 });
     }
 }

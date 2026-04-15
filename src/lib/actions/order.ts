@@ -84,6 +84,15 @@ export async function createOrder(formData: FormData) {
 
 export async function updateOrderStatus(orderId: string, status: string) {
     try {
+        // First, check if the order is already delivered to prevent further edits
+        const existingOrder = await prisma.order.findUnique({
+            where: { id: orderId }
+        });
+
+        if (existingOrder?.status === "DELIVERED") {
+            return { error: "This order has been delivered and cannot be modified." };
+        }
+
         const updateData: any = { status };
         
         if (status === "SHIPPED") {
