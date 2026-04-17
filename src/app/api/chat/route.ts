@@ -76,8 +76,8 @@ RULES:
 `;
 
         const result = await streamText({
-            // @ts-expect-error - suppress LanguageModel interface mismatch between core and provider packages
-            model: openai('gpt-4o-mini'),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            model: openai('gpt-4o-mini') as any,
             system: systemPrompt,
             messages,
             maxSteps: 5,
@@ -128,6 +128,7 @@ RULES:
         });
 
         return result.toDataStreamResponse();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error("AI_CHAT_ERROR:", error);
         return new Response(`An error occurred during chat. ${error?.message || String(error)}`, { status: 500 });
