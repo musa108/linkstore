@@ -1,21 +1,19 @@
-import { createOpenAI, openai } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
 
 /**
  * Returns the configured LanguageModel.
- * Prefers Google Gemini (Free tier) if GEMINI_API_KEY is provided.
+ * Prefers Google Gemini via the native @ai-sdk/google provider (not the OpenAI-compat shim,
+ * which produces non-standard tool-call response shapes that trip the AI SDK type validator).
  * Falls back to OpenAI if OPENAI_API_KEY is configured.
  */
 export function getChatModel() {
   const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
   if (geminiKey) {
-    // Google Gemini OpenAI-compatible API endpoint
-    const google = createOpenAI({
-      baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-      apiKey: geminiKey,
-    });
+    const google = createGoogleGenerativeAI({ apiKey: geminiKey });
     const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-    return google.chat(modelName);
+    return google(modelName);
   }
 
   // Fallback to OpenAI

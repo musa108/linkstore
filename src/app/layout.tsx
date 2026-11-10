@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
-const geistSans = Geist({
+const jakartaSans = Plus_Jakarta_Sans({
   display: "swap",
-  variable: "--font-geist-sans",
+  variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -31,7 +32,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" style={{ colorScheme: "light" }}>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${jakartaSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
         </body>
