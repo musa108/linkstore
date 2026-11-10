@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import { convertToModelMessages, stepCountIs, streamText } from "ai";
 import prisma from "@/lib/prisma";
 import { requireStore } from "@/server/auth";
@@ -6,6 +5,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { logger, newRequestId, errorInfo } from "@/lib/logger";
 import { sanitizeMessages } from "@/server/chat/messages";
 import { createMerchantTools } from "@/server/chat/merchant-tools";
+import { getChatModel, isAiConfigured } from "@/server/chat/model";
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ const SYSTEM = `You are the store-operations assistant inside LinkStore for a Ni
 
 export async function POST(req: Request) {
     const requestId = newRequestId();
-    if (!process.env.OPENAI_API_KEY) return json({ error: "The assistant is unavailable right now." }, 503);
+    if (!isAiConfigured()) return json({ error: "The assistant is unavailable right now." }, 503);
     const owned = await requireStore();
     if (!owned.ok) return json({ error: "Unauthorized" }, 401);
     const rl = await rateLimit(`merchantchat:${owned.userId}`, 40, 10 * 60_000);
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     try {
         const result = streamText({
-            model: openai("gpt-4o-mini"), system: SYSTEM, messages: await convertToModelMessages(messages),
+            model: getChatModel(), system: SYSTEM, messages: await convertToModelMessages(messages),
             tools: createMerchantTools({ db: prisma, store: owned.store }),
             stopWhen: stepCountIs(5), maxOutputTokens: 600, temperature: 0.2, maxRetries: 1,
             abortSignal: AbortSignal.any([req.signal, AbortSignal.timeout(25_000)]),

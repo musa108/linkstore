@@ -1,4 +1,3 @@
-import { openai } from "@ai-sdk/openai";
 import { convertToModelMessages, stepCountIs, streamText } from "ai";
 import prisma from "@/lib/prisma";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
@@ -6,6 +5,7 @@ import { logger, newRequestId, errorInfo } from "@/lib/logger";
 import { createShopperTools } from "@/server/chat/tools";
 import { lastUserText, sanitizeConversation } from "@/server/chat/messages";
 import { buildSystemPrompt } from "@/server/chat/prompt";
+import { getChatModel, isAiConfigured } from "@/server/chat/model";
 
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ const json = (body: object, status: number, extra: Record<string, string> = {}) 
 
 export async function POST(req: Request) {
     const requestId = newRequestId();
-    if (!process.env.OPENAI_API_KEY) return json({ error: "The assistant is unavailable right now." }, 503);
+    if (!isAiConfigured()) return json({ error: "The assistant is unavailable right now." }, 503);
 
     const ip = clientIp(req.headers);
     const rl = (await rateLimit(`chat:${ip}`, 20, 10 * 60_000));
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
         await prisma.chatMessage.create({ data: { conversationId, role: "user", content: lastUserText(convo.messages) } });
 
         const result = streamText({
-            model: openai("gpt-4o-mini"),
+            model: getChatModel(),
             system: buildSystemPrompt(store.name, store.announcement),
             messages: await convertToModelMessages(convo.messages),
             tools: createShopperTools({ db: prisma, store, clientKey: ip }),
