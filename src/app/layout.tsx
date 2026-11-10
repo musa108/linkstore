@@ -6,11 +6,13 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
 
 const geistSans = Geist({
+  display: "swap",
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
+  display: "swap",
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
@@ -27,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" style={{ colorScheme: 'light dark' }}>
+      <html lang="en" style={{ colorScheme: "light" }}>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >

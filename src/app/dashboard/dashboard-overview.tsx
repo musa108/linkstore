@@ -1,193 +1,338 @@
 "use client";
 
 import { useState } from "react";
-import { TrendingUp, Zap, ShoppingCart, Share2, Check } from "lucide-react";
-import Image from "next/image";
-import { motion, Variants } from "framer-motion";
+import Link from "next/link";
+import {
+  AlertTriangle,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  CheckCircle2,
+  Circle,
+  ExternalLink,
+  Share2,
+  Sparkles,
+  Store,
+} from "lucide-react";
 import AnalyticsChart from "./analytics-chart";
+import { formatPrice } from "@/lib/utils";
 
-import { Store } from "@prisma/client";
-
-interface DashboardOverviewProps {
-    store: Store & { _count?: { products: number; orders: number }, visits: number, conversionClicks: number };
-    chartData?: { date: string; revenue: number; orders: number }[];
-    totalRevenue?: number;
+export interface OverviewData {
+  store: { name: string; slug: string; visits: number; conversionClicks: number; hasPayout: boolean };
+  chart: { date: string; revenue: number; orders: number }[];
+  revenue7d: number;
+  productCount: number;
+  toShip: number;
+  recent: { id: string; customerName: string; total: number; status: string; createdAt: string }[];
+  lowStock: { id: string; label: string; stock: number }[];
 }
 
-export default function DashboardOverview({ store, chartData = [], totalRevenue = 0 }: DashboardOverviewProps) {
-    const [copied, setCopied] = useState(false);
+const STATUS_STYLE: Record<string, string> = {
+  PENDING: "bg-amber-50 text-amber-900 border-amber-200",
+  PAID: "bg-emerald-50 text-emerald-900 border-emerald-200",
+  SHIPPED: "bg-[#1e2024] text-white border-transparent",
+  DELIVERED: "bg-emerald-50 text-emerald-900 border-emerald-200",
+  CANCELLED: "bg-rose-50 text-rose-900 border-rose-200",
+  REFUNDED: "bg-rose-50 text-rose-900 border-rose-200",
+};
 
-    const onShare = async () => {
-        const url = `${window.location.origin}/${store.slug}`;
-        if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: store.name,
-                    text: `Check out my store on LinkStore: ${store.name}`,
-                    url: url,
-                });
-            } catch (err) {
-                // Ignore abortions
-                if ((err as Error).name !== 'AbortError') {
-                    console.error(err);
-                }
-            }
-        } else {
-            try {
-                await navigator.clipboard.writeText(url);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            } catch (err) {
-                console.error("FAILED_TO_COPY", err);
-            }
-        }
-    };
+export const STATUS_LABEL: Record<string, string> = {
+  PENDING: "Awaiting payment",
+  PAID: "Paid – ready to ship",
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled",
+  REFUNDED: "Refunded",
+};
 
-    const container: Variants = {
-        hidden: { opacity: 0 },
-        show: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.1,
-                delayChildren: 0.2
-            }
-        }
-    };
+export default function DashboardOverview({ data }: { data: OverviewData }) {
+  const { store } = data;
+  const [copied, setCopied] = useState(false);
+  const link = typeof window === "undefined" ? `/${store.slug}` : `${window.location.origin}/${store.slug}`;
 
-    const item: Variants = {
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } }
-    };
+  async function share() {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: store.name, url: link });
+        return;
+      }
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* user cancelled */
+    }
+  }
 
-    return (
-        <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="space-y-10"
+  const conversion = store.visits > 0 ? ((store.conversionClicks / store.visits) * 100).toFixed(1) : "0.0";
+  const steps = [
+    { done: data.productCount > 0, label: "Add your first product", href: "/dashboard/products/new" },
+    { done: store.hasPayout, label: "Add payout details so you can get paid", href: "/dashboard/settings" },
+    { done: store.visits > 0, label: "Share your store link", href: "#share" },
+  ];
+  const remaining = steps.filter((s) => !s.done).length;
+
+  return (
+    <div className="space-y-8">
+      {/* Title & Store Status */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-[#eb5a28]">
+            Merchant Overview
+          </span>
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl text-foreground">
+            {store.name}
+          </h1>
+          <p className="mt-0.5 text-xs text-foreground/60">
+            Real-time sales, live catalogue performance, and store management.
+          </p>
+        </div>
+
+        <Link
+          href={`/${store.slug}`}
+          target="_blank"
+          className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full border border-border bg-white px-3.5 py-1.5 text-xs font-semibold text-foreground/80 shadow-xs hover:border-[#eb5a28] hover:text-[#eb5a28] transition"
         >
-            <motion.div variants={item}>
-                <h2 className="text-4xl font-black text-foreground tracking-tight">Welcome back, {store.name}</h2>
-                <p className="text-sm font-bold text-foreground/40 uppercase tracking-widest mt-1">Here is what is happening with your store today.</p>
-            </motion.div>
+          <Store className="h-3.5 w-3.5 text-[#eb5a28]" />
+          <span>Live Customer View</span>
+          <ArrowUpRight className="h-3 w-3 opacity-60" />
+        </Link>
+      </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-8 auto-rows-fr">
-                {/* Main Stat - Large */}
-                <motion.div
-                    variants={item}
-                    className="md:col-span-2 md:row-span-2 bento-card p-6 md:p-10 group min-h-[400px] border-indigo-100 overflow-hidden"
-                >
-                    <div className="flex flex-col h-full">
-                        <div className="flex justify-between items-start text-left">
-                            <div className="space-y-4">
-                                <div className="h-16 w-16 rounded-[28px] bg-indigo-50 flex items-center justify-center text-indigo-600 transition-all group-hover:scale-110 group-hover:rotate-3 shadow-sm group-hover:shadow-indigo-100">
-                                    <TrendingUp className="h-9 w-9" />
-                                </div>
-                                <div>
-                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40">Total Visits</h3>
-                                    <p className="text-6xl md:text-8xl font-black tracking-tighter text-foreground mt-4 leading-none">{store.visits}</p>
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <span className="inline-flex items-center rounded-full bg-emerald-50 px-4 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 border border-emerald-100">
-                                    +12% this week
-                                </span>
-                            </div>
-                        </div>
-                        <div className="mt-auto pt-8 h-64 w-full">
-                            <AnalyticsChart data={chartData} />
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Conversion Stat - Wide */}
-                <motion.div
-                    variants={item}
-                    className="md:col-span-2 bento-card p-10 flex items-center justify-between group border-amber-100/50"
-                >
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground/40">Conversion Rate</h3>
-                        <p className="text-6xl font-black tracking-tighter text-foreground leading-none">
-                            {store.visits > 0 ? ((store.conversionClicks / store.visits) * 100).toFixed(1) : 0}%
-                        </p>
-                    </div>
-                    <div className="h-16 w-16 rounded-[24px] bg-amber-50 flex items-center justify-center text-amber-600 transition-all group-hover:scale-110 group-hover:-rotate-3 shadow-sm group-hover:shadow-amber-100 border border-amber-100">
-                        <Zap className="h-8 w-8" />
-                    </div>
-                </motion.div>
-
-                {/* Small Stats */}
-                <motion.div
-                    variants={item}
-                    className="bento-card p-8 flex flex-col justify-between group border-emerald-100/50"
-                >
-                    <div className="h-14 w-14 rounded-[22px] bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
-                        <ShoppingCart className="h-6 w-6" />
-                    </div>
-                    <div className="mt-6">
-                        <p className="text-3xl font-black tracking-tighter text-foreground leading-none mb-2">{store._count?.orders || 0}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Total Orders</p>
-                    </div>
-                </motion.div>
-
-                <motion.div
-                    variants={item}
-                    className="bento-card p-8 flex flex-col justify-between group border-blue-100/50"
-                >
-                    <div className="h-14 w-14 rounded-[22px] bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
-                        <TrendingUp className="h-6 w-6" />
-                    </div>
-                    <div className="mt-6">
-                        <p className="text-3xl font-black tracking-tighter text-foreground leading-none mb-2">₦{totalRevenue.toLocaleString()}</p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-foreground/40">Total Sales</p>
-                    </div>
-                </motion.div>
+      {/* Architectural Store Link Banner (Charcoal + Orange Accent) */}
+      <section
+        id="share"
+        className="relative overflow-hidden rounded-2xl border border-border bg-[#1e2024] p-6 text-white shadow-elevated"
+        aria-label="Your store link"
+      >
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#eb5a28]" />
+              <p className="text-xs font-bold uppercase tracking-widest text-white/60">
+                Your Public Store Link
+              </p>
             </div>
+            <p className="mt-1.5 truncate text-lg sm:text-xl font-bold tracking-tight text-white font-mono">
+              {link.replace(/^https?:\/\//, "")}
+            </p>
+            <p className="mt-1 text-xs text-white/50">
+              Share in your Instagram bio, TikTok bio, or WhatsApp status.
+            </p>
+          </div>
 
-            {/* Empty State / Activity Section */}
-            <motion.div
-                variants={item}
-                className="mt-12 bento-card border-dashed bg-card/40 p-10 md:p-20 text-center relative overflow-hidden group shadow-immersive"
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              onClick={share}
+              className="btn btn-primary h-10 px-5 text-xs sm:text-sm font-bold shadow-sm"
             >
-                <motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.5, 0.3],
-                    }}
-                    transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                    className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-96 w-96 bg-indigo-50/50 rounded-full blur-3xl p-40"
-                    style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.1) 0%, rgba(255,255,255,0) 70%)' }}
-                />
+              {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+              <span>{copied ? "Link Copied" : "Share Store"}</span>
+            </button>
+            <Link
+              href={`/${store.slug}`}
+              target="_blank"
+              className="btn h-10 border border-white/20 bg-white/10 px-4 text-xs sm:text-sm font-semibold text-white hover:bg-white/20"
+            >
+              Preview
+            </Link>
+          </div>
+        </div>
+      </section>
 
-                <div className="relative z-10">
-                    <div className="mx-auto mb-8 h-24 w-24 rounded-[32px] bg-card relative overflow-hidden shadow-bento group-hover:scale-110 group-hover:rotate-6 transition-all border border-border/50 p-4">
-                        <Image src="/logo.png" alt="LinkStore" fill className="object-contain p-4" />
-                    </div>
-                    <h3 className="text-3xl font-black text-foreground tracking-tight">Your Business Journey</h3>
-                    <p className="mt-4 text-foreground/50 max-w-sm mx-auto font-bold uppercase tracking-widest text-[10px] leading-relaxed">
-                        LinkStore is tracking every visitor and click. <br />Scale your social media sales with ease.
-                    </p>
-                    <button
-                        onClick={onShare}
-                        className="mt-10 group relative flex h-14 w-full md:w-64 items-center justify-center overflow-hidden rounded-2xl bg-gray-900 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-black active:scale-[0.98] shadow-xl"
+      {/* Setup checklist */}
+      {remaining > 0 && (
+        <section
+          className="rounded-2xl border border-border bg-white p-6 shadow-subtle"
+          aria-label="Setup checklist"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold tracking-wide text-foreground uppercase">
+              Store Launch Checklist
+            </h2>
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-bold text-foreground/70">
+              {3 - remaining} of 3 completed
+            </span>
+          </div>
+
+          <ul className="mt-4 grid gap-2.5 sm:grid-cols-3">
+            {steps.map((s) => (
+              <li key={s.label}>
+                <Link
+                  href={s.href}
+                  className={`flex min-h-[48px] items-center gap-3 rounded-xl border p-3.5 text-xs font-medium transition-all ${
+                    s.done
+                      ? "border-border/60 bg-canvas/60 text-foreground/50 line-through"
+                      : "border-border bg-white hover:border-[#eb5a28] hover:shadow-xs text-foreground"
+                  }`}
+                >
+                  {s.done ? (
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  ) : (
+                    <Circle className="h-4 w-4 text-[#eb5a28] shrink-0" />
+                  )}
+                  <span className="truncate">{s.label}</span>
+                  {!s.done && <ArrowRight className="ml-auto h-3.5 w-3.5 text-[#eb5a28]" />}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Architectural KPI Cards */}
+      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4" aria-label="Key numbers">
+        {[
+          {
+            label: "Revenue (7 Days)",
+            value: formatPrice(data.revenue7d),
+            hint: "Paid & confirmed orders",
+            highlight: true,
+          },
+          {
+            label: "Orders to Ship",
+            value: String(data.toShip),
+            hint: data.toShip > 0 ? "Awaiting your dispatch" : "All caught up",
+            href: "/dashboard/orders",
+          },
+          {
+            label: "Store Visits",
+            value: data.store.visits.toLocaleString(),
+            hint: "Unique shopper sessions",
+          },
+          {
+            label: "Cart Conversion",
+            value: `${conversion}%`,
+            hint: "Visitors who added items",
+          },
+        ].map((k) => (
+          <div
+            key={k.label}
+            className={`rounded-2xl border p-5 transition hover:shadow-subtle ${
+              k.highlight
+                ? "border-[#eb5a28]/20 bg-gradient-to-b from-white to-[#fff8f5]"
+                : "border-border bg-white"
+            }`}
+          >
+            <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/55">
+              {k.label}
+            </p>
+            <p className="tabular mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+              {k.value}
+            </p>
+            <p className="mt-1 text-[11px] text-foreground/50">{k.hint}</p>
+            {k.href && (
+              <Link
+                href={k.href}
+                className="mt-3 inline-flex items-center gap-1 text-[11px] font-bold text-[#eb5a28] hover:underline"
+              >
+                <span>View orders</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
+          </div>
+        ))}
+      </section>
+
+      {/* Low stock warning */}
+      {data.lowStock.length > 0 && (
+        <section
+          className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5"
+          aria-label="Low stock"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-900">
+              <AlertTriangle className="h-4 w-4" />
+              <span>Low Inventory Alert</span>
+            </h2>
+            <Link
+              href="/dashboard/products"
+              className="text-xs font-bold text-amber-900 hover:underline"
+            >
+              Manage stock →
+            </Link>
+          </div>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {data.lowStock.map((v) => (
+              <li
+                key={v.id}
+                className="flex items-center justify-between rounded-xl border border-amber-200/80 bg-white px-3.5 py-2 text-xs text-amber-950 font-medium"
+              >
+                <span className="truncate">{v.label}</span>
+                <span className="tabular font-bold text-amber-700">{v.stock} units left</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Sales Chart & Recent Orders */}
+      <div className="grid gap-6 lg:grid-cols-5">
+        <section
+          className="rounded-2xl border border-border bg-white p-6 shadow-subtle lg:col-span-3"
+          aria-label="Sales chart"
+        >
+          <div className="flex items-center justify-between border-b border-border/80 pb-4">
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Sales Performance</h2>
+              <p className="text-xs text-foreground/50">Daily revenue over the last 7 days</p>
+            </div>
+            <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-semibold text-foreground/70">
+              Last 7 Days
+            </span>
+          </div>
+          <div className="mt-6">
+            <AnalyticsChart data={data.chart} />
+          </div>
+        </section>
+
+        <section
+          className="rounded-2xl border border-border bg-white p-6 shadow-subtle lg:col-span-2"
+          aria-label="Recent orders"
+        >
+          <div className="flex items-center justify-between border-b border-border/80 pb-4">
+            <div>
+              <h2 className="text-sm font-bold text-foreground">Recent Orders</h2>
+              <p className="text-xs text-foreground/50">Latest customer checkouts</p>
+            </div>
+            <Link
+              href="/dashboard/orders"
+              className="text-xs font-bold text-[#eb5a28] hover:underline"
+            >
+              View all
+            </Link>
+          </div>
+
+          {data.recent.length === 0 ? (
+            <div className="mt-8 rounded-xl border border-dashed border-border bg-canvas/60 p-6 text-center">
+              <p className="text-xs font-semibold text-foreground/60">No orders yet</p>
+              <p className="mt-1 text-[11px] text-foreground/45">
+                Share your store link on WhatsApp or Instagram to make your first sale.
+              </p>
+            </div>
+          ) : (
+            <ul className="mt-4 divide-y divide-border/60">
+              {data.recent.map((o) => (
+                <li key={o.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-bold text-foreground">{o.customerName}</p>
+                    <span
+                      className={`mt-1 inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                        STATUS_STYLE[o.status] ?? ""
+                      }`}
                     >
-                        <span className={`flex items-center gap-2 transition-all duration-300 ${copied ? "opacity-0 scale-50" : "opacity-100 scale-100"}`}>
-                            <Share2 className="h-4 w-4" />
-                            Share My Store
-                        </span>
-                        {copied && (
-                            <div className="absolute inset-0 flex items-center justify-center gap-2 text-emerald-400 bg-gray-900">
-                                <Check className="h-4 w-4" />
-                                Link Copied
-                            </div>
-                        )}
-                    </button>
-                </div>
-            </motion.div>
-        </motion.div>
-    );
+                      {STATUS_LABEL[o.status] ?? o.status}
+                    </span>
+                  </div>
+                  <p className="tabular text-xs font-bold text-foreground">
+                    {formatPrice(o.total)}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </div>
+  );
 }

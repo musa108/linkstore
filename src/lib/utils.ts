@@ -12,60 +12,36 @@ export function formatPrice(price: number | string | { toString(): string }) {
     }).format(Number(price.toString()));
 }
 
+const isDecimalLike = (o: object): o is { toString(): string } => {
+    const ctor = (o as { constructor?: { name?: string } }).constructor?.name;
+    return ctor === "Decimal" || ctor === "d" || ctor === "Decimal2" ||
+        (typeof (o as { toNumber?: unknown }).toNumber === "function" && "d" in o && "e" in o && "s" in o);
+};
+
 /**
- * Deeply serializes Prisma objects to make them safe for Client Components.
- * Specifically converts Decimal objects to numbers or strings.
+ * Deeply serializes Prisma objects so they can cross the server→client boundary:
+ * Date → ISO string, Decimal → number, bigint → string. The static type is kept as `T`
+ * (the client-side interfaces in `@/types` describe the *logical* shape).
  */
 export function serializePrisma<T>(data: T): T {
     if (!data) return data;
-    
-    const seen = new WeakSet();
+    const seen = new WeakSet<object>();
 
-    function recursiveClone(obj: any, depth = 0): any {
-        // Safety: Prevent stack overflow on extremely deep structures (rare in Prisma but possible)
+    function clone(value: unknown, depth = 0): unknown {
         if (depth > 10) return undefined;
-
-        // Handle primitives and null
-        if (obj === null || typeof obj !== 'object') {
-            if (typeof obj === 'bigint') return obj.toString();
-            return obj;
-        }
-
-        // Handle Dates
-        if (obj instanceof Date) return obj.toISOString();
-
-        // Handle Prisma Decimals
-        const constructorName = obj?.constructor?.name;
-        if (
-            constructorName === 'Decimal' || 
-            constructorName === 'd' || 
-            constructorName === 'Decimal2' ||
-            (typeof obj.toNumber === 'function' && 'd' in obj && 'e' in obj && 's' in obj)
-        ) {
-            return Number(obj.toString());
-        }
-
-        // Handle circular references
-        if (seen.has(obj)) return undefined;
-        seen.add(obj);
-
-        // Handle Arrays
-        if (Array.isArray(obj)) {
-            return obj.map(item => recursiveClone(item, depth + 1));
-        }
-
-        // Handle Objects
-        const clone: any = {};
-        for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                clone[key] = recursiveClone(obj[key], depth + 1);
-            }
-        }
-        return clone;
+        if (value === null || typeof value !== "object") return typeof value === "bigint" ? value.toString() : value;
+        if (value instanceof Date) return value.toISOString();
+        if (isDecimalLike(value)) return Number(value.toString());
+        if (seen.has(value)) return undefined;
+        seen.add(value);
+        if (Array.isArray(value)) return (value as unknown[]).map((v) => clone(v, depth + 1));
+        const out: Record<string, unknown> = {};
+        for (const key of Object.keys(value)) out[key] = clone((value as Record<string, unknown>)[key], depth + 1);
+        return out;
     }
 
     try {
-        return recursiveClone(data);
+        return clone(data) as T;
     } catch (error) {
         console.error("SERIALIZE_PRISMA_FATAL_ERROR:", error);
         return (Array.isArray(data) ? [] : {}) as T;

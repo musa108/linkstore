@@ -1,247 +1,435 @@
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
-import { ArrowRight, Globe, LayoutDashboard, ShieldCheck, ShoppingBag, Zap, Instagram, Twitter, Facebook } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CheckCircle2,
+  Lock,
+  Package,
+  ShieldCheck,
+  Smartphone,
+  Star,
+  Store,
+  Truck,
+  Users,
+  Zap,
+} from "lucide-react";
+import { Logo } from "@/components/brand/logo";
+import { StorefrontPreview } from "@/components/marketing/storefront-preview";
+import { EarningsCalculator } from "@/components/marketing/earnings-calculator";
+import { LinkClaimer } from "@/components/marketing/link-claimer";
+import { ComparisonTable } from "@/components/marketing/comparison-table";
+import { FeatureTabs } from "@/components/marketing/feature-tabs";
+import { FaqAccordion } from "@/components/marketing/faq-accordion";
+
+export const metadata = {
+  title: "LinkStore – The Professional Store Link for Nigerian Social Commerce",
+  description:
+    "Turn your WhatsApp, Instagram and TikTok followers into paying customers. Instant Paystack bank transfers, automated fake alert protection, live delivery tracking and a 24/7 store assistant.",
+};
+
+const STEPS = [
+  {
+    n: "01",
+    title: "Claim your store link & bank account",
+    body: "Choose linkstore.app/yourbrand. Connect your Nigerian bank account once via Paystack so your earnings settle automatically.",
+    badge: "Under 2 Minutes",
+  },
+  {
+    n: "02",
+    title: "Upload products from your phone",
+    body: "Snap photos, set prices in naira, add size variants and delivery fees. Your catalogue updates immediately without writing code.",
+    badge: "Zero Tech Skills",
+  },
+  {
+    n: "03",
+    title: "Share your link & receive verified orders",
+    body: "Put it in your Instagram bio, TikTok profile or WhatsApp catalogue. Customers pick, pay and track; you just dispatch.",
+    badge: "100% Scam-Proof",
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    quote:
+      "Before LinkStore, I spent 3 hours every evening matching bank statements with DM screenshots to catch fake alerts. Now, every single order is already paid and verified by Paystack before I pack it.",
+    author: "Amaka O.",
+    brand: "Amaka Wears",
+    category: "Fashion Boutique",
+    location: "Ikeja, Lagos",
+    rating: 5,
+  },
+  {
+    quote:
+      "Customers love that they can pay with a direct bank transfer and track their dispatch rider without texting me every 10 minutes. It made my small brand look 10x more trustworthy.",
+    author: "Tunde B.",
+    brand: "Kicks & Tech Hub",
+    category: "Sneakers & Accessories",
+    location: "Wuse II, Abuja",
+    rating: 5,
+  },
+  {
+    quote:
+      "The AI shopping assistant literally answered midnight questions about my skincare products and closed 14 sales while I was asleep last weekend. Best tool I have used as a vendor.",
+    author: "Blessing E.",
+    brand: "Glow Organics",
+    category: "Natural Skincare",
+    location: "Port Harcourt",
+    rating: 5,
+  },
+];
 
 export default async function LandingPage() {
-    const { userId } = await auth();
+  const { userId } = await auth();
+  const cta = userId
+    ? { href: "/dashboard", label: "Open Dashboard" }
+    : { href: "/sign-up", label: "Create Your Store" };
 
-    return (
-        <div className="min-h-screen bg-canvas text-foreground selection:bg-indigo-500/30 selection:text-indigo-900 overflow-x-hidden relative font-sans">
-            {/* Ambient Background */}
-            <div className="fixed inset-0 -z-10 bg-canvas pointer-events-none">
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
+  return (
+    <div className="min-h-screen bg-canvas text-foreground selection:bg-emerald-100 selection:text-emerald-900">
+      {/* 0. Top Announcement / Trust Bar */}
+      <div className="border-b border-border/70 bg-emerald-50/70 px-4 py-2 text-center text-xs font-semibold text-emerald-900">
+        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 sm:gap-4 flex-wrap">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <span>Direct Paystack Settlement</span>
+          </span>
+          <span className="hidden sm:inline text-border">•</span>
+          <span className="hidden sm:inline">Zero Monthly Subscription</span>
+          <span className="hidden sm:inline text-border">•</span>
+          <span>Next-Day Payouts to All Nigerian Banks 🇳🇬</span>
+        </div>
+      </div>
+
+      {/* 1. Sticky Navigation Header */}
+      <header className="sticky top-0 z-40 border-b border-border/70 bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Logo />
+
+          <nav aria-label="Main" className="hidden items-center gap-7 text-sm font-semibold text-foreground/75 md:flex">
+            <a href="#how" className="transition hover:text-primary">How It Works</a>
+            <a href="#comparison" className="transition hover:text-primary">Why LinkStore</a>
+            <a href="#features" className="transition hover:text-primary">Features</a>
+            <a href="#calculator" className="transition hover:text-primary">Calculator</a>
+            <a href="#pricing" className="transition hover:text-primary">Pricing</a>
+            <a href="#faq" className="transition hover:text-primary">FAQ</a>
+          </nav>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-1 rounded-full border border-border bg-canvas px-2.5 py-1 text-[11px] font-bold text-foreground/70">
+              <span>🇳🇬</span>
+              <span>NGN</span>
             </div>
 
-            {/* Header */}
-            <header className="fixed top-0 left-0 right-0 z-[100] bg-canvas/60 backdrop-blur-xl border-b border-border/50 py-4 px-6 md:px-12">
-                <div className="max-w-7xl mx-auto flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <div className="h-10 w-10 relative overflow-hidden rounded-xl shadow-lg border border-white/20 transition-transform group-hover:scale-110 group-hover:rotate-3">
-                            <Image src="/logo.png" alt="LinkStore" fill className="object-cover" />
-                        </div>
-                        <span className="text-2xl font-black italic tracking-tighter text-foreground uppercase">LinkStore</span>
-                    </Link>
-
-                    <nav className="hidden md:flex items-center gap-8">
-                        {["Features", "Enterprise", "Pricing"].map((item) => (
-                            <Link key={item} href="#" className="text-sm font-black uppercase tracking-widest text-foreground/40 hover:text-indigo-500 transition-colors">
-                                {item}
-                            </Link>
-                        ))}
-                    </nav>
-
-                    <div className="flex items-center gap-4">
-                        {userId ? (
-                            <Link
-                                href="/dashboard"
-                                className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-black text-white shadow-xl shadow-indigo-500/10 transition-all hover:bg-indigo-700 active:scale-95"
-                            >
-                                Dashboard
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        ) : (
-                            <>
-                                <div className="hidden sm:block">
-                                    <SignInButton mode="modal">
-                                        <button className="text-sm font-black uppercase tracking-widest text-foreground/50 hover:text-foreground transition-colors">
-                                            Log In
-                                        </button>
-                                    </SignInButton>
-                                </div>
-                                <SignUpButton mode="modal">
-                                    <button className="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-black text-white shadow-xl shadow-indigo-500/10 transition-all hover:bg-indigo-700 active:scale-95">
-                                        Start Free
-                                    </button>
-                                </SignUpButton>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </header>
-
-            {/* Hero Section */}
-            <main className="pt-32 md:pt-48 pb-24 md:pb-40 px-6 relative">
-                <div className="max-w-7xl mx-auto text-center space-y-12">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/5 px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-                        <Zap className="h-3 w-3 fill-indigo-500" />
-                        Built for Nigerian Merchants
-                    </div>
-
-                    <h1 className="text-6xl md:text-9xl font-black tracking-tighter text-foreground leading-[0.85] max-w-5xl mx-auto italic animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
-                        Sell more on <br />
-                        <span className="text-indigo-500">Social Media.</span>
-                    </h1>
-
-                    <p className="max-w-2xl mx-auto text-xl md:text-2xl font-medium text-foreground/60 leading-relaxed animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
-                        Turn your Instagram, WhatsApp, and TikTok bio into a professional storefront. One Link, countless sales.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
-                        <SignUpButton mode="modal">
-                            <button className="w-full sm:w-auto flex items-center justify-center gap-3 rounded-2xl bg-foreground text-canvas px-10 py-5 text-lg font-black transition-all hover:scale-105 active:scale-95 group shadow-2xl">
-                                Create Your Store
-                                <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
-                            </button>
-                        </SignUpButton>
-                        <Link
-                            href="/dashboard"
-                            className="w-full sm:w-auto text-sm font-black uppercase tracking-[0.2em] text-foreground/40 hover:text-indigo-500 transition-colors py-4"
-                        >
-                            View Samples
-                        </Link>
-                    </div>
-
-                    {/* App Mockup */}
-                    <div className="relative pt-24 animate-in fade-in zoom-in duration-1000 delay-500">
-                        <div className="absolute inset-0 bg-indigo-500/5 blur-3xl rounded-full -z-10 scale-75" />
-                        <div className="relative mx-auto max-w-5xl aspect-video rounded-3xl md:rounded-[48px] overflow-hidden border-[8px] md:border-[16px] border-card shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] dark:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.6)] group">
-                            <Image 
-                                src="/mockup.png" 
-                                alt="LinkStore Dashboard" 
-                                fill 
-                                className="object-cover transition-transform duration-700 group-hover:scale-105" 
-                            />
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            {/* Features Bento */}
-            <section className="py-32 px-6 relative overflow-hidden">
-                <div className="max-w-7xl mx-auto space-y-16">
-                    <div className="text-center md:text-left space-y-4">
-                        <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground italic">
-                            Everything you need to <br />
-                            <span className="text-indigo-500">scale.</span>
-                        </h2>
-                    </div>
-
-                    <div className="grid gap-8 md:grid-cols-6 md:grid-rows-2">
-                        <div className="md:col-span-3 bento-card p-10 space-y-6 group border-indigo-500/10">
-                            <div className="h-16 w-16 rounded-2xl bg-indigo-500 flex items-center justify-center text-white shadow-lg group-hover:rotate-6 transition-transform">
-                                <ShoppingBag className="h-8 w-8" />
-                            </div>
-                            <h3 className="text-3xl font-black tracking-tight">One-Click Storefronts</h3>
-                            <p className="text-foreground/50 font-medium leading-relaxed">
-                                Upload your products once and get a beautiful, lightning-fast store URL for your bio. No coding required.
-                            </p>
-                        </div>
-
-                        <div className="md:col-span-3 bento-card p-10 space-y-6 group border-amber-500/10">
-                            <div className="h-16 w-16 rounded-2xl bg-amber-500 flex items-center justify-center text-white shadow-lg group-hover:-rotate-6 transition-transform">
-                                <Zap className="h-8 w-8" />
-                            </div>
-                            <h3 className="text-3xl font-black tracking-tight">Automated Payouts</h3>
-                            <p className="text-foreground/50 font-medium leading-relaxed">
-                                Integrated with Paystack Split Payments. The system automatically handles payouts so you can focus on selling.
-                            </p>
-                        </div>
-
-                        <div className="md:col-span-2 bento-card p-10 space-y-4 group">
-                            <div className="h-12 w-12 rounded-xl bg-secondary flex items-center justify-center text-foreground/60 group-hover:scale-110 transition-transform">
-                                <LayoutDashboard className="h-6 w-6" />
-                            </div>
-                            <h4 className="text-xl font-black">Mobile-First</h4>
-                            <p className="text-sm font-medium text-foreground/40 leading-relaxed">
-                                Manage orders and see analytics directly from your smartphone.
-                            </p>
-                        </div>
-
-                        <div className="md:col-span-2 bento-card p-10 space-y-4 group border-emerald-500/10">
-                            <div className="h-12 w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
-                                <ShieldCheck className="h-6 w-6" />
-                            </div>
-                            <h4 className="text-xl font-black">Secure Checkout</h4>
-                            <p className="text-sm font-medium text-foreground/40 leading-relaxed">
-                                Enterprise-grade security for every transaction through Paystack.
-                            </p>
-                        </div>
-
-                        <div className="md:col-span-2 bento-card p-10 space-y-4 group border-blue-500/10">
-                            <div className="h-12 w-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
-                                <Globe className="h-6 w-6" />
-                            </div>
-                            <h4 className="text-xl font-black">Custom Branding</h4>
-                            <p className="text-sm font-medium text-foreground/40 leading-relaxed">
-                                Your logo, your colors, your brand. Our technology.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="py-32 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <div className="relative overflow-hidden rounded-[48px] bg-foreground px-8 py-24 md:py-32 text-center text-canvas shadow-3xl">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.2)_0%,transparent_50%)]" />
-                        <div className="relative z-10 max-w-3xl mx-auto space-y-8">
-                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none italic">
-                                Ready to join the <span className="text-indigo-500">future</span> of commerce?
-                            </h2>
-                            <p className="text-xl text-canvas/60 font-medium max-w-xl mx-auto">
-                                Join 500+ merchants who have built their social media empire with LinkStore.
-                            </p>
-                            <SignUpButton mode="modal">
-                                <button className="inline-flex items-center gap-3 rounded-2xl bg-canvas px-12 py-5 text-xl font-black text-foreground transition-all hover:scale-105 active:scale-95 group shadow-xl">
-                                    Get Started For Free
-                                    <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
-                                </button>
-                            </SignUpButton>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="py-24 px-6 border-t border-border/50 bg-canvas relative overflow-hidden">
-                <div className="max-w-7xl mx-auto grid gap-12 md:grid-cols-4">
-                    <div className="md:col-span-2 space-y-6">
-                        <Link href="/" className="flex items-center gap-3">
-                            <div className="h-10 w-10 relative overflow-hidden rounded-xl shadow-lg border border-white/20">
-                                <Image src="/logo.png" alt="LinkStore" fill className="object-cover" />
-                            </div>
-                            <span className="text-2xl font-black italic tracking-tighter uppercase">LinkStore</span>
-                        </Link>
-                        <p className="text-foreground/40 font-medium max-w-xs leading-relaxed">
-                            Helping Nigerian entrepreneurs bridge the gap between social media and professional commerce.
-                        </p>
-                        <div className="flex gap-4">
-                            {[Instagram, Twitter, Facebook].map((Icon, i) => (
-                                <Link key={i} href="#" className="h-10 w-10 rounded-full bg-secondary flex items-center justify-center text-foreground/40 hover:text-indigo-500 transition-all hover:scale-110">
-                                    <Icon className="h-5 w-5" />
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-
-                    {[
-                        { title: "Platform", links: ["Features", "Dashboard", "Marketplace", "API"] },
-                        { title: "Company", links: ["About", "Success Stories", "Blog", "Contact"] },
-                    ].map((col) => (
-                        <div key={col.title} className="space-y-6">
-                            <h4 className="text-sm font-black uppercase tracking-widest text-foreground">{col.title}</h4>
-                            <ul className="space-y-4">
-                                {col.links.map((link) => (
-                                    <li key={link}>
-                                        <Link href="#" className="text-sm font-bold text-foreground/40 hover:text-indigo-500 transition-colors">
-                                            {link}
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
-                </div>
-                <div className="max-w-7xl mx-auto pt-24 mt-24 border-t border-border/10 text-center">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-foreground/20">
-                        © 2026 LinkStore. Build with excellence.
-                    </p>
-                </div>
-            </footer>
+            {!userId && (
+              <Link href="/sign-in" className="btn btn-quiet hidden sm:inline-flex text-xs sm:text-sm font-semibold">
+                Sign In
+              </Link>
+            )}
+            <Link href={cta.href} className="btn btn-primary text-xs sm:text-sm">
+              {cta.label}
+            </Link>
+          </div>
         </div>
-    );
+      </header>
+
+      <main>
+        {/* 2. Hero Section */}
+        <section className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <div className="reveal inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-800">
+                <Store className="h-3.5 w-3.5 text-primary" />
+                <span>FOR WHATSAPP, INSTAGRAM &amp; TIKTOK SELLERS</span>
+              </div>
+
+              <h1 className="reveal reveal-1 mt-5 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl text-foreground">
+                Stop losing sales to <span className="text-primary underline decoration-primary/30 decoration-wavy underline-offset-8">&ldquo;DM for price&rdquo;</span> and fake bank alerts.
+              </h1>
+
+              <p className="reveal reveal-2 mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-foreground/75">
+                Give your customers a clean storefront with instant Paystack bank transfer, live order tracking, and a 24/7 store assistant that takes orders while you sleep.
+              </p>
+
+              <div className="reveal reveal-3 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link href={cta.href} className="btn btn-primary h-12 px-7 text-base font-bold shadow-md">
+                  {cta.label}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a href="#how" className="btn btn-quiet h-12 px-6 text-base font-semibold">
+                  See How It Works
+                </a>
+              </div>
+
+              {/* Micro-Trust Signals */}
+              <div className="reveal reveal-3 mt-8 border-t border-border/80 pt-6">
+                <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-foreground/70">
+                  <li className="flex items-center gap-2">
+                    <BadgeCheck className="h-4 w-4 text-primary" />
+                    <span>Zero monthly subscription</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <BadgeCheck className="h-4 w-4 text-primary" />
+                    <span>Instant Paystack verification</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <BadgeCheck className="h-4 w-4 text-primary" />
+                    <span>Works on any smartphone</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Right: High-Fidelity Interactive Storefront Preview */}
+            <div className="reveal reveal-2 flex justify-center">
+              <StorefrontPreview />
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Proof & Trust Ecosystem */}
+        <section className="border-y border-border bg-white py-10">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <p className="text-center text-xs font-bold uppercase tracking-wider text-foreground/50">
+              Trusted by social media merchants across Nigeria
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-4 text-center sm:grid-cols-4">
+              <div className="rounded-2xl border border-border/60 bg-canvas/60 p-4">
+                <p className="tabular text-2xl font-extrabold text-foreground">₦0 / mo</p>
+                <p className="mt-0.5 text-xs text-foreground/65">No monthly subscription fee</p>
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-canvas/60 p-4">
+                <p className="tabular text-2xl font-extrabold text-primary">100%</p>
+                <p className="mt-0.5 text-xs text-foreground/65">Verified payment guarantee</p>
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-canvas/60 p-4">
+                <p className="tabular text-2xl font-extrabold text-foreground">20+ Banks</p>
+                <p className="mt-0.5 text-xs text-foreground/65">Direct Paystack bank settlement</p>
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-canvas/60 p-4">
+                <p className="tabular text-2xl font-extrabold text-primary">24 / 7</p>
+                <p className="mt-0.5 text-xs text-foreground/65">Automated catalogue assistant</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Comparison Section: The DM Struggle vs. LinkStore */}
+        <section id="comparison" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="text-center max-w-3xl mx-auto">
+            <span className="eyebrow">
+              <Users className="h-3.5 w-3.5" />
+              <span>THE OLD WAY VS. THE LINKSTORE WAY</span>
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+              Why Nigerian social vendors are ditching the DM scramble
+            </h2>
+            <p className="mt-3 text-base text-foreground/75 leading-relaxed">
+              Selling through screenshots and manual chats costs you valuable hours every day and invites fake alert scams. Here is how LinkStore transforms your day.
+            </p>
+          </div>
+
+          <div className="mt-12">
+            <ComparisonTable />
+          </div>
+        </section>
+
+        {/* 5. How It Works (3 Steps) */}
+        <section id="how" className="border-y border-border bg-white py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="max-w-2xl">
+              <span className="eyebrow">
+                <Zap className="h-3.5 w-3.5" />
+                <span>HOW IT WORKS</span>
+              </span>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+                From zero to taking paid orders in three simple steps
+              </h2>
+              <p className="mt-2 text-base text-foreground/70">
+                You do not need to hire a developer or own a computer. Everything is managed directly from your phone.
+              </p>
+            </div>
+
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {STEPS.map((s) => (
+                <div key={s.n} className="flex flex-col justify-between rounded-3xl border border-border bg-canvas p-8 shadow-subtle transition hover:border-primary/40">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-base font-extrabold text-white shadow-xs">
+                        {s.n}
+                      </span>
+                      <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-foreground/70 border border-border">
+                        {s.badge}
+                      </span>
+                    </div>
+                    <h3 className="mt-6 text-xl font-bold text-foreground">{s.title}</h3>
+                    <p className="mt-3 text-sm text-foreground/70 leading-relaxed">{s.body}</p>
+                  </div>
+                  <div className="mt-8 border-t border-border/80 pt-4 flex items-center gap-2 text-xs font-semibold text-primary">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Quick mobile setup</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Five Operational Pillars (Interactive Feature Showcase) */}
+        <section id="features" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="eyebrow">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>EVERYTHING YOU NEED TO SELL SAFELY</span>
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+              Built specifically for modern social retail
+            </h2>
+            <p className="mt-3 text-base text-foreground/75">
+              Every tool in LinkStore is designed to protect your profits, automate repetitive inquiries, and build lasting customer trust.
+            </p>
+          </div>
+
+          <div className="mt-12">
+            <FeatureTabs />
+          </div>
+        </section>
+
+        {/* 7. Interactive Earnings Calculator & Pricing */}
+        <section id="calculator" className="border-y border-border bg-white py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="eyebrow">
+                <Store className="h-3.5 w-3.5" />
+                <span>NO SUBSCRIPTION · NO TRICKS</span>
+              </span>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+                You only pay when your customer pays
+              </h2>
+              <p className="mt-3 text-base text-foreground/75">
+                We believe in simple, aligned pricing. LinkStore charges a flat 5% platform fee per paid order. If you make no sales, you pay nothing.
+              </p>
+            </div>
+
+            <EarningsCalculator ctaHref={cta.href} />
+          </div>
+        </section>
+
+        {/* 8. Merchant Testimonials */}
+        <section className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+          <div className="text-center max-w-2xl mx-auto">
+            <span className="eyebrow">
+              <Star className="h-3.5 w-3.5" />
+              <span>AUTHENTIC VENDOR STORIES</span>
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+              Loved by Nigerian sellers who value their time
+            </h2>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.author} className="flex flex-col justify-between rounded-3xl border border-border bg-white p-7 shadow-elevated">
+                <div>
+                  <div className="flex gap-1 text-amber-500">
+                    {[...Array(t.rating)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-amber-500" />
+                    ))}
+                  </div>
+                  <p className="mt-4 text-sm text-foreground/80 leading-relaxed italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </p>
+                </div>
+
+                <div className="mt-6 border-t border-border/80 pt-4">
+                  <p className="text-sm font-bold text-foreground">{t.author}</p>
+                  <p className="text-xs font-semibold text-primary">{t.brand} · {t.category}</p>
+                  <p className="text-[11px] text-foreground/50">{t.location}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 9. FAQ Accordion */}
+        <section id="faq" className="border-y border-border bg-canvas py-20">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6">
+            <div className="text-center mb-10">
+              <span className="eyebrow">
+                <BadgeCheck className="h-3.5 w-3.5" />
+                <span>FREQUENT QUESTIONS</span>
+              </span>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
+                Everything you need to know before starting
+              </h2>
+            </div>
+
+            <FaqAccordion />
+          </div>
+        </section>
+
+        {/* 10. High-Impact Link Claimer Final Call to Action */}
+        <section className="px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-5xl rounded-[2.5rem] border border-white/10 bg-[#1e2024] px-6 py-16 text-center text-white sm:px-12 shadow-2xl">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1 text-xs font-semibold text-white/80 backdrop-blur-sm">
+              <Store className="h-3.5 w-3.5" />
+              <span>Claim Your Brand URL Today</span>
+            </div>
+
+            <h2 className="mx-auto mt-5 max-w-2xl text-3xl font-extrabold tracking-tight sm:text-5xl">
+              Your next verified sale is one link away.
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-xl text-base text-white/80 leading-relaxed">
+              Reserve your custom store name before another vendor takes it. Set up takes less than 3 minutes directly from your phone.
+            </p>
+
+            <div className="mt-8">
+              <LinkClaimer baseHref={cta.href} />
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* 11. Refined Professional Footer */}
+      <footer className="border-t border-border bg-white text-xs text-foreground/70">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 border-b border-border/80 pb-8">
+            <div className="flex items-center gap-3">
+              <Logo size={32} />
+              <div>
+                <p className="font-bold text-foreground">LinkStore Nigeria</p>
+                <p className="text-[11px] text-foreground/60">Social commerce infrastructure for modern African vendors</p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6 font-semibold">
+              <a href="#how" className="hover:text-primary">How It Works</a>
+              <a href="#features" className="hover:text-primary">Features</a>
+              <a href="#pricing" className="hover:text-primary">Pricing</a>
+              <a href="#calculator" className="hover:text-primary">Calculator</a>
+              <a href="#faq" className="hover:text-primary">FAQ</a>
+              <Link href={cta.href} className="text-primary font-bold hover:underline">
+                {cta.label}
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-foreground/55">
+            <div className="flex items-center gap-4">
+              <span>© {new Date().getFullYear()} LinkStore Technologies. All rights reserved.</span>
+              <span>•</span>
+              <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                <Lock className="h-3 w-3" /> NDPR &amp; Paystack Security Compliant
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>Built for Nigerian Instagram, TikTok &amp; WhatsApp sellers</span>
+              <span>🇳🇬</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }

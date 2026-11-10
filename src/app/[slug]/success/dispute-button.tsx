@@ -62,7 +62,7 @@ export default function DisputeButton({ orderId }: DisputeButtonProps) {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             onClick={() => !isSubmitting && setIsOpen(false)}
-                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                            className="absolute inset-0 bg-white/60 backdrop-blur-sm"
                         />
                         
                         <motion.div

@@ -1,109 +1,77 @@
 import { UserButton } from "@clerk/nextjs";
-import { LayoutDashboard, Package, Settings, ShoppingCart, BarChart3, Star } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
+import { isAdminUserId } from "@/server/auth";
+import { RailNav, TabNav, type NavItem } from "./dashboard-nav";
 
-export default function DashboardLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    return (
-        <div className="flex h-screen overflow-hidden bg-canvas">
-            {/* Sidebar */}
-            <aside className="fixed left-0 top-0 hidden h-full w-20 border-r border-border bg-card lg:flex flex-col items-center py-8 transition-all hover:w-64 group z-50">
-                <div className="mb-12">
-                    <Link href="/dashboard" className="flex items-center gap-3 transition-transform active:scale-95">
-                        <div className="h-10 w-10 rounded-xl relative overflow-hidden shadow-lg shadow-indigo-500/20">
-                            <Image src="/logo.png" alt="LinkStore" fill className="object-cover" />
-                        </div>
-                        <span className="text-xl font-bold tracking-tighter text-foreground opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            LinkStore
-                        </span>
-                    </Link>
-                </div>
+const BASE: NavItem[] = [
+  { href: "/dashboard", icon: "overview", label: "Overview" },
+  { href: "/dashboard/orders", icon: "orders", label: "Orders" },
+  { href: "/dashboard/products", icon: "products", label: "Products" },
+  { href: "/dashboard/analytics", icon: "analytics", label: "Analytics" },
+  { href: "/dashboard/reviews", icon: "reviews", label: "Reviews" },
+  { href: "/dashboard/settings", icon: "settings", label: "Settings" },
+];
 
-                <nav className="flex flex-1 flex-col gap-4 px-4 w-full">
-                    {[
-                        { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-                        { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
-                        { href: "/dashboard/products", icon: Package, label: "Products" },
-                        { href: "/dashboard/orders", icon: ShoppingCart, label: "Orders" },
-                        { href: "/dashboard/reviews", icon: Star, label: "Reviews" },
-                        { href: "/dashboard/settings", icon: Settings, label: "Settings" },
-                    ].map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center gap-4 rounded-xl p-3 text-foreground/50 transition-all hover:bg-primary/5 hover:text-primary active:scale-95 group/item"
-                        >
-                            <item.icon className="h-6 w-6 shrink-0" />
-                            <span className="text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                {item.label}
-                            </span>
-                        </Link>
-                    ))}
-                </nav>
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { userId } = await auth();
+  const items = isAdminUserId(userId)
+    ? [...BASE, { href: "/dashboard/admin/payments", icon: "admin" as const, label: "Payments" }]
+    : BASE;
 
-                <div className="mt-auto px-4 w-full flex justify-center group-hover:justify-start">
-                    <div className="flex items-center gap-4 p-3 rounded-xl hover:bg-secondary transition-colors cursor-pointer w-full">
-                        <UserButton />
-                        <span className="text-sm font-semibold text-foreground/80 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            My Account
-                        </span>
-                    </div>
-                </div>
-            </aside>
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 lg:pl-20 transition-all">
-                <header className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-md border-b border-border/50 h-16 md:h-20 px-4 md:px-8 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-4">
-                        <div className="lg:hidden h-8 w-8 rounded-lg relative overflow-hidden shadow-indigo-500/20">
-                            <Image src="/logo.png" alt="L" fill className="object-cover" />
-                        </div>
-                        <h2 className="text-xs font-black uppercase tracking-widest text-foreground/40">Dashboard</h2>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="hidden sm:flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-[10px] md:text-xs font-black uppercase tracking-widest text-foreground/60 shadow-sm">
-                            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                            Live Store
-                        </div>
-                        <div className="lg:hidden">
-                            <UserButton />
-                        </div>
-                    </div>
-                </header>
-
-                <main className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12">
-                    <div className="max-w-7xl mx-auto pb-24 md:pb-20">
-                        {children}
-                    </div>
-                </main>
-            </div>
-
-            {/* Mobile Bottom Navigation */}
-            <nav className="fixed bottom-0 left-0 z-50 w-full lg:hidden bg-card/80 backdrop-blur-xl border-t border-border/50 px-6 py-4 flex items-center justify-between shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
-                {[
-                    { href: "/dashboard", icon: LayoutDashboard, label: "Overview" },
-                    { href: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
-                    { href: "/dashboard/products", icon: Package, label: "Products" },
-                    { href: "/dashboard/orders", icon: ShoppingCart, label: "Orders" },
-                    { href: "/dashboard/reviews", icon: Star, label: "Reviews" },
-                    { href: "/dashboard/settings", icon: Settings, label: "Settings" },
-                ].map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className="flex flex-col items-center gap-1 text-foreground/40 transition-all active:scale-90"
-                    >
-                        <item.icon className="h-6 w-6" />
-                        <span className="text-[10px] font-black uppercase tracking-tighter">
-                            {item.label}
-                        </span>
-                    </Link>
-                ))}
-            </nav>
+  return (
+    <div className="min-h-screen bg-canvas text-foreground">
+      {/* Architectural Sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border bg-white py-6 lg:flex">
+        <div className="mb-8 px-6">
+          <Logo href="/dashboard" />
         </div>
-    );
+        <RailNav items={items} />
+        <div className="mt-auto border-t border-border px-5 pt-4">
+          <div className="flex items-center gap-3 rounded-xl border border-border/60 bg-canvas/60 p-2.5">
+            <UserButton />
+            <div className="min-w-0">
+              <p className="truncate text-xs font-bold text-foreground">Merchant Account</p>
+              <p className="text-[10px] text-foreground/50">Admin Console</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Body */}
+      <div className="lg:pl-64">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-white/90 px-4 backdrop-blur-md sm:px-8">
+          <div className="lg:hidden">
+            <Logo href="/dashboard" size={26} />
+          </div>
+          <div className="hidden lg:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-foreground/40">
+            <span>LinkStore</span>
+            <span>/</span>
+            <span className="text-foreground/80">Merchant Console</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener"
+              className="hidden sm:inline-flex items-center gap-1 rounded-full border border-border bg-canvas px-3 py-1 text-xs font-semibold text-foreground/70 transition hover:border-primary hover:text-primary"
+            >
+              <span>Main Site</span>
+              <ArrowUpRight className="h-3 w-3" />
+            </a>
+            <div className="lg:hidden">
+              <UserButton />
+            </div>
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-6xl px-4 pb-28 pt-6 sm:px-8 sm:pt-8 lg:pb-16">
+          {children}
+        </main>
+      </div>
+
+      <TabNav items={items.slice(0, 5)} />
+    </div>
+  );
 }

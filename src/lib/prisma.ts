@@ -1,33 +1,38 @@
 import { PrismaClient } from "@prisma/client";
-import { Pool } from 'pg';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prismaClientSingleton = () => {
-    console.log("Initializing Prisma Client with URL:", process.env.DATABASE_URL?.replace(/:[^:]*@/, ":****@"));
-    
-    if (!process.env.DATABASE_URL) {
-        return new PrismaClient();
-    }
-
-    let connectionString = process.env.DATABASE_URL;
-    
-    // Automatically upgrade sslmode=require to sslmode=verify-full to silence security warnings 
-    // and maintain current security guarantees in future 'pg' driver versions.
-    if (connectionString?.includes('sslmode=require')) {
-        connectionString = connectionString.replace('sslmode=require', 'sslmode=verify-full');
-    }
-
-    const pool = new Pool({ connectionString });
-    const adapter = new PrismaPg(pool);
-    return new PrismaClient({ adapter } as any);
+const createClient = () => {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) throw new Error("DATABASE_URL is not set");
+    // `sslmode=require` → `verify-full` keeps today's guarantees as `pg` tightens semantics.
+    const normalised = connectionString.includes("sslmode=require")
+        ? connectionString.replace("sslmode=require", "sslmode=verify-full")
+        : connectionString;
+    const pool = new Pool({ connectionString: normalised, max: Number(process.env.DB_POOL_MAX ?? 10), connectionTimeoutMillis: 10_000 });
+    return new PrismaClient({ adapter: new PrismaPg(pool) });
 };
 
 declare global {
-    var prisma: undefined | ReturnType<typeof prismaClientSingleton>;
+    var prisma: PrismaClient | undefined;
 }
 
-const prisma = globalThis.prisma ?? prismaClientSingleton();
+// Lazy proxy: importing this module never connects (keeps `next build` and unit tests DB-free).
+let instance: PrismaClient | undefined;
+function get(): PrismaClient {
+    if (!instance) {
+        instance = globalThis.prisma ?? createClient();
+        if (process.env.NODE_ENV !== "production") globalThis.prisma = instance;
+    }
+    return instance;
+}
+
+const prisma = new Proxy({} as PrismaClient, {
+    get(_t, prop) {
+        const c = get();
+        const v = Reflect.get(c, prop, c);
+        return typeof v === "function" ? v.bind(c) : v;
+    },
+});
 
 export default prisma;
-
-if (process.env.NODE_ENV !== "production") globalThis.prisma = prisma;

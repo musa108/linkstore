@@ -1,74 +1,50 @@
-import prisma from "@/lib/prisma";
-import { verifyPaystackTransaction } from "@/lib/paystack";
 import { redirect } from "next/navigation";
-import { XCircle } from "lucide-react";
 import Link from "next/link";
-import { revalidatePath } from "next/cache";
+import { XCircle, Clock } from "lucide-react";
+import prisma from "@/lib/prisma";
+import { finalizePayment } from "@/server/payments/finalize";
 
-export default async function VerifyPaymentPage({
-    params,
-    searchParams,
-}: {
-    params: Promise<{ slug: string }>;
-    searchParams: Promise<{ reference?: string; trxref?: string }>;
+export const dynamic = "force-dynamic";
+
+/**
+ * Paystack redirects the browser here. The redirect is INFORMATIONAL: this page asks Paystack
+ * (server-to-server) and compares amount/currency before anything is marked paid. The webhook
+ * is the backstop if the customer never lands here.
+ */
+export default async function VerifyPaymentPage({ params, searchParams }: {
+    params: Promise<{ slug: string }>; searchParams: Promise<{ reference?: string; trxref?: string }>;
 }) {
     const { slug } = await params;
-    const { reference, trxref } = await searchParams;
-    const paystackReference = reference || trxref;
+    const sp = await searchParams;
+    const reference = sp.reference ?? sp.trxref;
+    if (!reference) redirect(`/${slug}/checkout`);
 
-    if (!paystackReference) {
-        redirect(`/${slug}/checkout`);
+    const outcome = await finalizePayment(reference, "callback");
+    if (outcome.status === "success") {
+        const order = await prisma.order.findUnique({ where: { id: outcome.orderId }, select: { id: true, store: { select: { slug: true } } } });
+        if (!order || order.store.slug !== slug) redirect(`/${slug}`);
+        redirect(`/${slug}/success?orderId=${order.id}`);
     }
 
-    const verification = await verifyPaystackTransaction(paystackReference);
-
-    if (verification.success && verification.data.status === "success") {
-        // Update order status to paid and store the reference
-        await prisma.order.update({
-            where: { id: paystackReference },
-            data: { 
-                status: "PAID",
-                paystackReference: paystackReference
-            },
-        });
-
-        revalidatePath("/dashboard/orders");
-        revalidatePath(`/${slug}/track/${paystackReference}`);
-
-        redirect(`/${slug}/success?orderId=${paystackReference}`);
-    }
-
-    // Handle failure
+    const pending = outcome.status === "pending" || outcome.status === "error";
+    const Icon = pending ? Clock : XCircle;
     return (
-        <div className="min-h-screen bg-secondary flex flex-col items-center justify-center p-6 text-center">
-            <div className="max-w-md w-full space-y-8 bg-card p-12 rounded-3xl shadow-xl border border-border/50 animate-in zoom-in duration-500">
-                <div className="flex justify-center">
-                    <div className="rounded-full bg-red-50 p-6">
-                        <XCircle className="h-16 w-16 text-red-500" />
-                    </div>
+        <main className="min-h-screen bg-background flex items-center justify-center p-6">
+            <div className="max-w-md w-full space-y-6 bg-card p-10 rounded-2xl border border-border text-center">
+                <div className={`mx-auto h-14 w-14 rounded-full flex items-center justify-center ${pending ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600"}`}>
+                    <Icon className="h-7 w-7" aria-hidden />
                 </div>
-
-                <div className="space-y-4">
-                    <h1 className="text-3xl font-black text-foreground leading-tight">Payment Failed</h1>
-                    <p className="text-foreground/50 text-lg leading-relaxed">
-                        We couldn&apos;t verify your payment. Your order has not been completed.
-                    </p>
-                    {verification.error && (
-                        <p className="text-sm text-red-500 font-medium">
-                            Reason: {verification.error}
-                        </p>
-                    )}
-                </div>
-
-                <div className="pt-8">
-                    <Link
-                        href={`/${slug}/checkout`}
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gray-900 p-5 text-lg font-bold text-white shadow-xl hover:bg-gray-800 transition-all active:scale-95"
-                    >
-                        Try Again
-                    </Link>
+                <h1 className="text-2xl font-bold text-foreground">{pending ? "We're confirming your payment" : "Payment not completed"}</h1>
+                <p className="text-foreground/70 leading-relaxed">
+                    {pending
+                        ? "Your bank hasn't confirmed this payment yet. Please don't pay again — refresh this page in a minute. If you were charged, your order will be confirmed automatically."
+                        : "We couldn't confirm a successful payment, so no order was placed. You have not been charged for a completed order."}
+                </p>
+                <div className="flex flex-col gap-3 pt-2">
+                    {pending && <Link href={`/${slug}/verify?reference=${encodeURIComponent(reference)}`} className="rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground">Check again</Link>}
+                    <Link href={`/${slug}/checkout`} className="rounded-xl border border-border px-5 py-3 font-semibold text-foreground">{pending ? "Back to checkout" : "Try again"}</Link>
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

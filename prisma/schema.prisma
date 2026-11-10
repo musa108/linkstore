@@ -19,6 +19,7 @@ model Store {
   mainlandDeliveryFee Decimal   @default(1500)
   products           Product[]
   orders             Order[]
+  conversations      ChatConversation[]
   visits             Int       @default(0)
   conversionClicks   Int       @default(0)
   phoneNumber        String?   // For WhatsApp Notifications
@@ -49,6 +50,8 @@ model Product {
   reviews     Review[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+
+  @@index([storeId, inStock])
 }
 
 model ProductMedia {
@@ -59,6 +62,8 @@ model ProductMedia {
   type      String   @default("IMAGE") // IMAGE or VIDEO
   order     Int      @default(0)
   createdAt DateTime @default(now())
+
+  @@index([productId, order])
 }
 
 model Order {
@@ -76,8 +81,10 @@ model Order {
   status            String      @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED
   isDisputed        Boolean     @default(false)
   disputeReason     String?
-  paystackReference String?     @unique
-  
+  paystackReference String?     @unique // legacy; authoritative references live on Payment
+  currency          String      @default("NGN")
+  idempotencyKey    String?     @unique // client-generated per checkout attempt; prevents duplicate orders
+
   // Dual-Confirmation Fields
   vendorConfirmedDelivery   Boolean   @default(false)
   customerConfirmedDelivery Boolean   @default(false)
@@ -86,8 +93,13 @@ model Order {
 
   items             OrderItem[]
   reviews           Review[]
+  payments          Payment[]
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
+
+  @@index([storeId, createdAt])
+  @@index([storeId, status])
+  @@index([customerEmail])
 }
 
 model Review {
@@ -100,6 +112,9 @@ model Review {
   rating        Int      @default(5)
   comment       String?
   createdAt     DateTime @default(now())
+
+  @@unique([orderId, productId])
+  @@index([productId, createdAt])
 }
 
 model OrderItem {
@@ -113,6 +128,9 @@ model OrderItem {
   quantity        Int
   priceAtPurchase Decimal
   createdAt       DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Variant {
@@ -127,4 +145,114 @@ model Variant {
   orderItems  OrderItem[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([productId])
+}
+
+
+// ─── Payments ────────────────────────────────────────────────────────────────
+// One row per payment attempt. All monetary values are integer kobo (NGN minor
+// units). `status` is the PAYMENT lifecycle and is independent of Order.status
+// (the fulfilment lifecycle).
+model Payment {
+  id                    String         @id @default(cuid())
+  orderId               String
+  order                 Order          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  provider              String         @default("PAYSTACK")
+  reference             String         @unique
+  amountKobo            Int
+  currency              String         @default("NGN")
+  status                String         @default("INITIALIZED") // INITIALIZED | SUCCESS | FAILED | ABANDONED | REFUNDED
+  commissionBps         Int            // basis points snapshot at initialisation (500 = 5.00%)
+  commissionKobo        Int
+  merchantShareKobo     Int
+  subaccountCode        String?
+  providerTransactionId String?
+  failureReason         String?
+  paidAt                DateTime?
+  events                PaymentEvent[]
+  refunds               Refund[]
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@index([orderId])
+  @@index([status, createdAt])
+}
+
+// Append-only log of inbound provider events. `eventKey` makes webhook
+// processing idempotent (duplicate deliveries hit the unique constraint).
+model PaymentEvent {
+  id          String    @id @default(cuid())
+  eventKey    String    @unique
+  provider    String    @default("PAYSTACK")
+  type        String
+  reference   String?
+  paymentId   String?
+  payment     Payment?  @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  payload     Json
+  status      String    @default("RECEIVED") // RECEIVED | PROCESSED | IGNORED | FAILED
+  error       String?
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([reference])
+  @@index([status, receivedAt])
+}
+
+// ─── Storefront chatbot (shopper-facing) ─────────────────────────────────────
+model ChatConversation {
+  id        String        @id @default(cuid())
+  storeId   String
+  store     Store         @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  sessionId String        // anonymous, client-generated; never used for authorisation
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([storeId, updatedAt])
+  @@index([sessionId])
+}
+
+model ChatMessage {
+  id             String           @id @default(cuid())
+  conversationId String
+  conversation   ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String           // user | assistant
+  content        String
+  createdAt      DateTime         @default(now())
+
+  @@index([conversationId, createdAt])
+}
+
+
+// ─── Refunds ─────────────────────────────────────────────────────────────────
+// Merchants REQUEST; a platform admin APPROVES (which calls Paystack's refund API).
+// Status: REQUESTED → APPROVED → PROCESSING → PROCESSED | FAILED, or REQUESTED → REJECTED.
+model Refund {
+  id               String    @id @default(cuid())
+  paymentId        String
+  payment          Payment   @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  amountKobo       Int
+  reason           String
+  status           String    @default("REQUESTED")
+  requestedBy      String    // Clerk user id of the merchant
+  decidedBy        String?   // Clerk user id of the admin
+  decidedAt        DateTime?
+  providerRefundId String?
+  providerStatus   String?
+  failureReason    String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([paymentId])
+}
+
+// ─── Global rate limiting (shared by all app instances) ──────────────────────
+model RateLimitBucket {
+  key     String   @id
+  count   Int
+  resetAt DateTime
+
+  @@index([resetAt])
 }

@@ -9,6 +9,7 @@ export interface CartItem {
     price: number;
     imageUrl: string | null;
     quantity: number;
+    storeId?: string; // items from another store are dropped by the storefront (carts are per store)
 }
 
 interface CartStore {

@@ -1,26 +1,16 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isPublicRoute = createRouteMatcher([
-  "/sign-in(.*)",
-  "/sign-up(.*)",
-  "/api/webhooks(.*)",
-  "/api/chat(.*)",
-  "/:slug", // Public storefront
-  "/:slug/track/(.*)", // Order tracking
-  "/" // Landing page
-]);
+// Everything is public (storefronts, checkout, tracking, webhooks, health, cron-with-secret)
+// EXCEPT the merchant area. Page/actions additionally enforce ownership server-side.
+const isProtected = createRouteMatcher(["/dashboard(.*)", "/setup(.*)"]);
 
-export default clerkMiddleware(async (auth, request) => {
-  if (!isPublicRoute(request)) {
-    await auth.protect();
-  }
+export default clerkMiddleware(async (auth, req) => {
+    if (isProtected(req)) await auth.protect();
 });
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
+    matcher: [
+        "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+        "/(api|trpc)(.*)",
+    ],
 };

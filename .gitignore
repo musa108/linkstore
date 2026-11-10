@@ -44,3 +44,11 @@ next-env.d.ts
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# local / generated
+*.log
+build_log*
+push_error*
+/.next
+.env*
+!.env.example

@@ -2,15 +2,11 @@ import prisma from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { 
     CheckCircle2, 
-    Circle, 
     Clock, 
     Package, 
-    Truck, 
     Home, 
     Star, 
-    MessageSquare, 
-    ChevronRight,
-    Loader2
+    MessageSquare
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -56,8 +52,7 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
         notFound();
     }
 
-    const safeOrder = serializePrisma(order) as any;
-    const safeStore = serializePrisma(store) as any;
+    const safeOrder = serializePrisma(order);
 
     return (
         <div className="min-h-screen bg-secondary/30 pb-20">
@@ -179,7 +174,7 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                                 <ReviewForm 
                                     orderId={safeOrder.id} 
                                     role="PRODUCT_REVIEW" 
-                                    orderItems={safeOrder.items.map((i: any) => ({ 
+                                    orderItems={safeOrder.items.map((i) => ({ 
                                         productId: i.productId, 
                                         name: i.product.name 
                                     }))}

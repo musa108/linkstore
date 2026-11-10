@@ -5,8 +5,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { serializePrisma } from "@/lib/utils";
 import PrintButton from "./print-button";
+import ClearCart from "./clear-cart";
 import DisputeButton from "./dispute-button";
-import { OrderWithItems } from "@/types";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +45,7 @@ export default async function SuccessPage({
     if (!safeStore || !safeStore.name || !safeOrder || !safeOrder.id) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-secondary">
+            <ClearCart storeId={safeOrder.storeId} />
                 <div className="text-center p-8 bg-card rounded-3xl border border-border shadow-soft animate-in fade-in zoom-in">
                     <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
                     <h2 className="text-xl font-black mb-2">Order Confirmed!</h2>
@@ -153,7 +154,7 @@ export default async function SuccessPage({
                         <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest mb-4">Itemized Bill</p>
                         
                         {safeOrder.items && Array.isArray(safeOrder.items) ? (
-                            safeOrder.items.map((item: any) => (
+                            safeOrder.items.map((item) => (
                                 <div key={item.id} className="flex items-center justify-between group">
                                     <div className="flex items-center gap-4 flex-1 overflow-hidden">
                                         <div className="h-12 w-12 rounded-xl bg-secondary flex-shrink-0 flex items-center justify-center overflow-hidden border border-border/50">

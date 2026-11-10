@@ -159,7 +159,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                                     {item.type === "IMAGE" ? (
                                         <Image src={item.url} alt="Product" fill className="object-cover" />
                                     ) : (
-                                        <div className="relative h-full w-full bg-gray-900 flex items-center justify-center">
+                                        <div className="relative h-full w-full bg-primary flex items-center justify-center">
                                             <video src={item.url} className="h-full w-full object-cover opacity-50" />
                                             <div className="absolute inset-0 flex items-center justify-center">
                                                 <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
@@ -169,7 +169,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                                             <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-lg bg-indigo-600 text-[8px] font-black text-white uppercase tracking-widest">Video</span>
                                         </div>
                                     )}
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <div className="absolute inset-0 bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                         <button
                                             type="button"
                                             onClick={() => setMedia(media.filter((_, i) => i !== index))}
@@ -351,7 +351,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                             defaultChecked={initialData ? initialData.inStock : true}
                             className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border/80 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                        <div className="w-11 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-border/80 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </div>
                     <label htmlFor="inStock" className="text-sm font-bold text-foreground/80 cursor-pointer">
                         Mark as Active & Available in Store
@@ -363,7 +363,7 @@ export default function ProductForm({ storeId, initialData }: ProductFormProps) 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 group relative flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-gray-900 text-sm font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-black active:scale-[0.98] disabled:opacity-50 shadow-xl"
+                    className="flex-1 group relative flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-primary text-sm font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-indigo-700 active:scale-[0.98] disabled:opacity-50 shadow-xl"
                 >
                     <span className={`transition-all duration-300 ${loading ? "opacity-0 scale-50" : "opacity-100 scale-100"}`}>
                         {initialData ? "Save Changes" : "Create Product"}

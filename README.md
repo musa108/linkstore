@@ -1,95 +1,49 @@
-<div align="center">
-  <img src="public/logo.png" alt="LinkStore Logo" width="120" />
-  <h1>LinkStore</h1>
-  <p><b>The #1 Link-in-Bio Storefront for Nigerian Social Media Merchants</b></p>
-  
-  [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-  [![Clerk](https://img.shields.io/badge/Clerk-Auth-6C47FF?style=for-the-badge&logo=clerk)](https://clerk.dev/)
-  [![Paystack](https://img.shields.io/badge/Paystack-Fintech-011B33?style=for-the-badge&logo=paystack)](https://paystack.com/)
-</div>
+# LinkStore
 
----
+A link-in-bio storefront for Nigerian social-media merchants: one shareable URL per store, products with variants and stock, Paystack checkout with split payments, order tracking with dual delivery confirmation, a merchant dashboard, and a store-scoped shopping assistant.
 
-## ✨ Overview
+> Docs: [`PRD.md`](PRD.md) · [`Architecture.md`](Architecture.md) · [`Architecture_essential.md`](Architecture_essential.md) (rules every contributor/agent must follow) · [`Agents.md`](Agents.md) · [`Claude.md`](Claude.md)
 
-**LinkStore** helps Nigerian social media entrepreneurs turn their Instagram, WhatsApp, and TikTok presence into a professionalized commerce experience. Bridge the gap between "DM for price" and automated growth with a one-link store that handles everything from product display to automated payouts.
+## What actually exists
+- Public storefronts at `/<slug>`, cart, checkout, success/track pages, reviews (delivered orders only), disputes.
+- Payments: server-priced checkout → Paystack → **verified** (amount + currency + reference) via webhook, redirect page and a reconcile cron. Idempotent. Commission is recorded per payment in kobo.
+- Dashboard: overview, products (variants, media, stock), orders (ship, confirm delivery), reviews, analytics, settings/payout setup.
+- Shopper assistant (OpenAI via Vercel AI SDK v6): searches **this store's** live catalogue, shows product cards with *Add to cart*, hands off to checkout, and checks order status after the shopper supplies the order ID + checkout email/phone. Read-only.
+- Merchant assistant (dashboard): sales, orders and stock Q&A; proposes "mark as shipped" which you confirm with a button.
+- Refunds: merchants request, a platform admin approves (set `ADMIN_USER_IDS`), Paystack executes. Admin page: `/dashboard/admin/payments` (ledger reconciliation, refund queue, settlement comparison).
+- Not built: WhatsApp notifications and pushed inventory alerts (low stock shows in the dashboard), dark mode (removed on purpose), alerting for reconciliation findings.
+- Design system: see [`DESIGN.md`](DESIGN.md).
 
-![LinkStore Mockup](public/mockup.png)
+## Stack
+Next.js 15 · React 19 · Tailwind 4 · Prisma 7 (+`pg` adapter) · PostgreSQL · Clerk · Paystack · Vercel AI SDK 6 · Cloudinary · Vitest.
 
-## 🚀 Key Features
-
-- **⚡ One-Click Storefronts**: Create a professional, lightning-fast store URL for your social media bio in seconds.
-- **💳 Automated Payouts**: Integrated with **Paystack Split Payments**. The system automatically handles your share and platform commissions (5.0%) without manual intervention.
-- **🌙 Premium Adaptive UI**: A high-end design that automatically adjusts to **System Light & Dark Modes** for a professional look on any device.
-- **📱 Mobile-First Dashboard**: Manage your inventory, track orders, and view deep analytics (Visits & Conversion clicks) directly from your smartphone.
-- **🛡️ Enterprise Security**: Secure transactions and bank-grade data protection through Clerk and Paystack integrations.
-
-## 🛠️ Tech Stack
-
-- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
-- **Authentication**: [Clerk](https://clerk.com/)
-- **Payments**: [Paystack API](https://paystack.com/) (Subaccounts & Split Payments)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
-- **Media**: [Cloudinary](https://cloudinary.com/) (Image hosting)
-- **Icons**: [Lucide React](https://lucide.dev/)
-
-## ⚙️ Setup Instructions
-
-### 1. Clone the repository
+## Setup
 ```bash
-git clone https://github.com/yourusername/linkstore.git
-cd linkstore
-```
-
-### 2. Install dependencies
-```bash
+git clone <your-fork-url> && cd linkstore
 npm install
-```
-
-### 3. Configure Environment Variables
-Create a `.env` file in the root directory and add your credentials:
-```env
-# Database
-DATABASE_URL="postgresql://..."
-
-# Auth (Clerk)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-CLERk_SECRET_KEY=sk_...
-
-# Payments (Paystack)
-PAYSTACK_PUBLIC_KEY=pk_...
-PAYSTACK_SECRET_KEY=sk_...
-
-# Media (Cloudinary)
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=...
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=...
-```
-
-### 4. Database Setup
-```bash
-npx prisma generate
-npx prisma db push
-```
-
-### 5. Start Development Server
-```bash
+cp .env.example .env        # fill in values (see comments)
+npm run db:deploy           # applies prisma/migrations to an EMPTY database (3 migrations)
 npm run dev
 ```
+**Existing database created with `prisma db push`?** Run once: `npm run db:baseline` (marks `0_init` as applied), then `npm run db:deploy`. Before deploying, run the pre-flight query at the top of `prisma/migrations/20261016000000_payments_chat_integrity/migration.sql` (duplicate reviews would block a unique index).
 
-## 📈 Roadmap
+### Paystack
+Set the webhook URL in the Paystack dashboard to `https://<your-domain>/api/webhooks/paystack`. The same secret key is used to verify signatures. Use test keys until you have completed a test purchase end-to-end.
 
-- [x] Multi-tenant Storefront architecture.
-- [x] Automated Split Payment settlement.
-- [x] High-performance Bento Grid features UI.
-- [x] System-wide Dark Mode.
-- [ ] WhatsApp Order Notifications.
-- [ ] Product Inventory Alerts.
-- [ ] Advanced Customer Analytics.
+### Scheduled job
+`vercel.json` calls `/api/cron/maintenance` every 15 minutes (needs `CRON_SECRET`; Vercel Hobby limits cron frequency). It reconciles missed webhooks, expires abandoned payments, cancels stale unpaid orders and prunes chat history older than 30 days.
 
----
+## Scripts
+| Command | Purpose |
+|---|---|
+| `npm run typecheck` / `npm run lint` | static checks |
+| `npm test` | unit tests (+ integration if `TEST_DATABASE_URL` points to a **disposable** Postgres) |
+| `npm run test:db` | start a throwaway Postgres, run everything, tear it down |
+| `npm run db:verify-migrations` | apply all migrations to a disposable DB, check backfill + schema drift |
+| `npm run db:deploy` | `prisma migrate deploy` (production release step) |
 
-<p align="center">
-  Built with ❤️ for Nigerian Excellence by LinkStore Team.
-</p>
+## Health & ops
+`GET /api/health` → `{ ok, database, env, openai }` (names only, no values). Logs are structured JSON with sensitive keys redacted.
+
+## Security notes
+Prices, totals, fees and roles are never accepted from the browser. Merchant actions require ownership of the target store/product/order. See `Architecture.md §5`.

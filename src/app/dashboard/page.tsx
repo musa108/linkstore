@@ -1,85 +1,37 @@
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import DashboardOverview from "./dashboard-overview";
-import { serializePrisma } from "@/lib/utils";
+import prisma from "@/lib/prisma";
 import { getSalesData } from "@/lib/actions/dashboard";
-import { AlertCircle, RefreshCcw, LayoutDashboard } from "lucide-react";
-import Link from "next/link";
+import { serializePrisma } from "@/lib/utils";
+import { toKobo } from "@/domain/money";
+import DashboardOverview, { type OverviewData } from "./dashboard-overview";
+import MerchantAssistant from "@/components/chat/merchant-assistant";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
     const { userId } = await auth();
+    if (!userId) redirect("/sign-in");
 
-    if (!userId) {
-        redirect("/sign-in");
-    }
+    const store = await prisma.store.findUnique({ where: { vendorId: userId } });
+    if (!store) redirect("/setup");
 
-    try {
-        // Fetch store to see if it exists
-        const storeRaw = await prisma.store.findUnique({
-            where: { vendorId: userId },
-            include: {
-                _count: {
-                    select: { products: true, orders: true },
-                },
-            },
-        });
+    const [sales, productCount, toShip, recent, lowStock] = await Promise.all([
+        getSalesData(store.id, "7d"),
+        prisma.product.count({ where: { storeId: store.id } }),
+        prisma.order.count({ where: { storeId: store.id, status: "PAID" } }),
+        prisma.order.findMany({ where: { storeId: store.id, status: { not: "CANCELLED" } }, orderBy: { createdAt: "desc" }, take: 5, select: { id: true, customerName: true, total: true, status: true, createdAt: true } }),
+        prisma.variant.findMany({ where: { product: { storeId: store.id }, stockCount: { lte: store.lowStockThreshold } }, select: { id: true, name: true, stockCount: true, product: { select: { name: true } } }, orderBy: { stockCount: "asc" }, take: 5 }),
+    ]);
 
-        if (!storeRaw) {
-            redirect("/setup");
-        }
-
-        // Fetch sales data
-        const salesDataResponse = await getSalesData(storeRaw.id, "7d");
-        const chartData = salesDataResponse.data || [];
-        const totalRevenue = salesDataResponse.totalRevenue || 0;
-
-        // Convert Decimals to Numbers/Strings for client components for consistent handling
-        const store = serializePrisma(storeRaw);
-        const safeChartData = serializePrisma(chartData);
-
-        return <DashboardOverview 
-            store={store} 
-            chartData={safeChartData} 
-            totalRevenue={totalRevenue} 
-        />;
-
-    } catch (error) {
-        console.error("CRITICAL_DASHBOARD_CRASH:", error);
-
-        return (
-            <div className="p-8 h-[80vh] flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
-                <div className="h-20 w-20 rounded-3xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-8 border border-indigo-100/50 shadow-soft">
-                    <LayoutDashboard className="h-10 w-10 text-indigo-500" />
-                </div>
-                
-                <h2 className="text-2xl font-black text-foreground mb-4">Dashboard temporarily unreachable</h2>
-                <p className="text-foreground/50 font-medium mb-4 leading-relaxed">
-                    We&apos;re currently performing a safety check on your database connection. Your store and products remain safe and active.
-                </p>
-                <div className="mb-12 p-4 bg-red-50 rounded-2xl border border-red-100 text-left overflow-auto max-h-40 w-full">
-                    <p className="text-[10px] font-mono text-red-600 break-words">
-                        ERROR: {error instanceof Error ? error.message : String(error)}
-                    </p>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row gap-4 w-full">
-                    <Link 
-                        href="/dashboard"
-                        className="flex-1 h-14 bg-foreground text-card rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-95"
-                    >
-                        <RefreshCcw className="h-4 w-4" />
-                        Reload Dashboard
-                    </Link>
-                    <Link 
-                        href="/dashboard/settings"
-                        className="flex-1 h-14 bg-secondary text-foreground/60 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-border/50"
-                    >
-                        <AlertCircle className="h-4 w-4" />
-                        Go to Settings
-                    </Link>
-                </div>
-            </div>
-        );
-    }
+    const chart = "data" in sales && sales.data ? sales.data : [];
+    const data: OverviewData = {
+        store: { name: store.name, slug: store.slug, visits: store.visits, conversionClicks: store.conversionClicks, hasPayout: Boolean(store.subaccountCode) },
+        chart,
+        revenue7d: chart.reduce((s, d) => s + d.revenue, 0),
+        productCount, toShip,
+        recent: serializePrisma(recent).map((o) => ({ id: o.id, customerName: o.customerName.split(" ")[0] ?? o.customerName, total: toKobo(o.total) / 100, status: o.status, createdAt: String(o.createdAt) })),
+        lowStock: lowStock.map((v) => ({ id: v.id, label: `${v.product.name} – ${v.name}`, stock: v.stockCount })),
+    };
+    return (<><DashboardOverview data={data} /><MerchantAssistant /></>);
 }

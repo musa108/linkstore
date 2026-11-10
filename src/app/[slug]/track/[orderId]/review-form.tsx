@@ -5,8 +5,7 @@ import { confirmOrderDelivery } from "@/lib/actions/order";
 import { submitReview } from "@/lib/actions/review";
 import { 
     Star, 
-    CheckCircle2, 
-    MessageSquare, 
+    CheckCircle2,  
     ChevronRight, 
     Loader2, 
     ThumbsUp 
@@ -30,7 +29,7 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
     async function handleConfirmReceipt() {
         setLoading(true);
         try {
-            const res = await confirmOrderDelivery(orderId, "CUSTOMER");
+            const res = await confirmOrderDelivery(orderId);
             if (res.error) {
                 alert(res.error);
             } else {
@@ -84,7 +83,7 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
                         layout
                         onClick={handleConfirmReceipt}
                         disabled={loading}
-                        className="w-full h-15 bg-white text-indigo-600 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-gray-50 transition-all active:scale-95 shadow-xl shadow-indigo-700/20"
+                        className="w-full h-15 bg-white text-indigo-600 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-secondary transition-all active:scale-95 shadow-xl shadow-indigo-700/20"
                     >
                         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ThumbsUp className="h-4 w-4" />}
                         Confirm Package Received
@@ -123,7 +122,7 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
                                         className={`px-6 py-3 rounded-2xl text-xs font-bold transition-all border ${
                                             selectedProduct === p.productId 
                                                 ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-100" 
-                                                : "bg-secondary border-transparent text-foreground/40 hover:bg-gray-100 hover:text-foreground"
+                                                : "bg-secondary border-transparent text-foreground/40 hover:bg-secondary hover:text-foreground"
                                         }`}
                                     >
                                         {p.name}

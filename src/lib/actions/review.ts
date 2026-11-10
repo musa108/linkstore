@@ -1,59 +1,43 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
+import prisma from "@/lib/prisma";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { logger, errorInfo } from "@/lib/logger";
 
+const reviewSchema = z.object({
+    orderId: z.string().min(1).max(40), productId: z.string().min(1).max(40),
+    rating: z.coerce.number().int().min(1).max(5), comment: z.string().trim().max(1000).optional().transform((v) => v || null),
+});
+
+/** Reviews require a DELIVERED order that actually contained the product; the reviewer name comes from the order. */
 export async function submitReview(formData: FormData) {
-    const orderId = formData.get("orderId") as string;
-    const productId = formData.get("productId") as string;
-    const customerName = formData.get("customerName") as string;
-    const rating = Number(formData.get("rating"));
-    const comment = formData.get("comment") as string;
-
-    if (!orderId || !productId || !rating) {
-        return { error: "Missing review details" };
-    }
-
+    const parsed = reviewSchema.safeParse({ orderId: formData.get("orderId"), productId: formData.get("productId"), rating: formData.get("rating"), comment: formData.get("comment") ?? undefined });
+    if (!parsed.success) return { error: "Please give a rating from 1 to 5." };
+    const h = await headers();
+    if (!(await rateLimit(`review:${clientIp(h)}`, 10, 10 * 60_000)).allowed) return { error: "Too many requests. Please try again later." };
+    const { orderId, productId, rating, comment } = parsed.data;
     try {
-        // Verify order is DELIVERED before allowing a review
-        const order = await prisma.order.findUnique({
-            where: { id: orderId },
-            select: { status: true }
-        });
-
-        if (!order || order.status !== "DELIVERED") {
-            return { error: "You can only review products from delivered orders." };
-        }
-
-        const review = await prisma.review.create({
-            data: {
-                orderId,
-                productId,
-                customerName,
-                rating,
-                comment,
-            }
-        });
-
+        const order = await prisma.order.findUnique({ where: { id: orderId }, select: { status: true, customerName: true, items: { select: { productId: true } } } });
+        if (!order || order.status !== "DELIVERED") return { error: "You can only review products from delivered orders." };
+        if (!order.items.some((i) => i.productId === productId)) return { error: "That product isn't part of this order." };
+        const review = await prisma.review.create({ data: { orderId, productId, customerName: order.customerName, rating, comment } });
         revalidatePath("/dashboard/reviews");
-        revalidatePath(`/[slug]`, 'page'); // Update storefront reviews
-        
+        revalidatePath("/[slug]", "page");
         return { success: true, review };
-    } catch (error) {
-        console.error("SUBMIT_REVIEW_ERROR", error);
+    } catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") return { error: "You've already reviewed this product." };
+        logger.error("review.submit_failed", errorInfo(err));
         return { error: "Could not submit review. Please try again." };
     }
 }
 
 export async function getProductReviews(productId: string) {
+    if (!/^[a-z0-9]{10,40}$/i.test(productId)) return [];
     try {
-        const reviews = await prisma.review.findMany({
-            where: { productId },
-            orderBy: { createdAt: "desc" }
-        });
-        return reviews;
-    } catch (error) {
-        console.error("GET_REVIEWS_ERROR", error);
-        return [];
-    }
+        return await prisma.review.findMany({ where: { productId }, orderBy: { createdAt: "desc" }, take: 50, select: { id: true, customerName: true, rating: true, comment: true, createdAt: true } });
+    } catch (err) { logger.warn("review.list_failed", errorInfo(err)); return []; }
 }
