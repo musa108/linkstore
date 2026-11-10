@@ -14,8 +14,8 @@ export function getChatModel() {
       baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
       apiKey: geminiKey,
     });
-    const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";
-    return google(modelName);
+    const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    return google.chat(modelName);
   }
 
   // Fallback to OpenAI
