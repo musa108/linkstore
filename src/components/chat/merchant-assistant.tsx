@@ -91,7 +91,7 @@ export default function MerchantAssistant() {
                     </form>
                 </div>
             )}
-            <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close store assistant" : "Open store assistant"} className="btn btn-primary h-14 w-14 rounded-full p-0 shadow-lg"><Sparkles className="h-6 w-6" /></button>
+            <button onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? "Close store assistant" : "Open store assistant"} className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:bg-primary-hover active:scale-95"><Sparkles className="h-6 w-6 shrink-0" /></button>
         </div>
     );
 }

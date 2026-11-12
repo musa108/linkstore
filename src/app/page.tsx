@@ -87,20 +87,7 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen bg-canvas text-foreground selection:bg-emerald-100 selection:text-emerald-900">
-      {/* 0. Top Announcement / Trust Bar */}
-      <div className="border-b border-border/70 bg-emerald-50/70 px-4 py-2 text-center text-xs font-semibold text-emerald-900">
-        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 sm:gap-4 flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-primary" />
-            <span>Direct Paystack Settlement</span>
-          </span>
-          <span className="hidden sm:inline text-border">•</span>
-          <span className="hidden sm:inline">Zero Monthly Subscription</span>
-          <span className="hidden sm:inline text-border">•</span>
-          <span>Next-Day Payouts to All Nigerian Banks 🇳🇬</span>
-        </div>
-      </div>
-
+    
       {/* 1. Sticky Navigation Header */}
       <header className="sticky top-0 z-40 border-b border-border/70 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -116,10 +103,6 @@ export default async function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <div className="hidden lg:flex items-center gap-1 rounded-full border border-border bg-canvas px-2.5 py-1 text-[11px] font-bold text-foreground/70">
-              <span>🇳🇬</span>
-              <span>NGN</span>
-            </div>
 
             {!userId && (
               <Link href="/sign-in" className="btn btn-quiet hidden sm:inline-flex text-xs sm:text-sm font-semibold">
@@ -138,11 +121,6 @@ export default async function LandingPage() {
         <section className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28">
           <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <div className="reveal inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-xs font-bold text-emerald-800">
-                <Store className="h-3.5 w-3.5 text-primary" />
-                <span>FOR WHATSAPP, INSTAGRAM &amp; TIKTOK SELLERS</span>
-              </div>
-
               <h1 className="reveal reveal-1 mt-5 text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl text-foreground">
                 Stop losing sales to <span className="text-primary underline decoration-primary/30 decoration-wavy underline-offset-8">&ldquo;DM for price&rdquo;</span> and fake bank alerts.
               </h1>

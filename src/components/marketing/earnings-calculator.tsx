@@ -111,7 +111,7 @@ export function EarningsCalculator({ ctaHref = "/sign-up" }: { ctaHref?: string 
 
             <Link
               href={ctaHref}
-              className="btn btn-primary w-full text-center text-sm font-bold shadow-sm"
+              className="btn btn-primary h-12 w-full text-center text-sm font-bold shadow-sm"
             >
               Start Selling With 0 Setup Fee
               <ArrowRight className="h-4 w-4" />
