@@ -191,11 +191,11 @@ export default function ClientStorefront({
           {/* Cart Trigger */}
           <button
             onClick={() => setCartOpen(true)}
-            className="btn btn-quiet relative ml-auto sm:ml-0 min-h-10 px-4 text-xs font-bold shadow-xs hover:border-[#eb5a28]/40"
+            className="btn btn-quiet relative ml-auto sm:ml-0 h-11 px-4 text-xs sm:text-sm font-bold shadow-xs hover:border-[#eb5a28]/40 flex items-center gap-2"
             aria-label={`Open cart, ${count} item${count === 1 ? "" : "s"}`}
           >
-            <ShoppingBag className="h-4 w-4" aria-hidden />
-            <span className="hidden sm:inline">Bag</span>
+            <ShoppingBag className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="font-bold">Bag</span>
             {count > 0 && (
               <span
                 className="tabular flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-extrabold text-white"
@@ -331,12 +331,12 @@ export default function ClientStorefront({
                       )}
                     </div>
 
-                    <div className="space-y-1 p-3.5 sm:p-4">
-                      <p className="line-clamp-2 min-h-[38px] text-xs sm:text-sm font-bold text-foreground leading-snug group-hover:text-[#eb5a28] transition-colors">
+                    <div className="space-y-1.5 p-3.5 sm:p-4">
+                      <p className="line-clamp-2 min-h-[42px] text-sm sm:text-base font-bold text-foreground leading-snug group-hover:text-[#eb5a28] transition-colors">
                         {p.name}
                       </p>
                       <div className="flex items-center justify-between pt-1">
-                        <p className="tabular text-xs sm:text-sm font-extrabold text-foreground">
+                        <p className="tabular text-sm sm:text-base font-extrabold text-foreground">
                           {p.variants?.length &&
                           new Set(p.variants.map((v) => unitPrice(p, v))).size > 1
                             ? "From "
@@ -353,7 +353,7 @@ export default function ClientStorefront({
                       <button
                         onClick={() => open(p)}
                         disabled={sold}
-                        className="btn btn-quiet w-full min-h-9 text-xs font-bold hover:border-[#eb5a28] hover:text-[#eb5a28]"
+                        className="btn btn-quiet w-full h-10 text-xs sm:text-sm font-bold hover:border-[#eb5a28] hover:text-[#eb5a28]"
                       >
                         {sold ? "Sold Out" : "Choose Options"}
                       </button>
@@ -361,7 +361,7 @@ export default function ClientStorefront({
                       <button
                         onClick={() => add(p)}
                         disabled={sold}
-                        className="btn w-full min-h-9 text-xs font-bold text-white shadow-xs disabled:opacity-40"
+                        className="btn w-full h-10 text-xs sm:text-sm font-bold text-white shadow-xs disabled:opacity-40"
                         style={{ backgroundColor: brand }}
                       >
                         {sold ? "Out of Stock" : "Add to Bag"}
@@ -639,7 +639,7 @@ function ProductSheet({
             <button
               disabled={needs}
               onClick={() => onAdd(variant)}
-              className="btn h-12 w-full text-sm font-bold text-white shadow-sm disabled:opacity-40"
+              className="btn h-12 w-full text-sm sm:text-base font-bold text-white shadow-sm disabled:opacity-40"
               style={{ backgroundColor: brand }}
             >
               {needs ? "Select an Option to Continue" : "Add to Shopping Bag"}

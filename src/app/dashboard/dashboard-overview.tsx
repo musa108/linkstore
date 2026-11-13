@@ -121,10 +121,10 @@ export default function DashboardOverview({ data }: { data: OverviewData }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             <button
               onClick={share}
-              className="btn btn-primary h-10 px-5 text-xs sm:text-sm font-bold shadow-sm"
+              className="btn btn-primary h-11 px-6 text-sm font-bold shadow-sm"
             >
               {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
               <span>{copied ? "Link Copied" : "Share Store"}</span>
@@ -132,9 +132,9 @@ export default function DashboardOverview({ data }: { data: OverviewData }) {
             <Link
               href={`/${store.slug}`}
               target="_blank"
-              className="btn h-10 border border-white/20 bg-white/10 px-4 text-xs sm:text-sm font-semibold text-white hover:bg-white/20"
+              className="btn h-11 border border-white/20 bg-white/10 px-5 text-sm font-semibold text-white hover:bg-white/20"
             >
-              Preview
+              Preview Store
             </Link>
           </div>
         </div>
