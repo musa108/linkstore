@@ -150,10 +150,10 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                                 </div>
 
                                 {!safeOrder.vendorConfirmedDelivery && safeOrder.customerConfirmedDelivery && (
-                                    <div className="mt-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-800 text-xs font-medium">
-                                        <p className="font-bold">You confirmed delivery!</p>
+                                    <div className="mt-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 text-xs font-medium">
+                                        <p className="font-bold">Receipt Confirmed!</p>
                                         <p className="mt-0.5 text-foreground/70">
-                                            The review form will open immediately once the merchant also checks off dispatch in their dashboard, or you can write a review once both sides verify.
+                                            Thank you for verifying delivery. You can now leave your review for this purchase below.
                                         </p>
                                     </div>
                                 )}

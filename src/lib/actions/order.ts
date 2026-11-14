@@ -52,31 +52,63 @@ export async function updateOrderStatus(orderId: string, status: string) {
 }
 
 /**
- * Dual confirmation. The caller's ROLE IS DERIVED ON THE SERVER: a signed-in merchant who owns the
- * order's store is the vendor; anyone else is the customer (the unguessable order id is the customer's capability).
+ * Dual confirmation. When called from customer tracking page (role = "CUSTOMER"):
+ * sets customerConfirmedDelivery = true (and if vendor also confirmed, status = "DELIVERED").
+ * When called from merchant dashboard (role = "VENDOR"): sets vendorConfirmedDelivery = true.
  */
-export async function confirmOrderDelivery(orderId: string) {
+export async function confirmOrderDelivery(orderId: string, role?: "CUSTOMER" | "VENDOR") {
     const parsed = z.string().min(1).max(40).safeParse(orderId);
     if (!parsed.success) return { error: "Order not found" };
     const userId = await currentUserId();
     try {
         const result = await prisma.$transaction(async (tx) => {
             await tx.$queryRaw`SELECT id FROM "Order" WHERE id = ${orderId} FOR UPDATE`;
-            const order = await tx.order.findUnique({ where: { id: orderId }, include: { store: { select: { vendorId: true } } } });
+            const order = await tx.order.findUnique({
+                where: { id: orderId },
+                include: { store: { select: { vendorId: true, slug: true } } },
+            });
             if (!order) return { error: "Order not found" } as const;
             if (order.status !== "SHIPPED") return { error: "Only shipped orders can be confirmed as delivered." } as const;
+
             const isVendor = Boolean(userId) && order.store.vendorId === userId;
-            const vendorDone = isVendor || order.vendorConfirmedDelivery;
-            const customerDone = !isVendor || order.customerConfirmedDelivery;
+
+            let vendorDone = order.vendorConfirmedDelivery;
+            let customerDone = order.customerConfirmedDelivery;
+
+            if (role === "CUSTOMER") {
+                customerDone = true;
+                // If the vendor themselves is confirming package receipt on the tracking page (e.g. testing), mark both
+                if (isVendor) {
+                    vendorDone = true;
+                }
+            } else if (role === "VENDOR") {
+                if (!isVendor) return { error: "Unauthorized" } as const;
+                vendorDone = true;
+            } else {
+                // Default server-derived role logic (for tests and backwards compatibility)
+                if (isVendor) {
+                    vendorDone = true;
+                } else {
+                    customerDone = true;
+                }
+            }
+
             const done = vendorDone && customerDone;
             const updated = await tx.order.update({
                 where: { id: orderId },
-                data: { vendorConfirmedDelivery: vendorDone, customerConfirmedDelivery: customerDone, ...(done ? { status: "DELIVERED", deliveredAt: new Date() } : {}) },
+                data: {
+                    vendorConfirmedDelivery: vendorDone,
+                    customerConfirmedDelivery: customerDone,
+                    ...(done ? { status: "DELIVERED", deliveredAt: new Date() } : {}),
+                },
             });
-            return { order: updated } as const;
+            return { order: updated, storeSlug: order.store.slug } as const;
         });
+
+        if ("storeSlug" in result && result.storeSlug) {
+            revalidatePath(`/${result.storeSlug}/track/${orderId}`, "page");
+        }
         revalidatePath("/dashboard/orders");
-        revalidatePath(`/[slug]/track/${orderId}`, "page");
         return result;
     } catch (err) {
         logger.error("order.confirm_delivery_failed", { orderId, ...errorInfo(err) });

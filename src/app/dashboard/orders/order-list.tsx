@@ -388,7 +388,7 @@ export default function OrderList({ orders }: { orders: OrderRow[] }) {
                       {o.status === "SHIPPED" && !o.vendorConfirmedDelivery && (
                         <button
                           disabled={busy}
-                          onClick={() => run(o.id, () => confirmOrderDelivery(o.id))}
+                          onClick={() => run(o.id, () => confirmOrderDelivery(o.id, "VENDOR"))}
                           className="btn btn-primary min-h-9 text-xs"
                         >
                           {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}

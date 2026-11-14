@@ -31,15 +31,15 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
     async function handleConfirmReceipt() {
         setLoading(true);
         try {
-            const res = await confirmOrderDelivery(orderId);
+            const res = await confirmOrderDelivery(orderId, "CUSTOMER");
             if (res.error) {
                 alert(res.error);
                 setLoading(false);
             } else {
                 setSuccess(true);
                 setTimeout(() => {
-                    window.location.reload();
-                }, 400);
+                    window.location.href = window.location.pathname + "?delivered=1&t=" + Date.now();
+                }, 300);
             }
         } catch {
             setLoading(false);
