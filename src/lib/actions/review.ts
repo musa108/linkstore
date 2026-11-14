@@ -13,7 +13,7 @@ const reviewSchema = z.object({
     rating: z.coerce.number().int().min(1).max(5), comment: z.string().trim().max(1000).optional().transform((v) => v || null),
 });
 
-/** Reviews require a DELIVERED order that actually contained the product; the reviewer name comes from the order. */
+/** Reviews require a verified delivery (order status DELIVERED or customer has confirmed delivery receipt). */
 export async function submitReview(formData: FormData) {
     const parsed = reviewSchema.safeParse({ orderId: formData.get("orderId"), productId: formData.get("productId"), rating: formData.get("rating"), comment: formData.get("comment") ?? undefined });
     if (!parsed.success) return { error: "Please give a rating from 1 to 5." };
@@ -21,9 +21,13 @@ export async function submitReview(formData: FormData) {
     if (!(await rateLimit(`review:${clientIp(h)}`, 10, 10 * 60_000)).allowed) return { error: "Too many requests. Please try again later." };
     const { orderId, productId, rating, comment } = parsed.data;
     try {
-        const order = await prisma.order.findUnique({ where: { id: orderId }, select: { status: true, customerName: true, items: { select: { productId: true } } } });
-        if (!order || order.status !== "DELIVERED") return { error: "You can only review products from delivered orders." };
-        if (!order.items.some((i) => i.productId === productId)) return { error: "That product isn't part of this order." };
+        const order = await prisma.order.findUnique({
+            where: { id: orderId },
+            select: { status: true, customerConfirmedDelivery: true, customerName: true, items: { select: { productId: true } } }
+        });
+        const isEligible = Boolean(order && (order.status === "DELIVERED" || order.customerConfirmedDelivery));
+        if (!isEligible) return { error: "You can only review products from delivered orders." };
+        if (!order?.items.some((i) => i.productId === productId)) return { error: "That product isn't part of this order." };
         const review = await prisma.review.create({ data: { orderId, productId, customerName: order.customerName, rating, comment } });
         revalidatePath("/dashboard/reviews");
         revalidatePath("/[slug]", "page");

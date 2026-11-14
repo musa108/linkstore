@@ -149,6 +149,15 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                                     </div>
                                 </div>
 
+                                {!safeOrder.vendorConfirmedDelivery && safeOrder.customerConfirmedDelivery && (
+                                    <div className="mt-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-800 text-xs font-medium">
+                                        <p className="font-bold">You confirmed delivery!</p>
+                                        <p className="mt-0.5 text-foreground/70">
+                                            The review form will open immediately once the merchant also checks off dispatch in their dashboard, or you can write a review once both sides verify.
+                                        </p>
+                                    </div>
+                                )}
+
                                 {safeOrder.status === "SHIPPED" && !safeOrder.customerConfirmedDelivery && (
                                     <div className="mt-8 p-6 bg-indigo-600 rounded-[30px] text-white shadow-xl shadow-indigo-100 animate-in fade-in slide-in-from-bottom-5 duration-700">
                                         <p className="text-sm font-bold mb-4 flex items-center gap-2">
@@ -161,15 +170,17 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                             </div>
                         )}
 
-                        {/* Review System */}
-                        {safeOrder.status === "DELIVERED" && (
+                        {/* Review System: Opens when delivered, OR when customer has verified their package */}
+                        {(safeOrder.status === "DELIVERED" || safeOrder.customerConfirmedDelivery) && (
                             <div className="bg-white rounded-[40px] p-8 md:p-12 shadow-2xl border border-border/50 animate-in fade-in zoom-in duration-500">
                                 <h3 className="text-2xl font-black text-foreground mb-4 flex items-center gap-3">
                                     <Star className="h-8 w-8 text-amber-400 fill-amber-400" />
                                     Share Your Experience
                                 </h3>
                                 <p className="text-foreground/50 font-medium mb-10 leading-relaxed max-w-lg">
-                                    Your order has been successfully delivered and verified. Help the store grow by sharing your honest review.
+                                    {safeOrder.status === "DELIVERED"
+                                        ? "Your order has been successfully delivered and verified by both sides. Help the store grow by sharing your honest review."
+                                        : "You have verified receipt of your package! Share your honest review below to help other shoppers."}
                                 </p>
                                 <ReviewForm 
                                     orderId={safeOrder.id} 

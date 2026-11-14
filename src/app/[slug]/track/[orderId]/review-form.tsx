@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { confirmOrderDelivery } from "@/lib/actions/order";
 import { submitReview } from "@/lib/actions/review";
 import { 
@@ -20,6 +21,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ orderId, role, orderItems, customerName }: ReviewFormProps) {
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState("");
@@ -34,7 +36,7 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
                 alert(res.error);
             } else {
                 setSuccess(true);
-                setTimeout(() => window.location.reload(), 2000);
+                router.refresh();
             }
         } finally {
             setLoading(false);
