@@ -30,14 +30,15 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" style={{ colorScheme: "light" }}>
+      <html lang="en" style={{ colorScheme: "light" }} suppressHydrationWarning>
         <body
           className={`${jakartaSans.variable} ${geistMono.variable} antialiased`}
+          suppressHydrationWarning
         >
           {children}
+          <SpeedInsights/>
+          <Analytics/>
         </body>
-        <SpeedInsights/>
-        <Analytics/>
       </html>
     </ClerkProvider>
   );

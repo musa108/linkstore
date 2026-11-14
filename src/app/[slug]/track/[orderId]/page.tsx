@@ -114,13 +114,13 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-sm font-black text-foreground">₦{Number(item.priceAtPurchase).toLocaleString()}</p>
+                                            <p className="text-sm font-black text-foreground" suppressHydrationWarning>₦{Number(item.priceAtPurchase).toLocaleString("en-US")}</p>
                                         </div>
                                     </div>
                                 ))}
                                 <div className="pt-4 mt-6 border-t border-dashed border-border/50 flex justify-between items-center text-sm">
                                     <span className="font-bold text-foreground/40 uppercase tracking-widest">Total Value</span>
-                                    <span className="text-xl font-black text-indigo-600">₦{Number(order.total).toLocaleString()}</span>
+                                    <span className="text-xl font-black text-indigo-600" suppressHydrationWarning>₦{Number(order.total).toLocaleString("en-US")}</span>
                                 </div>
                             </div>
                         </div>

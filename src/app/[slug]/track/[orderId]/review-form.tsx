@@ -37,8 +37,9 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
                 setLoading(false);
             } else {
                 setSuccess(true);
-                router.refresh();
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 400);
             }
         } catch {
             setLoading(false);

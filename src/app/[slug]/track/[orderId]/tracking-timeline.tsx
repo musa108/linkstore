@@ -63,10 +63,11 @@ function TimelineStep({
           {label}
         </p>
         {date && (
-          <p className="text-[10px] font-semibold text-foreground/45 font-mono">
-            {new Date(date).toLocaleDateString(undefined, {
+          <p className="text-[10px] font-semibold text-foreground/45 font-mono" suppressHydrationWarning>
+            {new Date(date).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
+              timeZone: "UTC",
             })}
           </p>
         )}

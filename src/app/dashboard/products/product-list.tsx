@@ -175,11 +175,12 @@ export default function ProductList({ products, defaultThreshold = 5 }: ProductL
                     );
                   })()}
                 </td>
-                <td className="px-6 py-4 text-foreground/50 text-[11px] font-medium">
-                  {new Date(product.createdAt).toLocaleDateString(undefined, {
+                <td className="px-6 py-4 text-foreground/50 text-[11px] font-medium" suppressHydrationWarning>
+                  {new Date(product.createdAt).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
+                    timeZone: "UTC",
                   })}
                 </td>
                 <td className="px-6 py-4 text-right">

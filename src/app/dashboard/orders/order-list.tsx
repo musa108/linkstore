@@ -286,11 +286,12 @@ export default function OrderList({ orders }: { orders: OrderRow[] }) {
                         </span>
                       )}
                     </div>
-                    <p className="mt-1 truncate text-xs text-foreground/60 font-mono">
+                    <p className="mt-1 truncate text-xs text-foreground/60 font-mono" suppressHydrationWarning>
                       #{o.id.slice(-6).toUpperCase()} ·{" "}
-                      {new Date(o.createdAt).toLocaleDateString("en-NG", {
+                      {new Date(o.createdAt).toLocaleDateString("en-US", {
                         day: "numeric",
                         month: "short",
+                        timeZone: "UTC",
                       })}{" "}
                       · {o.items.map((i) => `${i.quantity}× ${i.product.name}`).join(", ")}
                     </p>
