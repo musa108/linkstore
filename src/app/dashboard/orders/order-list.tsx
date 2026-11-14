@@ -5,8 +5,10 @@ import Image from "next/image";
 import {
   CheckCircle2,
   ChevronDown,
+  ExternalLink,
   Loader2,
   MapPin,
+  MessageCircle,
   Phone,
   ShieldAlert,
   Truck,
@@ -18,6 +20,7 @@ import { formatPrice } from "@/lib/utils";
 
 export interface OrderRow {
   id: string;
+  storeSlug?: string;
   customerName: string;
   customerPhone: string;
   address: string;
@@ -337,18 +340,31 @@ export default function OrderList({ orders }: { orders: OrderRow[] }) {
                       </li>
                     </ul>
 
-                    <div className="grid gap-2 border-t border-border pt-3 text-xs sm:grid-cols-2">
+                    <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3 text-xs sm:grid-cols-2">
                       <p className="flex items-start gap-2 text-foreground/70">
                         <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-foreground/45" />
                         <span>{o.address}</span>
                       </p>
-                      <a
-                        href={`tel:${o.customerPhone}`}
-                        className="flex items-center gap-2 font-bold text-[#eb5a28] hover:underline"
-                      >
-                        <Phone className="h-3.5 w-3.5" />
-                        <span>{o.customerPhone}</span>
-                      </a>
+                      <div className="flex items-center gap-4">
+                        <a
+                          href={`tel:${o.customerPhone}`}
+                          className="flex items-center gap-1.5 font-bold text-[#eb5a28] hover:underline"
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                          <span>{o.customerPhone}</span>
+                        </a>
+                        <a
+                          href={`https://wa.me/${o.customerPhone.replace(/[^0-9]/g, "").replace(/^0/, "234")}?text=${encodeURIComponent(
+                            `Hello ${o.customerName}, this is regarding your order #${o.id.slice(-6).toUpperCase()} from our store.`
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1.5 font-bold text-[#25D366] hover:underline"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span>WhatsApp Customer</span>
+                        </a>
+                      </div>
                     </div>
 
                     {o.isDisputed && o.disputeReason && (
@@ -383,6 +399,17 @@ export default function OrderList({ orders }: { orders: OrderRow[] }) {
                           Vendor: {o.vendorConfirmedDelivery ? "Confirmed ✓" : "Pending"} · Buyer:{" "}
                           {o.customerConfirmedDelivery ? "Confirmed ✓" : "Pending"}
                         </span>
+                      )}
+                      {o.storeSlug && (
+                        <a
+                          href={`/${o.storeSlug}/track/${o.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                        >
+                          <span>Live Tracking Page</span>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
                       )}
                       {o.status === "PENDING" && (
                         <span className="text-xs text-foreground/60 italic">

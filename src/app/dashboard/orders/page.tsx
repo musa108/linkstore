@@ -17,10 +17,16 @@ export default async function OrdersPage() {
     const orders = await prisma.order.findMany({
         where: { storeId: store.id }, orderBy: { createdAt: "desc" }, take: PAGE,
         include: {
+            store: { select: { slug: true } },
             items: { include: { product: { select: { name: true, imageUrl: true } }, variant: { select: { name: true } } } },
             payments: { where: { status: { in: ["SUCCESS", "REFUNDED"] } }, take: 1, include: { refunds: { orderBy: { createdAt: "desc" } } } },
         },
     });
+
+    const serializedOrders = (serializePrisma(orders) as unknown as (OrderRow & { store?: { slug: string } })[]).map((o) => ({
+        ...o,
+        storeSlug: o.store?.slug ?? store.slug,
+    }));
 
     return (
         <div className="space-y-6">
@@ -28,7 +34,7 @@ export default async function OrdersPage() {
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Orders</h1>
                 <p className="mt-1 text-foreground/70">Ship paid orders, confirm delivery and handle refunds. Showing your latest {PAGE}.</p>
             </div>
-            <OrderList orders={serializePrisma(orders) as unknown as OrderRow[]} />
+            <OrderList orders={serializedOrders} />
         </div>
     );
 }

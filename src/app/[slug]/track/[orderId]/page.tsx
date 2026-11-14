@@ -201,8 +201,11 @@ export default async function TrackOrderPage({ params }: TrackPageProps) {
                         <div className="bg-card rounded-[40px] p-8 shadow-soft border border-border/50">
                             <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40 mb-6">Contact Store</h4>
                             <Link 
-                                href={`https://wa.me/${store.phoneNumber || '234'}`} 
+                                href={`https://wa.me/${(store.phoneNumber || '234').replace(/[^0-9]/g, '').replace(/^0/, '234')}?text=${encodeURIComponent(
+                                    `Hi ${store.name}, I'm tracking order #${order.id.slice(-6).toUpperCase()}.`
+                                )}`} 
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 className="w-full h-14 bg-emerald-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-emerald-600 transition-all active:scale-95 shadow-lg shadow-emerald-100"
                             >
                                 <MessageSquare className="h-4 w-4" />

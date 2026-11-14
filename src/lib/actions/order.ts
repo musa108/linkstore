@@ -34,7 +34,13 @@ export async function updateOrderStatus(orderId: string, status: string) {
         return { error: `An order that is ${owned.order.status.toLowerCase()} cannot be changed to ${status.toLowerCase()}.` };
     }
     try {
-        const res = await prisma.order.updateMany({ where: { id: orderId, status: owned.order.status }, data: { status, shippedAt: new Date() } });
+        const updateData: { status: string; shippedAt?: Date; deliveredAt?: Date } = { status };
+        if (status === "SHIPPED") {
+            updateData.shippedAt = new Date();
+        } else if (status === "DELIVERED") {
+            updateData.deliveredAt = new Date();
+        }
+        const res = await prisma.order.updateMany({ where: { id: orderId, status: owned.order.status }, data: updateData });
         if (res.count === 0) return { error: "This order was just updated. Refresh and try again." };
         revalidatePath("/dashboard/orders");
         revalidatePath(`/[slug]/track/${orderId}`, "page");
