@@ -34,11 +34,13 @@ export default function ReviewForm({ orderId, role, orderItems, customerName }: 
             const res = await confirmOrderDelivery(orderId);
             if (res.error) {
                 alert(res.error);
+                setLoading(false);
             } else {
                 setSuccess(true);
                 router.refresh();
+                window.location.reload();
             }
-        } finally {
+        } catch {
             setLoading(false);
         }
     }
