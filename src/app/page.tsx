@@ -5,12 +5,9 @@ import {
   BadgeCheck,
   CheckCircle2,
   Lock,
-  Package,
   ShieldCheck,
-  Smartphone,
   Star,
   Store,
-  Truck,
   Users,
   Zap,
 } from "lucide-react";

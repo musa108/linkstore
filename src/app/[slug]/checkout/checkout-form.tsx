@@ -4,7 +4,7 @@ import { useCart } from "@/hooks/use-cart";
 import { useState, useEffect, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { CheckCircle2, Loader2, Lock, ShieldCheck, Truck } from "lucide-react";
+import { Loader2, Lock, Truck } from "lucide-react";
 import { createOrder } from "@/lib/actions/order";
 import { Store } from "@/types";
 

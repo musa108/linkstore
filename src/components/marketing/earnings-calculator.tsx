@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowRight, BadgeCheck, Check, DollarSign, Landmark, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, BadgeCheck, Landmark, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 export function EarningsCalculator({ ctaHref = "/sign-up" }: { ctaHref?: string }) {

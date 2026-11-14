@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ArrowRight, Check, Sparkles, Store } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function LinkClaimer({ baseHref = "/sign-up" }: { baseHref?: string }) {

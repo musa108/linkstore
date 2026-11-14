@@ -9,9 +9,7 @@ import {
   Check,
   CheckCircle2,
   Circle,
-  ExternalLink,
   Share2,
-  Sparkles,
   Store,
 } from "lucide-react";
 import AnalyticsChart from "./analytics-chart";

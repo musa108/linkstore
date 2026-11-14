@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateStore, updateStorePayoutDetails } from "@/lib/actions/store";
-import { ImagePlus, X, Palette, Megaphone, Loader2, Landmark, CreditCard, User, Truck, ShieldCheck } from "lucide-react";
+import { ImagePlus, X, Palette, Megaphone, Loader2, Landmark, Truck } from "lucide-react";
 import { Store, Bank } from "@/types";
 import { motion, Variants } from "framer-motion";
 import { CldUploadButton, CloudinaryUploadWidgetResults } from "next-cloudinary";

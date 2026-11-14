@@ -1,6 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { isAdminUserId } from "@/server/auth";
 import { RailNav, TabNav, type NavItem } from "./dashboard-nav";
